@@ -1,5 +1,7 @@
 from django.conf import settings
-from algosdk import account, encoding, algod, transaction as algo_transaction
+from algosdk.v2client import *
+from algosdk import account
+from algosdk.future.transaction import PaymentTxn
 
 CLIENT = algod.AlgodClient(settings.ALGO_API_TOKEN, settings.ALGO_API_URL)
 
@@ -23,3 +25,9 @@ def wait_for_confirmation(txid):
         txinfo = CLIENT.pending_transaction_info(txid)
     print("Transaction {} confirmed in round {}.".format(txid, txinfo.get('confirmed-round')))
     return txinfo
+
+def transfer_algos(sender, sender_pk, receiver, amount, close_remainder_to=None):
+    params = CLIENT.suggested_params()
+    txn = PaymentTxn(sender, params, receiver, amount, close_remainder_to=close_remainder_to)
+    signed_txn = txn.sign(sender_pk)
+    return CLIENT.send_transaction(signed_txn)
