@@ -42,6 +42,9 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'users',
     'accounts',
+    'projects',
+    'smart_contracts',
+    'transactions'
 ]
 
 MIDDLEWARE = [

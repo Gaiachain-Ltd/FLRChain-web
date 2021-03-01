@@ -6,8 +6,21 @@ from users.managers import CustomUserManager
 
 #source: https://tech.serhatteker.com/post/2020-01/email-as-username-django/
 class CustomUser(AbstractUser):
+    BENEFICIARY = 0
+    FACILITATOR = 1
+    INVESTOR = 2
+    ADMINISTRATOR = 3
+
+    USER_TYPES = (
+        (BENEFICIARY, "Beneficiary"),
+        (FACILITATOR, "Facilitator"),
+        (INVESTOR, "Investor"),
+        (ADMINISTRATOR, "Administrator"),
+    )
+
     username = None
     email = models.EmailField(_('email address'), unique=True)
+    type = models.PositiveSmallIntegerField(choices=USER_TYPES, default=BENEFICIARY)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
