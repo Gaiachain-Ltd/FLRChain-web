@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'users',
+    'accounts',
 ]
 
 MIDDLEWARE = [
@@ -136,3 +137,7 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication',
     ],
 }
+
+# Algorand
+ALGO_API_TOKEN = os.getenv('ALGO_API_TOKEN')
+ALGO_API_URL = os.getenv('ALGO_API_URL', 'http://algorand:4161')

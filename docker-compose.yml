@@ -29,6 +29,16 @@ services:
       - db
     env_file:
       - ./backend/.env
+  algorand:
+    image: algorand/testnet:latest
+    tty: true
+    command: ./algod -l 0.0.0.0:4161 -d data
+    ports:
+      - 4161:4161
+      - 7833:7833
+    volumes:
+      - algorand_data:/root/node/data/
 
 volumes:
   postgres_data:
+  algorand_data:
