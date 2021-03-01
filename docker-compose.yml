@@ -10,6 +10,7 @@ services:
     volumes:
       - ./frontend/:/app
       - /app/node_modules
+
   db:
     image: postgres:alpine
     environment:
@@ -18,24 +19,40 @@ services:
       - POSTGRES_PASSWORD=postgres
     volumes:
       - postgres_data:/var/lib/postgresql/data/
+      
   backend:
     build: ./backend/
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - ./backend:/app
-    ports:
-      - 8000:8000
+    expose:
+      - 8000
     depends_on:
       - db
     env_file:
       - ./backend/.env
+
+  nginx:
+    image: "nginx"
+    restart: unless-stopped
+    volumes:
+      - type: bind
+        source: ./backend/nginx/dev.flrchain.conf
+        target: /etc/nginx/conf.d/dev.flrchain.conf
+        read_only: true
+      - ./backend/static:/static
+      - ./backend/media:/media
+    depends_on:
+      - backend
+    ports:
+      - "8000:8000"
+
   algorand:
     image: algorand/testnet:latest
     tty: true
     command: ./algod -l 0.0.0.0:4161 -d data
     ports:
       - 4161:4161
-      - 7833:7833
     volumes:
       - algorand_data:/root/node/data/
 
