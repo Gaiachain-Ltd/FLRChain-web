@@ -3,14 +3,15 @@ module.exports = {
   ** Headers of the page
   */
   head: {
-    title: 'frontend',
+    title: 'FLRChain',
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
       { hid: 'description', name: 'description', content: 'Nuxt.js project' }
     ],
     link: [
-      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
+      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
+      { rel: 'stylesheet', href: 'https://use.typekit.net/gdw2tmn.css'}
     ]
   },
   /*
@@ -24,7 +25,7 @@ module.exports = {
     /*
     ** Run ESLint on save
     */
-    extend (config, { isDev, isClient }) {
+    extend(config, { isDev, isClient }) {
       if (isDev && isClient) {
         config.module.rules.push({
           enforce: 'pre',
@@ -38,6 +39,26 @@ module.exports = {
   buildModules: [
     // Simple usage
     '@nuxtjs/vuetify',
-  ]
+  ],
+  vuetify: {
+    treeShake: true,
+    customVariables: ['@/assets/variables.scss'],
+    theme: {
+      options: { customProperties: true },
+      dark: false,
+      themes: {
+        light: {
+          primary: '#23BC3D',
+          secondary: '#06BCC1',
+          tertiary: '#F7F9FB',
+          accent: '#FAFAFD',
+          error: '#FF5252',
+          info: '#2196F3',
+          success: '#4CAF50',
+          warning: '#FFC107',
+        }
+      }
+    }
+  }
 }
 
