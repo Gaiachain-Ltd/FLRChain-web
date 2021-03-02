@@ -1,5 +1,11 @@
 <template>
-  <v-btn style="auth-btn-style" block rounded height="50" color="primary">{{ label }}</v-btn>
+  <v-btn
+    class="auth-btn-style text-none elevation-0"
+    block
+    height="50"
+    color="primary"
+    >{{ label }}</v-btn
+  >
 </template>
 
 <script>
@@ -15,6 +21,8 @@ export default {
 
 <style scoped>
 .auth-btn-style {
-    font-family: 'open-sans' !important;
+  font-family: "open-sans" !important;
+  font-size: 16px !important;
+  font-weight: 600 !important;
 }
 </style>

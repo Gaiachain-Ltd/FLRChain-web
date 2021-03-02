@@ -8,6 +8,6 @@
 
 <style scoped>
 .background-style {
-  background-color: var(--v-accent-base);
+  background-color: var(--v-accent-base) !important;
 }
 </style>

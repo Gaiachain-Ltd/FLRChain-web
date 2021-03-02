@@ -1,15 +1,12 @@
 <template>
-    <v-container fluid fill-height>
-        <v-layout column align-center justify-center>
-            <AuthCard title="Login" subtitle="Welcome back!"></AuthCard>
-        </v-layout>
-    </v-container>
+  <LoginAuthCard></LoginAuthCard>
 </template>
 
 <script>
 export default {
-    components: {
-        AuthCard: () => import("@/components/cards/AuthCard")
-    }
-}
+  layout: "auth",
+  components: {
+    LoginAuthCard: () => import("@/components/cards/LoginAuthCard"),
+  },
+};
 </script>

@@ -51,6 +51,7 @@ module.exports = {
           primary: '#23BC3D',
           secondary: '#06BCC1',
           tertiary: '#F7F9FB',
+          quaternary: "#778699",
           accent: '#FAFAFD',
           error: '#FF5252',
           info: '#2196F3',
