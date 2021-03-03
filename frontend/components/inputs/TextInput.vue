@@ -6,6 +6,7 @@
     flat
     background-color="#f7f9fb"
     height="50"
+    v-model="internalText"
   ></v-text-field>
 </template>
 
@@ -19,6 +20,19 @@ export default {
     placeholder: {
       type: String,
       default: "",
+    },
+    text: {
+      type: String,
+    },
+  },
+  computed: {
+    internalText: {
+      get() {
+        return this.text;
+      },
+      set(value) {
+        this.$emit("update:text", value);
+      },
     },
   },
 };

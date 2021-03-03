@@ -26,8 +26,11 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'sEk2#K1izjzajAAk22kalsiAAAjzakl')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '195.201.81.231']
-
+if DEBUG:
+    ALLOWED_HOSTS = '*'
+    CORS_ORIGIN_ALLOW_ALL = True
+else:
+    ALLOWED_HOSTS = ['localhost', '127.0.0.1', '195.201.81.231', '172.23.0.1']
 
 # Application definition
 
@@ -38,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
     'rest_framework',
     'rest_framework.authtoken',
     'users',
@@ -48,6 +52,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',

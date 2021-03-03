@@ -19,8 +19,8 @@ export default {
     clickable: {
       type: Boolean,
       default: false,
-    },
-  },
+    }
+  }
 };
 </script>
 

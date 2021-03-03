@@ -39,7 +39,40 @@ module.exports = {
   buildModules: [
     // Simple usage
     '@nuxtjs/vuetify',
+    '@nuxtjs/axios',
+    '@nuxtjs/auth',
   ],
+  axios: {
+    baseURL: process.env.BASE_URL
+  },
+  router: {
+    middleware: ['auth']
+  },
+  auth: {
+    strategies: {
+      local: {
+        autoFetch: false,
+        endpoints: {
+          login: {
+            url: '/api/v1/login/',
+            method: 'post',
+            property: 'token'
+          },
+          user: {
+            url: '/api/v1/info/',
+            method: 'get',
+            property: false,
+          }
+        },
+        tokenType: 'Token',
+        tokenName: 'Authorization',
+      },
+      redirect: {
+        login: '/login',
+        home: '/',
+      },
+    }
+  },
   vuetify: {
     treeShake: true,
     customVariables: ['@/assets/variables.scss'],

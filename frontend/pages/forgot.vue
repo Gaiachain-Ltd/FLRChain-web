@@ -1,5 +1,5 @@
 <template>
-  <RegisterAuthCard></RegisterAuthCard>
+  <ForgotAuthCard></ForgotAuthCard>
 </template>
 
 <script>
@@ -7,7 +7,7 @@ export default {
   layout: "auth",
   auth: false,
   components: {
-    RegisterAuthCard: () => import("@/components/cards/RegisterAuthCard"),
+    ForgotAuthCard: () => import("@/components/cards/ForgotAuthCard"),
   },
 };
 </script>

@@ -2,11 +2,17 @@
   <DefaultAuthCard title="Login" subtitle="Welcome back!">
     <v-layout column slot="content">
       <v-layout column mt-8>
-        <TextInput placeholder="Please enter your email..."></TextInput>
-        <TextInput placeholder="Please enter your password..."></TextInput>
+        <TextInput
+          :text.sync="username"
+          placeholder="Please enter your email..."
+        ></TextInput>
+        <TextInput
+          :text.sync="password"
+          placeholder="Please enter your password..."
+        ></TextInput>
       </v-layout>
       <v-layout row align-center mx-0>
-        <v-checkbox label="Remember me"></v-checkbox>
+        <v-checkbox mb-0 label="Remember me"></v-checkbox>
         <v-spacer></v-spacer>
         <DefaultText
           @clicked="$router.push('/forgot')"
@@ -16,10 +22,14 @@
         >
       </v-layout>
       <v-flex mb-8 mt-6>
-        <AuthButton label="Log In"></AuthButton>
+        <AuthButton
+          label="Log In"
+          :loading="loading"
+          @clicked="logIn"
+        ></AuthButton>
       </v-flex>
     </v-layout>
-    <v-layout column align-center slot="footer">
+    <v-layout column align-center mb-2 slot="footer">
       <DefaultText>You do not have account?</DefaultText>
       <DefaultText
         @clicked="$router.push('/register')"
@@ -33,11 +43,31 @@
 
 <script>
 export default {
+  data() {
+    return {
+      username: "",
+      password: "",
+      loading: false,
+    };
+  },
   components: {
     DefaultAuthCard: () => import("@/components/cards/DefaultAuthCard"),
     TextInput: () => import("@/components/inputs/TextInput"),
     AuthButton: () => import("@/components/buttons/AuthButton"),
     DefaultText: () => import("@/components/texts/DefaultText"),
+  },
+  methods: {
+    logIn() {
+      this.$auth
+        .loginWith("local", {
+          data: {
+            username: this.username,
+            password: this.password,
+          },
+        })
+        .then((x) => console.log("HURRAY!", x))
+        .catch((error) => console.log("ERROR", error, error.response));
+    },
   },
 };
 </script>

@@ -1,9 +1,11 @@
 <template>
   <v-btn
+    @click.prevent="$emit('clicked')"
     class="auth-btn-style text-none elevation-0"
     block
     height="50"
     color="primary"
+    :loading="loading"
     >{{ label }}</v-btn
   >
 </template>
@@ -15,6 +17,10 @@ export default {
       type: String,
       default: "",
     },
+    loading: {
+      type: Boolean,
+      default: false
+    }
   },
 };
 </script>
