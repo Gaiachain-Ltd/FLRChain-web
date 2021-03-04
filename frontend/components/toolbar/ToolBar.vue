@@ -26,6 +26,6 @@ export default {
   font-size: 28px !important;
   line-height: 40px !important;
   height: 40px;
-  color: var(--v-quaternary-base);
+  color: var(--v-quinary-base);
 }
 </style>

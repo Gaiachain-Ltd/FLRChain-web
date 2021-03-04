@@ -9,6 +9,7 @@
         <TextInput
           :text.sync="password"
           placeholder="Please enter your password..."
+          password
         ></TextInput>
       </v-layout>
       <v-layout row align-center mx-0>
@@ -16,8 +17,8 @@
         <v-spacer></v-spacer>
         <DefaultText
           @clicked="$router.push('/forgot')"
-          clickable
           :color="$vuetify.theme.themes.light.primary"
+          clickable
           >Forgot password?</DefaultText
         >
       </v-layout>

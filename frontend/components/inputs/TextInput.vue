@@ -7,6 +7,7 @@
     background-color="#f7f9fb"
     height="50"
     v-model="internalText"
+    :type="password ? 'password' : 'text'"
   ></v-text-field>
 </template>
 
@@ -24,6 +25,10 @@ export default {
     text: {
       type: String,
     },
+    password: {
+      type: Boolean,
+      default: false
+    }
   },
   computed: {
     internalText: {
@@ -40,6 +45,6 @@ export default {
 
 <style scoped>
 .text-field-style {
-  border-radius: 10px;
+  border-radius: 10px !important;
 }
 </style>

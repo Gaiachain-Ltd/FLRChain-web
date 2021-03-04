@@ -1,15 +1,19 @@
 <template>
-  <v-layout row class="pointer-cursor">
-    <DefaultSVGIcon v-if="enabled" :icon="iconOn"></DefaultSVGIcon>
-    <DefaultSVGIcon v-if="!enabled" :icon="iconOff"></DefaultSVGIcon>
+  <v-layout
+    row
+    class="pointer-cursor"
+    @click.prevent="() => $router.push(item.route)"
+  >
+    <DefaultSVGIcon v-if="item.enabled" :icon="item.iconOn"></DefaultSVGIcon>
+    <DefaultSVGIcon v-if="!item.enabled" :icon="item.iconOff"></DefaultSVGIcon>
     <DefaultText
       class="ml-4"
       :color="
-        enabled
+        item.enabled
           ? $vuetify.theme.themes.light.primary
           : $vuetify.theme.themes.light.quaternary
       "
-      >{{ label }}</DefaultText
+      >{{ item.label }}</DefaultText
     >
   </v-layout>
 </template>
@@ -17,17 +21,7 @@
 <script>
 export default {
   props: {
-    iconOn: {},
-    iconOff: {},
-    enabled: {
-      type: Boolean,
-    },
-    label: {
-      type: String,
-    },
-  },
-  data() {
-    return {};
+    item: {},
   },
   components: {
     DefaultSVGIcon: () => import("@/components/icons/DefaultSVGIcon"),

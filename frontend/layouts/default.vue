@@ -10,10 +10,7 @@
             class="my-3"
             v-for="item in items"
             :key="item.label"
-            :iconOn="item.iconOn"
-            :iconOff="item.iconOff"
-            :enabled="item.enabled"
-            :label="item.label"
+            :item="item"
           ></SideMenuItem>
         </v-layout>
         <v-spacer></v-spacer>
@@ -41,28 +38,30 @@ export default {
         {
           iconOn: require("@/assets/side/home_on.svg"),
           iconOff: require("@/assets/side/home_off.svg"),
-          enabled: this.$route.name === 'index',
+          enabled: this.$route.name === "index",
           label: "Home",
+          route: "/",
           visible: true,
         },
         {
           iconOn: require("@/assets/side/plus_on.svg"),
           iconOff: require("@/assets/side/plus_off.svg"),
-          enabled: this.$route.name === 'project',
+          enabled: this.$route.name === "project-create",
           label: "Create project",
-          visible: true//this.$auth.user.type === 2, //Facilitator
+          route: "/project/create",
+          visible: true, //this.$auth.user.type === 2, //Facilitator
         },
         {
           iconOn: require("@/assets/side/wallet_on.svg"),
           iconOff: require("@/assets/side/wallet_off.svg"),
-          enabled: this.$route.name === 'balance',
+          enabled: this.$route.name === "balance",
           label: "Balance",
           visible: true,
         },
       ].forEach((item) => {
         if (item.visible) {
           items.push(item);
-          console.log(this.$route.name)
+          console.log(this.$route.name);
         }
       });
       return items;
