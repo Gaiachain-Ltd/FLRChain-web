@@ -65,7 +65,7 @@ export default {
             password: this.password,
           },
         })
-        .then((x) => console.log("HURRAY!", x))
+        .then(() => this.$router.push('/'))
         .catch((error) => console.log("ERROR", error, error.response));
     },
   },

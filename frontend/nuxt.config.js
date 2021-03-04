@@ -37,7 +37,6 @@ module.exports = {
     }
   },
   buildModules: [
-    // Simple usage
     '@nuxtjs/vuetify',
     '@nuxtjs/axios',
     '@nuxtjs/auth',
@@ -56,12 +55,13 @@ module.exports = {
           login: {
             url: '/api/v1/login/',
             method: 'post',
-            property: 'token'
+            property_name: 'token'
           },
+          logout: false,
           user: {
             url: '/api/v1/info/',
             method: 'get',
-            property: false,
+            propertyName: false,
           }
         },
         tokenType: 'Token',
@@ -69,6 +69,7 @@ module.exports = {
       },
       redirect: {
         login: '/login',
+        logout: '/login',
         home: '/',
       },
     }
@@ -85,6 +86,7 @@ module.exports = {
           secondary: '#06BCC1',
           tertiary: '#F7F9FB',
           quaternary: "#778699",
+          quinary: "#414D55",
           accent: '#FAFAFD',
           error: '#FF5252',
           info: '#2196F3',
