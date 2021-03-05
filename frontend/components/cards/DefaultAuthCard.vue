@@ -1,5 +1,5 @@
 <template>
-  <v-card min-width="500" class="auth-card">
+  <v-card min-width="500">
     <v-card-title>
       <div class="auth-title">{{ title }}</div>
     </v-card-title>
@@ -42,8 +42,5 @@ export default {
   font-size: 32px !important;
   line-height: 42px !important;
   color: var(--v-primary-base);
-}
-.auth-card {
-  border-radius: 5px !important;
 }
 </style>

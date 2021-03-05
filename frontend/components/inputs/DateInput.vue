@@ -1,70 +1,79 @@
 <template>
   <v-menu
-    v-model="menu1"
+    v-model="showMenu"
     :close-on-content-click="false"
     transition="scale-transition"
     offset-y
+    offset-overflow
+    bottom
+    :nudge-bottom="-30"
     max-width="290px"
     min-width="auto"
   >
     <template v-slot:activator="{ on, attrs }">
-      <v-text-field
-        class="text-field-style"
-        background-color="#f7f9fb"
-        height="50"
-        v-model="dateFormatted"
-        v-bind="attrs"
-        @blur="date = parseDate(dateFormatted)"
-        v-on="on"
-        solo
-        flat
-      ></v-text-field>
+      <v-layout column>
+        <DefaultText :size="12" :color="$vuetify.theme.themes.light.senary">{{
+          label
+        }}</DefaultText>
+        <v-text-field
+          class="text-field-style"
+          background-color="#f7f9fb"
+          height="50"
+          v-model="date"
+          v-bind="attrs"
+          v-on="on"
+          @click.prevent="showMenu = showMenu"
+          solo
+          flat
+          readonly
+        >
+          <v-layout
+            column
+            pr-2
+            mb-1
+            align-center
+            slot="prepend-inner"
+            @click="showMenu = !showMenu"
+          >
+            <DefaultSVGIcon
+              :icon="require('@/assets/icons/calendar.svg')"
+            ></DefaultSVGIcon>
+          </v-layout>
+        </v-text-field>
+      </v-layout>
     </template>
     <v-date-picker
       v-model="date"
       no-title
-      @input="menu1 = false"
+      color="primary"
+      @input="showMenu = false"
     ></v-date-picker>
   </v-menu>
 </template>
 
 <script>
 export default {
-  data: (vm) => ({
-    date: new Date().toISOString().substr(0, 10),
-    dateFormatted: vm.formatDate(new Date().toISOString().substr(0, 10)),
-    menu1: false,
-    menu2: false,
-  }),
-  computed: {
-    computedDateFormatted() {
-      return this.formatDate(this.date);
+  props: {
+    label: {
+      type: String,
+      default: "",
     },
   },
-  watch: {
-    date(val) {
-      this.dateFormatted = this.formatDate(this.date);
-    },
+  data() {
+    return {
+      date: this.$moment().format("YYYY-MM-DD"),
+      showMenu: false,
+    };
   },
-  methods: {
-    formatDate(date) {
-      if (!date) return null;
-
-      const [year, month, day] = date.split("-");
-      return `${month}/${day}/${year}`;
-    },
-    parseDate(date) {
-      if (!date) return null;
-
-      const [month, day, year] = date.split("/");
-      return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
-    },
+  components: {
+    DefaultSVGIcon: () => import("@/components/icons/DefaultSVGIcon"),
+    DefaultText: () => import("@/components/texts/DefaultText"),
   },
 };
 </script>
 
 <style scoped>
 .text-field-style {
-  border-radius: 10px !important;
+  border-radius: 7px !important;
 }
 </style>

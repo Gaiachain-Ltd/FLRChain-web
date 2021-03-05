@@ -2,8 +2,10 @@
   <v-card mb-0>
     <v-card-text>
       <v-layout column ma-0 pa-4>
-        <v-flex>
-          <DefaultText color="primary">New project</DefaultText>
+        <v-flex mb-3>
+          <DefaultText :color="$vuetify.theme.themes.light.primary"
+            >New project</DefaultText
+          >
         </v-flex>
         <v-flex>
           <ProjectForm></ProjectForm>

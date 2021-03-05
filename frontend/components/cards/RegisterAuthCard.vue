@@ -9,23 +9,31 @@
         <v-radio label="Investor"></v-radio>
       </v-radio-group>
       <v-layout row mt-5 mx-0>
-        <TextInput xs5 placeholder="First name..."></TextInput>
+        <TextInput
+          xs5
+          label="First name"
+          placeholder="First name..."
+        ></TextInput>
         <v-spacer></v-spacer>
-        <TextInput xs5 placeholder="Last name..."></TextInput>
+        <TextInput xs5 label="Last name" placeholder="Last name..."></TextInput>
       </v-layout>
       <v-flex shrink mx-0>
-        <TextInput placeholder="Email..."></TextInput>
+        <TextInput label="Email" placeholder="Email..."></TextInput>
       </v-flex>
-        <v-layout row mx-0>
-        <TextInput xs5 placeholder="Password..."></TextInput>
+      <v-layout row mx-0>
+        <TextInput xs5 label="Password" placeholder="Password..."></TextInput>
         <v-spacer></v-spacer>
-        <TextInput xs5 placeholder="Repeat password..."></TextInput>
+        <TextInput
+          xs5
+          label="Re-password"
+          placeholder="Repeat password..."
+        ></TextInput>
       </v-layout>
       <v-flex mb-8>
         <AuthButton label="Register"></AuthButton>
       </v-flex>
     </v-layout>
-    <v-layout column align-center mb-2  slot="footer">
+    <v-layout column align-center mb-2 slot="footer">
       <DefaultText>Have account already?</DefaultText>
       <DefaultText
         @clicked="$router.push('/login')"

@@ -40,6 +40,7 @@ module.exports = {
     '@nuxtjs/vuetify',
     '@nuxtjs/axios',
     '@nuxtjs/auth',
+    '@nuxtjs/moment',
   ],
   axios: {
     baseURL: process.env.BASE_URL
@@ -87,8 +88,9 @@ module.exports = {
           tertiary: '#F7F9FB',
           quaternary: "#778699",
           quinary: "#414D55",
+          senary: "#71809C",
           accent: '#FAFAFD',
-          error: '#FF5252',
+          error: '#FE2121',
           info: '#2196F3',
           success: '#4CAF50',
           warning: '#FFC107',

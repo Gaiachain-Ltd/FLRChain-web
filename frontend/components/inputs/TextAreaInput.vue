@@ -3,16 +3,16 @@
     <DefaultText :size="12" :color="$vuetify.theme.themes.light.senary">{{
       label
     }}</DefaultText>
-    <v-text-field
+    <v-textarea
       class="text-field-style"
       :placeholder="placeholder"
       solo
       flat
       background-color="#f7f9fb"
-      height="50"
       v-model="internalText"
-      :type="password ? 'password' : 'text'"
-    ></v-text-field>
+      auto-grow
+      :rows="4"
+    ></v-textarea>
   </v-layout>
 </template>
 

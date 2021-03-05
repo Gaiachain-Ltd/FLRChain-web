@@ -1,0 +1,30 @@
+<template>
+  <v-card>
+    <v-layout column ma-6>
+      <DefaultText :size="18" :color="$vuetify.theme.themes.light.quinary">{{
+        project.name
+      }}</DefaultText>
+      <v-layout row ma-0 mt-6>
+        <v-layout column shrink>
+          <DefaultText :size="14">Project deadline</DefaultText>
+          <DefaultText class="mt-3" :size="12">{{ project.end }}</DefaultText>
+        </v-layout>
+        <v-layout column ml-10>
+          <DefaultText :size="14">Total invest amount</DefaultText>
+          <DefaultText class="mt-3" :size="12">{{ project.total }}</DefaultText>
+        </v-layout>
+      </v-layout>
+    </v-layout>
+  </v-card>
+</template>
+
+<script>
+export default {
+  props: {
+    project: {},
+  },
+  components: {
+    DefaultText: () => import("@/components/texts/DefaultText"),
+  },
+};
+</script>

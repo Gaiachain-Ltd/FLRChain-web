@@ -3,10 +3,12 @@
     <v-layout column slot="content">
       <v-layout column mt-8>
         <TextInput
+          label="Email"
           :text.sync="username"
           placeholder="Please enter your email..."
         ></TextInput>
         <TextInput
+          label="Password"
           :text.sync="password"
           placeholder="Please enter your password..."
           password

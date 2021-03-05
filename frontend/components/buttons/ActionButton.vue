@@ -1,11 +1,9 @@
 <template>
   <v-btn
     @click.prevent="$emit('clicked')"
-    class="auth-btn-style text-none elevation-0"
-    block
+    class="action-btn-style text-none elevation-0"
     height="50"
-    color="primary"
-    :loading="loading"
+    :color="color"
     >{{ label }}</v-btn
   >
 </template>
@@ -15,21 +13,21 @@ export default {
   props: {
     label: {
       type: String,
-      default: "",
     },
-    loading: {
-      type: Boolean,
-      default: false
-    }
+    color: {
+      type: String,
+      default: "primary",
+    },
   },
 };
 </script>
 
 <style scoped>
-.auth-btn-style {
+.action-btn-style {
   border-radius: 7px !important;
   font-family: "open-sans" !important;
   font-size: 16px !important;
   font-weight: 600 !important;
+  min-width: 250px !important;
 }
 </style>

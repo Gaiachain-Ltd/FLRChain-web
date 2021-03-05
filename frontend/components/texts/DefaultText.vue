@@ -1,9 +1,12 @@
 <template>
   <v-flex
     shrink
-    :class="['default-text-style', clickable && 'pointer-cursor']"
+    :class="[clickable && 'pointer-cursor']"
     @click.prevent="$emit('clicked')"
-    :style="{ color: color || $vuetify.theme.themes.light.quaternary }"
+    :style="{
+      color: color || $vuetify.theme.themes.light.quaternary,
+      fontSize: `${size}px !important`,
+    }"
   >
     <slot></slot>
   </v-flex>
@@ -16,18 +19,19 @@ export default {
       type: String,
       default: "",
     },
+    size: {
+      type: Number,
+      default: 16,
+    },
     clickable: {
       type: Boolean,
       default: false,
-    }
-  }
+    },
+  },
 };
 </script>
 
 <style scoped>
-.default-text-style {
-  font-size: 16px !important;
-}
 .pointer-cursor {
   cursor: pointer;
 }
