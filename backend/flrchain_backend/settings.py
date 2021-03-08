@@ -48,7 +48,8 @@ INSTALLED_APPS = [
     'accounts',
     'projects',
     'smart_contracts',
-    'transactions'
+    'transactions',
+    'drf_yasg',
 ]
 
 MIDDLEWARE = [
@@ -142,11 +143,49 @@ AUTH_USER_MODEL = 'users.CustomUser'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.TokenAuthentication',
     ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 100
+}
+
+# Logging
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'console': {
+            'format': '%(name)-12s %(asctime)s %(levelname)-8s %(message)s'
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'console',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'propagate': True,
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO')
+        }
+    },
+}
+
+# DRF-YASG
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        'api_key': {
+            'type': 'apiKey',
+            'in': 'header',
+            'name': 'Authorization'
+        }
+    },
 }
 
 # Algorand
 ALGO_API_TOKEN = os.getenv('ALGO_API_TOKEN')
 ALGO_API_URL = os.getenv('ALGO_API_URL', 'http://algorand:4161')
-ALGO_OPT_IN_AMOUNT = os.getenv('ALGO_OPT_IN_AMOUNT', 200000) 
+ALGO_OPT_IN_AMOUNT = os.getenv('ALGO_OPT_IN_AMOUNT', 200000)
