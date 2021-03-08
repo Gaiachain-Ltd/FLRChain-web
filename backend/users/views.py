@@ -5,9 +5,10 @@ from django.db import transaction
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
 
+
 @api_view(['POST'])
 @permission_classes([])
-def user_register(self, request):
+def user_register(request):
     with transaction.atomic():
         serializer = CustomUserSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)

@@ -31,12 +31,12 @@ class Account(models.Model):
                 address=address)
 
             #Opt-In:
-            main = Account.get_main_account()
-            utils.transfer_algos(
-                main.address, 
-                main.private_key,
-                address,
-                settings.ALGO_OPT_IN_AMOUNT)
+            # main = Account.get_main_account()
+            # utils.transfer_algos(
+            #     main.address, 
+            #     main.private_key,
+            #     address,
+            #     settings.ALGO_OPT_IN_AMOUNT)
             # TODO: Should we wait?
             return created_account
 
