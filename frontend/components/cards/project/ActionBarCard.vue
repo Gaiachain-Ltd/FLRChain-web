@@ -3,10 +3,14 @@
     <v-card-text>
       <v-layout row ma-0 justify-center>
         <v-flex shrink mr-3>
-          <ActionButton label="Cancel" color="error"></ActionButton>
+          <ActionButton
+            label="Cancel"
+            color="error"
+            @clicked="$emit('cancel')"
+          ></ActionButton>
         </v-flex>
         <v-flex shrink ml-3>
-          <ActionButton label="Save"></ActionButton>
+          <ActionButton label="Save" @clicked="$emit('save')"></ActionButton>
         </v-flex>
       </v-layout>
     </v-card-text>
@@ -23,12 +27,12 @@ export default {
 
 <style scoped>
 .card-style {
-    position: fixed !important;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    margin-bottom: -7px !important;
-    margin-left: 268px !important;
-    margin-right: 12px !important;
+  position: fixed !important;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin-bottom: -7px !important;
+  margin-left: 268px !important;
+  margin-right: 12px !important;
 }
 </style>

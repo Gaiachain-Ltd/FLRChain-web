@@ -5,9 +5,9 @@
       <v-layout column mt-6 class="list-style">
         <DefaultProjectDelegate
           class="mb-6 ml-1 mr-3"
-          v-for="delegate in delegates"
-          :key="delegate.id"
-          :project="delegate"
+          v-for="project in projects"
+          :key="project.id"
+          :project="project"
         ></DefaultProjectDelegate>
         <v-flex>
           <div class="placeholder"></div>
@@ -29,63 +29,19 @@ export default {
   },
   data() {
     return {
-      delegates: [
-        {
-          id: 1,
-          name: "Loerem1",
-          start: "2021-03-27",
-          end: "2021-04-27",
-          total: "2000",
-        },
-        {
-          id: 2,
-          name: "LOREM!",
-          start: "2021-03-27",
-          end: "2021-04-27",
-          total: "2000",
-        },
-        {
-          id: 3,
-          name: "LOREM!",
-          start: "2021-03-27",
-          end: "2021-04-27",
-          total: "2000",
-        },
-        {
-          id: 4,
-          name: "LOREM!",
-          start: "2021-03-27",
-          end: "2021-04-27",
-          total: "2000",
-        },
-        {
-          id: 5,
-          name: "LOREM!",
-          start: "2021-03-27",
-          end: "2021-04-27",
-          total: "2000",
-        },
-        {
-          id: 6,
-          name: "LOREM!",
-          start: "2021-03-27",
-          end: "2021-04-27",
-          total: "2000",
-        },
-        {
-          id: 7,
-          name: "LOREM!",
-          start: "2021-03-27",
-          end: "2021-04-27",
-          total: "2000",
-        },
-      ],
+      projects: [],
     };
   },
   components: {
     DefaultText: () => import("@/components/texts/DefaultText"),
     DefaultProjectDelegate: () =>
       import("@/components/delegates/DefaultProjectDelegate"),
+  },
+  async fetch() {
+    // TODO: Handle error!
+    this.projects = await this.$axios
+      .get("projects/")
+      .then((reply) => reply.data.results);
   },
 };
 </script>

@@ -5,9 +5,9 @@ class Project(models.Model):
     owner = models.ForeignKey(
         'users.CustomUser', on_delete=models.CASCADE)
     title = models.CharField(max_length=255)
-    start = models.DateTimeField()
-    end = models.DateTimeField()
-    description = models.TextField()
+    start = models.DateField()
+    end = models.DateField()
+    description = models.TextField(blank=True, null=True)
     beneficiaries = models.ManyToManyField(
         'users.CustomUser', related_name='beneficiaries')
     pending_beneficiaries = models.ManyToManyField(

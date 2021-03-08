@@ -8,7 +8,7 @@
           >
         </v-flex>
         <v-flex>
-          <ProjectForm></ProjectForm>
+          <ProjectForm :project.sync="project"></ProjectForm>
         </v-flex>
       </v-layout>
     </v-card-text>
@@ -17,6 +17,9 @@
 
 <script>
 export default {
+  props: {
+    project: {},
+  },
   components: {
     ProjectForm: () => import("@/components/forms/project/ProjectForm"),
     DefaultText: () => import("@/components/texts/DefaultText"),

@@ -2,7 +2,7 @@
   <v-card>
     <v-layout column ma-6>
       <DefaultText :size="18" :color="$vuetify.theme.themes.light.quinary">{{
-        project.name
+        project.title
       }}</DefaultText>
       <v-layout row ma-0 mt-6>
         <v-layout column shrink>
@@ -11,7 +11,7 @@
         </v-layout>
         <v-layout column ml-10>
           <DefaultText :size="14">Total invest amount</DefaultText>
-          <DefaultText class="mt-3" :size="12">{{ project.total }}</DefaultText>
+          <DefaultText class="mt-3" :size="12">{{ project.total || 0 }}</DefaultText>
         </v-layout>
       </v-layout>
     </v-layout>

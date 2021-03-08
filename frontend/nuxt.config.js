@@ -43,7 +43,7 @@ module.exports = {
     '@nuxtjs/moment',
   ],
   axios: {
-    baseURL: process.env.BASE_URL
+    baseURL: process.env.BASE_URL + 'api/v1/'
   },
   router: {
     middleware: ['auth']
@@ -54,13 +54,13 @@ module.exports = {
         autoFetch: false,
         endpoints: {
           login: {
-            url: '/api/v1/login/',
+            url: 'login/',
             method: 'post',
             property_name: 'token'
           },
           logout: false,
           user: {
-            url: '/api/v1/info/',
+            url: 'info/',
             method: 'get',
             propertyName: false,
           }

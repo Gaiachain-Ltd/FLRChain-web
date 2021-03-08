@@ -56,6 +56,7 @@ export default {
           iconOff: require("@/assets/side/wallet_off.svg"),
           enabled: this.$route.name === "balance",
           label: "Balance",
+          route: "/balance",
           visible: true,
         },
       ].forEach((item) => {

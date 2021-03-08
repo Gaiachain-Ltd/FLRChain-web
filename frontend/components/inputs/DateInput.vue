@@ -58,12 +58,22 @@ export default {
       type: String,
       default: "",
     },
+    text: {},
   },
   data() {
     return {
-      date: this.$moment().format("YYYY-MM-DD"),
       showMenu: false,
     };
+  },
+  computed: {
+    date: {
+      get() {
+        return this.text;
+      },
+      set(value) {
+        this.$emit("update:text", value);
+      },
+    },
   },
   components: {
     DefaultSVGIcon: () => import("@/components/icons/DefaultSVGIcon"),
