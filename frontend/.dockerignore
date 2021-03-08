@@ -1,3 +1,4 @@
 .env
 .gitignore
+sample.env
 node_modules/
