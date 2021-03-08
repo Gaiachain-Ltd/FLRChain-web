@@ -1,4 +1,5 @@
 .env
+sample.env
 static/
 media/
 nginx/
