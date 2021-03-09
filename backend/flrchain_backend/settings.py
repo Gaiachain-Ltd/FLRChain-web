@@ -30,8 +30,14 @@ if DEBUG:
     ALLOWED_HOSTS = '*'
     CORS_ORIGIN_ALLOW_ALL = True
 else:
-    ALLOWED_HOSTS = ['localhost', '127.0.0.1', '195.201.81.231', 
+    ALLOWED_HOSTS = ['localhost', '127.0.0.1', '195.201.81.231',
                      '172.23.0.1', 'flrchain.milosolutions.com']
+
+    CORS_ORIGIN_ALLOW_ALL = False
+
+    CORS_ORIGIN_WHITELIST = [
+        'https://flrchain.milosolutions.com'
+    ]
 
 # Application definition
 
