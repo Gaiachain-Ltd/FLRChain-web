@@ -1,0 +1,33 @@
+version: '3.9'
+
+services:
+  frontend:
+    restart: unless-stopped
+    build:
+      dockerfile: Development.dockerfile
+    volumes:
+      - ./frontend/:/app
+      - /app/node_modules
+      - /app/.nuxt
+
+  db:
+    restart: unless-stopped
+
+  backend:
+    restart: unless-stopped
+
+  backend_nginx:
+    restart: unless-stopped
+
+  frontend_nginx:
+    restart: unless-stopped
+    volumes:
+      - type: bind
+        source: ./frontend/nginx/dev.flrchain.conf
+        target: /etc/nginx/conf.d/default.conf
+        read_only: true
+    ports:
+      - 80:80
+
+  algorand:
+    restart: unless-stopped
