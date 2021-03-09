@@ -40,7 +40,7 @@ services:
 
   certbot:
     restart: unless-stopped
-    image: certbot:certbot
+    image: certbot:latest
     volumes:
       - ./certbot/conf:/etc/letsencrypt
       - ./certbot/www:/var/www/certbot
