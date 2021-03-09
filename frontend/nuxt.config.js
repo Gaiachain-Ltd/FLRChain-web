@@ -42,8 +42,10 @@ module.exports = {
     '@nuxtjs/auth',
     '@nuxtjs/moment',
   ],
-  axios: {
-    baseURL: process.env.BASE_URL + 'api/v1/'
+  publicRuntimeConfig: {
+    axios: {
+      baseURL: process.env.BASE_URL + 'api/v1/'
+    },
   },
   router: {
     middleware: ['auth']
