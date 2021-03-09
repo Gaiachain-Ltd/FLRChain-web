@@ -37,3 +37,11 @@ services:
       - ./backend/media:/media
     ports:
       - 8000:8000
+
+  certbot:
+    restart: unless-stopped
+    image: certbot:certbot
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
