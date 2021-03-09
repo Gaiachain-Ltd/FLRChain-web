@@ -1,4 +1,6 @@
 .env
 .gitignore
+.nuxt
 sample.env
-node_modules/
+node_modules
+nginx
