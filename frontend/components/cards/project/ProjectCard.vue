@@ -1,17 +1,15 @@
 <template>
   <v-card mb-0>
-    <v-card-text>
-      <v-layout column ma-0 pa-4>
-        <v-flex mb-3>
-          <DefaultText :color="$vuetify.theme.themes.light.primary"
-            >New project</DefaultText
-          >
-        </v-flex>
-        <v-flex>
-          <ProjectForm :project.sync="project"></ProjectForm>
-        </v-flex>
-      </v-layout>
-    </v-card-text>
+    <v-layout column ma-0 pa-6>
+      <v-flex mb-3>
+        <DefaultText :color="$vuetify.theme.themes.light.primary"
+          >New project</DefaultText
+        >
+      </v-flex>
+      <v-flex>
+        <ProjectForm :project.sync="project"></ProjectForm>
+      </v-flex>
+    </v-layout>
   </v-card>
 </template>
 
