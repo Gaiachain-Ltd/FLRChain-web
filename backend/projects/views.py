@@ -19,7 +19,8 @@ class ProjectView(CommonView):
         request_body=ProjectSerializer,
         tags=['projects'])
     def post(self, request):
-        serializer = self.serializer_class(data=request.data)
+        serializer = self.serializer_class(data=request.data, context={
+            'owner': request.user})
         serializer.is_valid(raise_exception=True)
-        serializer.save(owner=request.user)
+        serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)

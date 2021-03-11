@@ -12,13 +12,13 @@ class Project(models.Model):
         'users.CustomUser', related_name='beneficiaries')
     pending_beneficiaries = models.ManyToManyField(
         'users.CustomUser', related_name='pending_beneficiaries')
+    tasks = models.ManyToManyField('projects.Task', related_name='tasks')
 
 
 class Task(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     action = models.CharField(max_length=255)
-    reward = models.PositiveIntegerField()
-    fee = models.PositiveSmallIntegerField()
+    reward = models.PositiveIntegerField(default=0)
 
 
 class Investment(models.Model):
