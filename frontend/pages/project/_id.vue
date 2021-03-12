@@ -4,7 +4,11 @@
     <DefaultTitle class="mt-10 mb-5">{{ project.title }}</DefaultTitle>
     <v-layout row ma-0>
       <v-layout column>
-        <DetailsProjectCard :project="project"></DetailsProjectCard>
+        <DetailsProjectCard
+          class="mb-5"
+          :project="project"
+        ></DetailsProjectCard>
+        <DetailsTasksCard :tasks="project.tasks"></DetailsTasksCard>
       </v-layout>
     </v-layout>
   </v-layout>
@@ -22,6 +26,8 @@ export default {
     DefaultTitle: () => import("@/components/texts/DefaultTitle"),
     DetailsProjectCard: () =>
       import("@/components/cards/project/DetailsProjectCard"),
+    DetailsTasksCard: () =>
+      import("@/components/cards/project/DetailsTasksCard"),
   },
   async fetch() {
     this.project = await this.$axios
