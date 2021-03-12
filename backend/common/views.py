@@ -1,9 +1,9 @@
-from rest_framework.views import APIView
+from rest_framework import viewsets
 from rest_framework.settings import api_settings
 from rest_framework.permissions import IsAuthenticated
 
 
-class CommonView(APIView):
+class CommonView(viewsets.ViewSet):
     permission_classes = [IsAuthenticated,]
     filter_backends = api_settings.DEFAULT_FILTER_BACKENDS
     pagination_class = api_settings.DEFAULT_PAGINATION_CLASS

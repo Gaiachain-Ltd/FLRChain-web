@@ -2,8 +2,8 @@
   <v-layout column fill-height mt-2>
     <ToolBar title="Create project"></ToolBar>
     <DefaultTitle class="mt-10 mb-5">New project</DefaultTitle>
-    <ProjectCard class="mb-5" :project.sync="project"></ProjectCard>
-    <TasksCard :project.sync="project"></TasksCard>
+    <InputProjectCard class="mb-5" :project.sync="project"></InputProjectCard>
+    <InputTasksCard :project.sync="project"></InputTasksCard>
     <v-spacer></v-spacer>
     <div class="placeholder"></div>
     <ActionBarCard @save="handleCreate" @cancel="handleCancel"></ActionBarCard>
@@ -30,8 +30,8 @@ export default {
   },
   components: {
     ToolBar: () => import("@/components/toolbar/ToolBar"),
-    ProjectCard: () => import("@/components/cards/project/ProjectCard"),
-    TasksCard: () => import("@/components/cards/project/TasksCard"),
+    InputProjectCard: () => import("@/components/cards/project/InputProjectCard"),
+    InputTasksCard: () => import("@/components/cards/project/InputTasksCard"),
     ActionBarCard: () => import("@/components/cards/project/ActionBarCard"),
     DefaultTitle: () => import("@/components/texts/DefaultTitle"),
   },
