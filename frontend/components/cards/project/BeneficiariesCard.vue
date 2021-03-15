@@ -3,11 +3,11 @@
     <v-layout
       column
       ma-0
-      v-for="(beneficiary, index) in beneficiaries"
-      :key="beneficiary.id"
+      v-for="(assignment, index) in assignments"
+      :key="assignment.id"
     >
       <v-divider v-if="index" class="my-3"></v-divider>
-      <BeneficiaryDelegate :beneficiary="beneficiary"></BeneficiaryDelegate>
+      <BeneficiaryDelegate :assignment="assignment"></BeneficiaryDelegate>
     </v-layout>
   </DefaultCardWithTitle>
 </template>
@@ -16,26 +16,7 @@
 export default {
   data() {
     return {
-      beneficiaries: [
-        {
-          id: 0,
-          first_name: "Jan",
-          last_name: "Kowalski",
-          status: 0,
-        },
-        {
-          id: 2,
-          first_name: "Stan",
-          last_name: "Kowalski",
-          status: 0,
-        },
-        {
-          id: 3,
-          first_name: "Khan",
-          last_name: "Kowalski",
-          status: 0,
-        },
-      ],
+      assignments: [],
     };
   },
   components: {
@@ -43,6 +24,11 @@ export default {
       import("@/components/cards/DefaultCardWithTitle"),
     BeneficiaryDelegate: () =>
       import("@/components/delegates/BeneficiaryDelegate"),
+  },
+  async fetch() {
+    this.assignments = await this.$axios
+      .get(`projects/${this.$route.params.id}/assignments/`)
+      .then((reply) => reply.data.results);
   },
 };
 </script>

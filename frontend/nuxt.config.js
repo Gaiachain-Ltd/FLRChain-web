@@ -91,6 +91,7 @@ module.exports = {
           quaternary: "#778699",
           quinary: "#414D55",
           senary: "#71809C",
+          septenary: "#FFC423",
           accent: '#FAFAFD',
           error: '#FE2121',
           info: '#2196F3',

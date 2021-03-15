@@ -14,6 +14,7 @@ class ProjectSerializer(serializers.ModelSerializer):
     start = serializers.DateField()
     end = serializers.DateField()
     tasks = TaskSerializer(many=True)
+    
 
     class Meta:
         model = Project
