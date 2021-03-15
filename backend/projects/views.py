@@ -2,10 +2,11 @@ from django.shortcuts import render, get_object_or_404
 from rest_framework import status
 from rest_framework.response import Response
 from common.views import CommonView
-from projects.models import Project
-from projects.serializers import ProjectSerializer
+from projects.models import Project, Assignment
+from projects.serializers import ProjectSerializer, AssignmentSerializer
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
+
 
 class ProjectView(CommonView):
     serializer_class = ProjectSerializer
@@ -28,4 +29,36 @@ class ProjectView(CommonView):
     def retrieve(self, request, pk=None):
         project = get_object_or_404(Project, owner=request.user, pk=pk)
         serializer = self.serializer_class(project)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class AssignmentView(CommonView):
+    serializer_class = AssignmentSerializer
+
+    def list(self, request, pk=None):
+        assignments = Assignment.objects.filter(
+            project=pk).order_by('-created')
+        return self.paginated_response(assignments, request)
+
+    @swagger_auto_schema(
+        operation_summary="Create new assignment",
+        tags=['assignment'])
+    def create(self, request, pk=None):
+        project = get_object_or_404(Project, pk=pk)
+        assignment = Assignment.objects.create(
+            beneficiary=request.user,
+            project=project)
+        serializer = self.serializer_class(assignment)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    @swagger_auto_schema(
+        operation_summary="Update assignment",
+        request_body=AssignmentSerializer,
+        tags=['assignment'])
+    def patrial_update(self, request, pk=None):
+        assignment = get_object_or_404(Assignment, pk=pk)
+        serializer = self.serializer_class(assignment, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
         return Response(serializer.data, status=status.HTTP_200_OK)

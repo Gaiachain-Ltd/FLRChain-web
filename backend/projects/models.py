@@ -9,9 +9,7 @@ class Project(models.Model):
     end = models.DateField()
     description = models.TextField(blank=True, null=True)
     beneficiaries = models.ManyToManyField(
-        'users.CustomUser', related_name='beneficiaries')
-    pending_beneficiaries = models.ManyToManyField(
-        'users.CustomUser', related_name='pending_beneficiaries')
+        'users.CustomUser', through='Assignment', related_name='beneficiary_list')
     tasks = models.ManyToManyField('projects.Task', related_name='tasks')
 
 
@@ -21,13 +19,23 @@ class Task(models.Model):
     reward = models.PositiveIntegerField(default=0)
 
 
-class Investment(models.Model):
-    owner = models.ForeignKey(
-        'users.CustomUser', on_delete=models.CASCADE)
-    amount = models.PositiveIntegerField()
-    start = models.DateTimeField()
-    end = models.DateTimeField()
+class Assignment(models.Model):
+    REJECTED = 0
+    ACCEPTED = 1
+    WAITING = 2
 
-    
-# class Activity(models.Model):
-#     pass
+    STATUS = (
+        (REJECTED, 'Rejected'),
+        (ACCEPTED, 'Accepted'),
+        (WAITING, 'Waiting')
+    )
+
+    beneficiary = models.ForeignKey(
+        'users.CustomUser', on_delete=models.CASCADE)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    status = models.PositiveSmallIntegerField(default=2)
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ('beneficiary', 'project')

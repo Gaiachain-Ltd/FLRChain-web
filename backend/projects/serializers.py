@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from projects.models import *
 from django.db import transaction
+from users.serializers import CustomUserSerializer
 
 
 class TaskSerializer(serializers.ModelSerializer):
@@ -38,3 +39,12 @@ class ProjectSerializer(serializers.ModelSerializer):
 
             project.save()
             return project
+
+
+class AssignmentSerializer(serializers.ModelSerializer):
+    beneficiary = CustomUserSerializer(required=False, read_only=True)
+
+    class Meta:
+        model = Assignment
+        fields = ('id', 'beneficiary', 'status')
+        read_only_fields = ('beneficiary', )
