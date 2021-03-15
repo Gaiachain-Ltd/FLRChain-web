@@ -1,16 +1,9 @@
 <template>
-  <v-card mb-0>
-    <v-layout column ma-0 pa-6>
-      <v-flex mb-3>
-        <DefaultText :color="$vuetify.theme.themes.light.primary"
-          >New project</DefaultText
-        >
-      </v-flex>
+  <DefaultCardWithTitle title="New project:">
       <v-flex>
         <ProjectForm :project.sync="project"></ProjectForm>
       </v-flex>
-    </v-layout>
-  </v-card>
+    </DefaultCardWithTitle>
 </template>
 
 <script>
@@ -19,6 +12,7 @@ export default {
     project: {},
   },
   components: {
+    DefaultCardWithTitle: () => import("@/components/cards/DefaultCardWithTitle"),
     ProjectForm: () => import("@/components/forms/project/ProjectForm"),
     DefaultText: () => import("@/components/texts/DefaultText"),
   },
