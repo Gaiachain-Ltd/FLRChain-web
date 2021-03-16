@@ -1,6 +1,6 @@
 <template>
-  <v-flex class="icon-style" shrink>
-    <img :src="icon" class="icon-style" />
+  <v-flex shrink :style="iconStyle">
+    <img :src="icon" :style="iconStyle" />
   </v-flex>
 </template>
 
@@ -8,15 +8,20 @@
 export default {
   props: {
     icon: {},
+    size: {
+      type: Number,
+      default: 20,
+    },
+  },
+  computed: {
+    iconStyle() {
+      return {
+        minWidth: `${this.size}px !important`,
+        minHeigth: `${this.size}px !important`,
+        width: `${this.size}px !important`,
+        height: `${this.size}px !important`,
+      };
+    },
   },
 };
 </script>
-
-<style scoped>
-.icon-style {
-  min-width: 20px !important;
-  min-height: 20px !important;
-  height: 20px !important;
-  width: 20px !important;
-}
-</style>

@@ -1,32 +1,32 @@
 <template>
   <v-btn
     @click.prevent="$emit('clicked')"
-    class="auth-btn-style text-none elevation-0"
+    class="btn-style text-none elevation-0"
     block
     height="50"
-    color="primary"
+    :color="color"
     :loading="loading"
-    >{{ label }}</v-btn
-  >
+    ><slot></slot
+  ></v-btn>
 </template>
 
 <script>
 export default {
   props: {
-    label: {
-      type: String,
-      default: "",
-    },
     loading: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
+    color: {
+      type: String,
+      default: "primary",
+    },
   },
 };
 </script>
 
 <style scoped>
-.auth-btn-style {
+.btn-style {
   border-radius: 7px !important;
   font-family: "open-sans" !important;
   font-size: 16px !important;

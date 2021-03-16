@@ -15,7 +15,7 @@
       >
     </v-flex>
     <v-flex shrink v-if="assignment.status === 2">
-      <AnswerRequestButton></AnswerRequestButton>
+      <AnswerRequestButton :assignment="assignment"></AnswerRequestButton>
     </v-flex>
   </v-layout>
 </template>

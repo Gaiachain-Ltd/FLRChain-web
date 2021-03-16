@@ -25,11 +25,10 @@
         >
       </v-layout>
       <v-flex mb-8 mt-6>
-        <AuthButton
-          label="Log In"
+        <BlockButton
           :loading="loading"
           @clicked="logIn"
-        ></AuthButton>
+        >Log In</BlockButton>
       </v-flex>
     </v-layout>
     <v-layout column align-center mb-2 slot="footer">
@@ -56,7 +55,7 @@ export default {
   components: {
     DefaultAuthCard: () => import("@/components/cards/DefaultAuthCard"),
     TextInput: () => import("@/components/inputs/TextInput"),
-    AuthButton: () => import("@/components/buttons/AuthButton"),
+    BlockButton: () => import("@/components/buttons/BlockButton"),
     DefaultText: () => import("@/components/texts/DefaultText"),
   },
   methods: {

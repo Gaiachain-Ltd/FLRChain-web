@@ -6,6 +6,7 @@
     :style="{
       color: color || $vuetify.theme.themes.light.quaternary,
       fontSize: `${size}px !important`,
+      fontFamily: family
     }"
   >
     <slot></slot>
@@ -27,6 +28,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    family: {
+      type: String,
+      default: "muli"
+    }
   },
 };
 </script>
