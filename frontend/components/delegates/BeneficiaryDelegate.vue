@@ -15,7 +15,10 @@
       >
     </v-flex>
     <v-flex shrink v-if="assignment.status === 2">
-      <AnswerRequestButton :assignment="assignment"></AnswerRequestButton>
+      <AnswerRequestButton
+        :assignment="assignment"
+        @refresh="$emit('refresh')"
+      ></AnswerRequestButton>
     </v-flex>
   </v-layout>
 </template>

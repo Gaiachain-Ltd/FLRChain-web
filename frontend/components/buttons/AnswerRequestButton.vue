@@ -11,16 +11,20 @@
       >
     </template>
     <v-flex slot="content" my-6>
-      <DefaultText class="text-center" :size="22" color="#253F50" family="open-sans"
+      <DefaultText
+        class="text-center"
+        :size="22"
+        color="#253F50"
+        family="open-sans"
         ><b>{{ name }}</b> ask you for permission to join project</DefaultText
       >
     </v-flex>
     <v-layout slot="buttons" column ma-0 style="width: 100%">
       <v-flex mb-3>
-        <BlockButton>Accept</BlockButton>
+        <BlockButton @clicked="accept">Accept</BlockButton>
       </v-flex>
       <v-flex>
-        <BlockButton color="error">Reject</BlockButton>
+        <BlockButton color="error" @clicked="reject">Reject</BlockButton>
       </v-flex>
     </v-layout>
   </DefaultPopup>
@@ -40,6 +44,22 @@ export default {
     DefaultPopup: () => import("@/components/popups/DefaultPopup"),
     DefaultText: () => import("@/components/texts/DefaultText"),
     BlockButton: () => import("@/components/buttons/BlockButton"),
+  },
+  methods: {
+    accept() {
+      this.$axios
+        .put(`projects/assignments/${this.assignment.id}/`, {
+          status: 1,
+        })
+        .then(this.$emit("refresh"));
+    },
+    reject() {
+      this.$axios
+        .put(`projects/assignments/${this.assignment.id}/`, {
+          status: 0,
+        })
+        .then(this.$emit("refresh"));
+    },
   },
 };
 </script>

@@ -7,7 +7,10 @@
       :key="assignment.id"
     >
       <v-divider v-if="index" class="my-3"></v-divider>
-      <BeneficiaryDelegate :assignment="assignment"></BeneficiaryDelegate>
+      <BeneficiaryDelegate
+        :assignment="assignment"
+        @refresh="onRefresh"
+      ></BeneficiaryDelegate>
     </v-layout>
   </DefaultCardWithTitle>
 </template>
@@ -24,6 +27,11 @@ export default {
       import("@/components/cards/DefaultCardWithTitle"),
     BeneficiaryDelegate: () =>
       import("@/components/delegates/BeneficiaryDelegate"),
+  },
+  methods: {
+    onRefresh() {
+      this.$fetch();
+    },
   },
   async fetch() {
     this.assignments = await this.$axios

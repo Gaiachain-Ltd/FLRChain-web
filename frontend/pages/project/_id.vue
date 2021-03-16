@@ -14,7 +14,9 @@
       </v-flex>
       <v-flex xs4>
         <v-layout column ml-3 xs4>
-          <BeneficiariesCard></BeneficiariesCard>
+          <client-only placeholder="Loading...">
+            <BeneficiariesCard></BeneficiariesCard>
+          </client-only>
         </v-layout>
       </v-flex>
     </v-layout>
