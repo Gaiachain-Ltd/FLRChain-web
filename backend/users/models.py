@@ -23,6 +23,8 @@ class CustomUser(AbstractUser):
     type = models.PositiveSmallIntegerField(choices=USER_TYPES, default=BENEFICIARY)
     first_name = models.CharField(max_length=255, blank=True)
     last_name = models.CharField(max_length=255, blank=True)
+    phone = models.CharField(max_length=16, blank=True)
+    village = models.CharField(max_length=255, blank=True)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []

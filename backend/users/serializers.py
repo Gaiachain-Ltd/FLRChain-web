@@ -5,11 +5,14 @@ from users.models import CustomUser
 class CustomUserSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField(required=False)
     last_name = serializers.CharField(required=False)
+    phone = serializers.CharField(required=False)
+    village = serializers.CharField(required=False)
 
     class Meta:
         model = CustomUser
         fields = ('id', 'password', 'email', 'type',
-                  'first_name', 'last_name')
+                  'first_name', 'last_name', 'phone',
+                  'village')
         write_only_fields = ('password',)
         read_only_fields = ('id',)
         extra_kwargs = {
@@ -22,6 +25,8 @@ class CustomUserSerializer(serializers.ModelSerializer):
             validated_data['password'],
             type=validated_data.get('type', CustomUser.BENEFICIARY),
             first_name=validated_data.get('first_name', ""),
-            last_name=validated_data.get('last_name', ""))
+            last_name=validated_data.get('last_name', ""),
+            phone=validated_data.get('phone', ""),
+            village=validated_data.get('village', ""))
 
         return user
