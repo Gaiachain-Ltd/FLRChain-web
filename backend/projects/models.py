@@ -1,4 +1,5 @@
 from django.db import models
+from projects.managers import ProjectManager
 
 
 class Project(models.Model):
@@ -12,6 +13,7 @@ class Project(models.Model):
         'users.CustomUser', through='Assignment', related_name='beneficiary_list')
     tasks = models.ManyToManyField('projects.Task', related_name='tasks')
 
+    objects = ProjectManager()
 
 class Task(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
@@ -27,7 +29,7 @@ class Assignment(models.Model):
     STATUS = (
         (REJECTED, 'Rejected'),
         (ACCEPTED, 'Accepted'),
-        (WAITING, 'Waiting')
+        (WAITING, 'Waiting'),
     )
 
     beneficiary = models.ForeignKey(

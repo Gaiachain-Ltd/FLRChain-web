@@ -6,13 +6,18 @@ from projects.models import Project, Assignment
 from projects.serializers import ProjectSerializer, AssignmentSerializer
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
+from users.models import CustomUser
 
 
 class ProjectView(CommonView):
     serializer_class = ProjectSerializer
 
     def list(self, request):
-        projects = Project.objects.filter(owner=request.user)
+        if request.user.type == CustomUser.BENEFICIARY:
+            projects = Project.objects.with_beneficiary_assignment_status(
+                request.user)
+        else:
+            projects = Project.objects.filter(owner=request.user)
         return self.paginated_response(projects, request)
 
     @swagger_auto_schema(
@@ -27,7 +32,15 @@ class ProjectView(CommonView):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def retrieve(self, request, pk=None):
-        project = get_object_or_404(Project, owner=request.user, pk=pk)
+        if request.user.type == CustomUser.BENEFICIARY:
+            project = Project.objects.with_beneficiary_assignment_status(
+                request.user).filter(pk=pk).first()
+        else:
+            project = Project.objects.filter(pk=pk).first()
+
+        if not project:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
         serializer = self.serializer_class(project)
         return Response(serializer.data, status=status.HTTP_200_OK)
 

@@ -14,12 +14,13 @@ class ProjectSerializer(serializers.ModelSerializer):
     start = serializers.DateField()
     end = serializers.DateField()
     tasks = TaskSerializer(many=True)
-    
+    assignment_status = serializers.IntegerField(required=False)
 
     class Meta:
         model = Project
         fields = ('id', 'title', 'description', 'start', 'end',
-                  'tasks')
+                  'tasks', 'assignment_status')
+        read_only_fields = ('assignment_status',)
 
     def create(self, validated_data):
         with transaction.atomic():
