@@ -1,9 +1,15 @@
 from django.urls import path
 from rest_framework.authtoken.views import obtain_auth_token
 from users.views import *
+from drf_yasg.utils import swagger_auto_schema
+
+decorated_token_view = swagger_auto_schema(
+      operation_summary="Login user",
+      method='POST',
+      tags=['users', 'facililator', 'beneficiary'])(obtain_auth_token)
 
 urlpatterns = [
-    path('login/', obtain_auth_token, name='login'),
+    path('login/', decorated_token_view, name='login'),
     path('register/', user_register, name='register'),
     path('info/', user_info, name='info')
 ]
