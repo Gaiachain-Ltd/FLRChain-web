@@ -12,6 +12,9 @@ from users.models import CustomUser
 class ProjectView(CommonView):
     serializer_class = ProjectSerializer
 
+    @swagger_auto_schema(
+        operation_summary="Full project list",
+        tags=['projects', 'facililator', 'beneficiary'])
     def list(self, request):
         if request.user.type == CustomUser.BENEFICIARY:
             projects = Project.objects.with_beneficiary_assignment_status(
@@ -23,7 +26,7 @@ class ProjectView(CommonView):
     @swagger_auto_schema(
         operation_summary="Create new project",
         request_body=ProjectSerializer,
-        tags=['projects'])
+        tags=['projects', 'facililator'])
     def create(self, request):
         serializer = self.serializer_class(data=request.data, context={
             'owner': request.user})
@@ -31,6 +34,9 @@ class ProjectView(CommonView):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+    @swagger_auto_schema(
+        operation_summary="Project details",
+        tags=['projects', 'facililator', 'beneficiary'])
     def retrieve(self, request, pk=None):
         if request.user.type == CustomUser.BENEFICIARY:
             project = Project.objects.with_beneficiary_assignment_status(
@@ -48,14 +54,18 @@ class ProjectView(CommonView):
 class AssignmentView(CommonView):
     serializer_class = AssignmentSerializer
 
+    @swagger_auto_schema(
+        operation_summary="Beneficiary list",
+        tags=['assignment', 'facililator'])
     def list(self, request, pk=None):
         assignments = Assignment.objects.filter(
             project=pk).order_by('-created')
         return self.paginated_response(assignments, request)
 
     @swagger_auto_schema(
-        operation_summary="Create new assignment",
-        tags=['assignment'])
+        operation_summary="Join to project",
+        operation_description="Beneficiary sends join request to specified project",
+        tags=['assignment', 'beneficiary'])
     def create(self, request, pk=None):
         project = get_object_or_404(Project, pk=pk)
         assignment = Assignment.objects.create(
@@ -65,9 +75,9 @@ class AssignmentView(CommonView):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     @swagger_auto_schema(
-        operation_summary="Update assignment",
+        operation_summary="Accept or reject join request",
         request_body=AssignmentSerializer,
-        tags=['assignment'])
+        tags=['assignment', 'facililator'])
     def patrial_update(self, request, pk=None):
         assignment = get_object_or_404(Assignment, pk=pk)
         serializer = self.serializer_class(assignment, data=request.data)
