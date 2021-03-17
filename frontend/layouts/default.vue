@@ -25,6 +25,8 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
+
 export default {
   data() {
     return {
@@ -32,6 +34,7 @@ export default {
     };
   },
   computed: {
+    ...mapGetters(['isFacililator']),
     items() {
       let items = [];
       [
@@ -49,7 +52,7 @@ export default {
           enabled: this.$route.name === "project-create",
           label: "Create project",
           route: "/project/create",
-          visible: true, //this.$auth.user.type === 2, //Facilitator
+          visible: this.isFacililator,
         },
         {
           iconOn: require("@/assets/side/wallet_on.svg"),

@@ -4,12 +4,12 @@
     <v-layout row ma-0 fill-height>
       <ProjectList
         class="mt-10 mr-6"
-        title="My projects"
+        :title="firstTitle"
         :color="$vuetify.theme.themes.light.secondary"
       ></ProjectList>
       <ProjectList
         class="mt-10 ml-6"
-        title="My active projects"
+        :title="secondTitle"
         :color="$vuetify.theme.themes.light.primary"
       ></ProjectList>
     </v-layout>
@@ -18,11 +18,22 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
+
 export default {
   components: {
     ToolBar: () => import("@/components/toolbar/ToolBar"),
     ProjectList: () => import("@/components/lists/ProjectList"),
   },
+  computed: {
+    ...mapGetters(['isFacililator']),
+    firstTitle() {
+      return this.isFacililator ? 'My projects' : 'Projects to invest';
+    },
+    secondTitle() {
+      return this.isFacililator ? 'My active projects' : 'Donated projects';
+    }
+  }
 };
 </script>
 

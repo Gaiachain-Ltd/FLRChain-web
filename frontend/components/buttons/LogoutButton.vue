@@ -23,6 +23,8 @@
 </template>
 
 <script>
+import { mapGetters } from "vuex";
+
 export default {
   data() {
     return {};
@@ -32,15 +34,9 @@ export default {
     DefaultSVGIcon: () => import("@/components/icons/DefaultSVGIcon"),
   },
   computed: {
+    ...mapGetters(["isFacililator"]),
     accountType() {
-      switch (this.$auth.user.type) {
-        case 1:
-          return "FACILITATOR";
-        case 2:
-          return "INVESTOR";
-        default:
-          return "FACILITATOR";
-      }
+      return this.isFacililator ? "FACILILATOR" : "INVESTOR";
     },
   },
   methods: {
