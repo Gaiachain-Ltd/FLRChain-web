@@ -14,8 +14,23 @@
       </v-flex>
       <v-flex xs4>
         <v-layout column ml-3 xs4>
-          <client-only placeholder="Loading...">
-            <BeneficiariesCard></BeneficiariesCard>
+          <client-only v-if="isFacililator" placeholder="Loading...">
+            <BeneficiariesCard class="mb-6"></BeneficiariesCard>
+          </client-only>
+          <client-only
+            v-if="!isFacililator && !project.investment"
+            placeholder="Loading..."
+          >
+            <InputInvestmentCard
+              class="mb-6"
+              @refresh="$fetch"
+            ></InputInvestmentCard>
+          </client-only>
+          <client-only
+            v-if="!isFacililator && project.investment"
+            placeholder="Loading..."
+          >
+            <DetailsInvestmentCard class="mb-6"></DetailsInvestmentCard>
           </client-only>
         </v-layout>
       </v-flex>
@@ -24,6 +39,8 @@
 </template>
 
 <script>
+import { mapGetters } from "vuex";
+
 export default {
   data() {
     return {
@@ -39,6 +56,13 @@ export default {
       import("@/components/cards/project/DetailsTasksCard"),
     BeneficiariesCard: () =>
       import("@/components/cards/project/BeneficiariesCard"),
+    InputInvestmentCard: () =>
+      import("@/components/cards/project/InputInvestmentCard"),
+    DetailsInvestmentCard: () =>
+      import("@/components/cards/project/DetailsInvestmentCard"),
+  },
+  computed: {
+    ...mapGetters(["isFacililator"]),
   },
   async fetch() {
     this.project = await this.$axios

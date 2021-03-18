@@ -101,17 +101,22 @@ class InvestmentView(CommonView):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
 
+        start = serializer.validated_data['start']
+        end = serializer.validated_data['end']
+
         project = get_object_or_404(
             Project, 
             pk=pk, 
             investment=None,
-            start__lte=serializer.validated_data['start'],
-            end__gte=serializer.validated_data['end'])
+            start__lte=start,
+            end__gte=end)
 
         investment = Investment.objects.create(
             project=project,
             investor=request.user,
-            amount=serializer.validated_data['amount'])
+            amount=serializer.validated_data['amount'],
+            start=start,
+            end=end)
 
         serializer = self.serializer_class(investment)
         return Response(serializer.data, status=status.HTTP_201_CREATED)

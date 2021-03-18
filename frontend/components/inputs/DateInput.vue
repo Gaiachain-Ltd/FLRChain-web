@@ -8,7 +8,6 @@
     bottom
     :nudge-bottom="-30"
     max-width="290px"
-    min-width="auto"
   >
     <template v-slot:activator="{ on, attrs }">
       <v-layout column>
