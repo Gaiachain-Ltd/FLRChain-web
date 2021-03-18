@@ -4,6 +4,20 @@ from django.db import transaction
 from users.serializers import CustomUserSerializer
 
 
+class InvestmentSerializer(serializers.ModelSerializer):
+    investor = CustomUserSerializer(required=False, read_only=True)
+    status = serializers.IntegerField(required=False)
+    start = serializers.DateField()
+    end = serializers.DateField()
+    amount = serializers.IntegerField()
+
+    class Meta:
+        model = Investment
+        fields = ('id', 'investor', 'status', 'start',
+                  'end', 'amount')
+        read_only_fields = ('investor', 'status')
+
+
 class TaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task
@@ -14,13 +28,14 @@ class ProjectSerializer(serializers.ModelSerializer):
     start = serializers.DateField()
     end = serializers.DateField()
     tasks = TaskSerializer(many=True)
+    investment = InvestmentSerializer(required=False, read_only=True)
     assignment_status = serializers.IntegerField(required=False)
 
     class Meta:
         model = Project
         fields = ('id', 'title', 'description', 'start', 'end',
-                  'tasks', 'assignment_status')
-        read_only_fields = ('assignment_status',)
+                  'tasks', 'assignment_status', 'investment')
+        read_only_fields = ('assignment_status', 'investment')
 
     def create(self, validated_data):
         with transaction.atomic():

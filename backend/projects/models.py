@@ -8,6 +8,8 @@ class Project(models.Model):
     title = models.CharField(max_length=255)
     start = models.DateField()
     end = models.DateField()
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
     description = models.TextField(blank=True, null=True)
     beneficiaries = models.ManyToManyField(
         'users.CustomUser', through='Assignment', related_name='beneficiary_list')
@@ -36,7 +38,7 @@ class Assignment(models.Model):
     beneficiary = models.ForeignKey(
         'users.CustomUser', on_delete=models.CASCADE)
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
-    status = models.PositiveSmallIntegerField(default=2)
+    status = models.PositiveSmallIntegerField(default=2, choices=STATUS)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
@@ -56,6 +58,9 @@ class Investment(models.Model):
     investor = models.ForeignKey(
         'users.CustomUser', on_delete=models.CASCADE)
     project = models.OneToOneField(Project, on_delete=models.CASCADE)
-    status = models.PositiveSmallIntegerField(default=1)
+    status = models.PositiveSmallIntegerField(default=1, choices=STATUS)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
+    start = models.DateField()
+    end = models.DateField()
+    amount = models.PositiveIntegerField(default=0)

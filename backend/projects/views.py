@@ -3,7 +3,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from common.views import CommonView
 from projects.models import Project, Assignment
-from projects.serializers import ProjectSerializer, AssignmentSerializer
+from projects.serializers import *
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from users.models import CustomUser
@@ -14,13 +14,16 @@ class ProjectView(CommonView):
 
     @swagger_auto_schema(
         operation_summary="Full project list",
-        tags=['projects', 'facililator', 'beneficiary'])
+        tags=['projects', 'facililator', 'beneficiary', 'investor'])
     def list(self, request):
         if request.user.type == CustomUser.BENEFICIARY:
             projects = Project.objects.with_beneficiary_assignment_status(
                 request.user)
-        else:
+        elif request.user.type == CustomUser.FACILITATOR:
             projects = Project.objects.filter(owner=request.user)
+        else:
+            projects = Project.objects.all()
+
         return self.paginated_response(projects, request)
 
     @swagger_auto_schema(
@@ -36,7 +39,7 @@ class ProjectView(CommonView):
 
     @swagger_auto_schema(
         operation_summary="Project details",
-        tags=['projects', 'facililator', 'beneficiary'])
+        tags=['projects', 'facililator', 'beneficiary', 'investor'])
     def retrieve(self, request, pk=None):
         if request.user.type == CustomUser.BENEFICIARY:
             project = Project.objects.with_beneficiary_assignment_status(
@@ -85,3 +88,32 @@ class AssignmentView(CommonView):
         serializer.save()
 
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class InvestmentView(CommonView):
+    serializer_class = InvestmentSerializer
+
+    @swagger_auto_schema(
+        operation_summary="Invest in project",
+        request_body=InvestmentSerializer,
+        tags=['investor'])
+    def create(self, request, pk=None):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        project = get_object_or_404(
+            Project, 
+            pk=pk, 
+            investment=None,
+            start__lte=serializer.validated_data['start'],
+            end__gte=serializer.validated_data['end'])
+
+        investment = Investment.objects.create(
+            project=project,
+            investor=request.user,
+            amount=serializer.validated_data['amount'])
+
+        serializer = self.serializer_class(investment)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
+        
