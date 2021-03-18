@@ -120,5 +120,16 @@ class InvestmentView(CommonView):
 
         serializer = self.serializer_class(investment)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-        
-        
+    
+    @swagger_auto_schema(
+        operation_summary="Investment details",
+        tags=['investor'])
+    def retrieve(self, request, pk=None):
+        project = get_object_or_404(
+            Project, 
+            pk=pk, 
+            investment__isnull=False)
+
+        investment = project.investment
+        serializer = self.serializer_class(investment)
+        return Response(serializer.data, status=status.HTTP_200_OK)
