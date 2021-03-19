@@ -26,6 +26,10 @@ export default {
     color: {
       type: String,
     },
+    query: {
+      type: Object,
+      default: undefined
+    }
   },
   data() {
     return {
@@ -40,7 +44,7 @@ export default {
   async fetch() {
     // TODO: Handle error!
     this.projects = await this.$axios
-      .get("projects/")
+      .get("projects/", {params: this.query})
       .then((reply) => reply.data.results);
   },
 };

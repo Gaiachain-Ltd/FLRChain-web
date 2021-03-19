@@ -7,10 +7,14 @@ from projects.serializers import *
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from users.models import CustomUser
+from django_filters import rest_framework as filters
 
 
 class ProjectView(CommonView):
     serializer_class = ProjectSerializer
+    filterset_fields = {
+        'investment': ['isnull',]
+    }
 
     @swagger_auto_schema(
         operation_summary="Full project list",
@@ -22,7 +26,7 @@ class ProjectView(CommonView):
         elif request.user.type == CustomUser.FACILITATOR:
             projects = Project.objects.filter(owner=request.user)
         else:
-            projects = Project.objects.all()
+            projects = Project.objects.for_investor(request.user)
 
         return self.paginated_response(projects, request)
 

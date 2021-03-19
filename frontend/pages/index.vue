@@ -6,11 +6,13 @@
         class="mt-10 mr-6"
         :title="firstTitle"
         :color="$vuetify.theme.themes.light.secondary"
+        :query="firstQuery"
       ></ProjectList>
       <ProjectList
         class="mt-10 ml-6"
         :title="secondTitle"
         :color="$vuetify.theme.themes.light.primary"
+        :query="secondQuery"
       ></ProjectList>
     </v-layout>
     <v-spacer></v-spacer>
@@ -30,8 +32,14 @@ export default {
     firstTitle() {
       return this.isFacililator ? 'My projects' : 'Projects to invest';
     },
+    firstQuery() {
+      return { investment__isnull: true };
+    },
     secondTitle() {
       return this.isFacililator ? 'My active projects' : 'Donated projects';
+    },
+    secondQuery() {
+      return { investment__isnull: false };
     }
   }
 };
