@@ -1,6 +1,11 @@
+import logging
 from django.db import models, transaction
 from algorand import utils
 from django.conf import settings
+from transactions.models import Transaction
+
+
+logger = logging.getLogger(__name__)
 
 
 class Account(models.Model):
@@ -15,6 +20,8 @@ class Account(models.Model):
     private_key = models.CharField(max_length=128)
     address = models.CharField(max_length=58)
     type = models.PositiveSmallIntegerField(default=NORMAL_ACCOUNT, choices=ACCOUNT_TYPES)
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
 
     @staticmethod
     def get_main_account():
@@ -24,20 +31,19 @@ class Account(models.Model):
     def generate(user):
         with transaction.atomic():
             private_key, address = utils.generate_account()
+            logger.debug("Generated algorand account for user %s.", user)
 
             created_account = Account.objects.create(
                 user=user,
                 private_key=private_key,
                 address=address)
+            logger.debug("Created account for user %s.", user)
 
-            #Opt-In:
-            # main = Account.get_main_account()
-            # utils.transfer_algos(
-            #     main.address, 
-            #     main.private_key,
-            #     address,
-            #     settings.ALGO_OPT_IN_AMOUNT)
-            # TODO: Should we wait?
+            # Transaction.opt_in(
+            #     created_account, 
+            #     Account.get_main_account())
+            # logger.debug("Opt-In transaction for user %s account.", user)
+            
             return created_account
 
     def balance(self):
