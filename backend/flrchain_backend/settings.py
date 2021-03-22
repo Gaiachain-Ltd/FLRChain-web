@@ -196,6 +196,11 @@ LOGGING = {
             'handlers': ['console'],
             'propagate': True,
             'level': 'DEBUG'
+        },
+        'transactions': {
+            'handlers': ['console'],
+            'propagate': True,
+            'level': 'DEBUG'
         }
     },
 }
@@ -214,5 +219,5 @@ SWAGGER_SETTINGS = {
 # Algorand
 ALGO_API_TOKEN = os.getenv('ALGO_API_TOKEN')
 ALGO_API_URL = os.getenv('ALGO_API_URL', 'http://algorand:4161')
-ALGO_OPT_IN_AMOUNT = os.getenv('ALGO_OPT_IN_AMOUNT', 200000)
+ALGO_OPT_IN_AMOUNT = os.getenv('ALGO_OPT_IN_AMOUNT', 201000)
 ALGO_ASSET = os.getenv('ALGO_ASSET', 10458941) # Default: TESTnet USDC on ALGO
