@@ -1,6 +1,7 @@
 import secrets
 import base64
 import logging
+from decimal import *
 from django.db import models
 from pyteal import *
 from accounts.models import Account
@@ -40,12 +41,23 @@ class SmartContract(models.Model):
                 smart_contract=smart_contract,
                 address=smart_contract_address,
                 type=Account.SMART_CONTRACT_ACCOUNT)
+
+            getcontext().prec = 6
+            facilitator_fee = investment.amount * Decimal(settings.FACILITATOR_FEE)
+            investment_amount = investment.amount - facilitator_fee
             
             smart_contract_account.opt_in([
                 Transaction.prepare_transfer(
                     investment.investor.account,
+                    investment.project.owner.account,
+                    facilitator_fee,
+                    currency=Transaction.USDC,
+                    action=Transaction.FACILITATOR_FEE
+                ),
+                Transaction.prepare_transfer(
+                    investment.investor.account,
                     smart_contract_account,
-                    investment.amount,  # USDC
+                    investment_amount,
                     currency=Transaction.USDC,
                     action=Transaction.INVESTMENT)
             ])

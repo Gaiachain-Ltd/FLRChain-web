@@ -216,6 +216,9 @@ SWAGGER_SETTINGS = {
     },
 }
 
+# Constants
+FACILITATOR_FEE = os.getenv('FACILITATOR_FEE', 0.1)
+
 # Algorand
 ALGO_API_TOKEN = os.getenv('ALGO_API_TOKEN')
 ALGO_API_URL = os.getenv('ALGO_API_URL', 'http://algorand:4161')

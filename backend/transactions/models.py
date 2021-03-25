@@ -14,13 +14,15 @@ class Transaction(models.Model):
     CLOSE = 3
     INVESTMENT = 4
     REWARD = 5
+    FACILITATOR_FEE = 6
     ACTIONS = (
         (OPT_IN, "Opt-In action"),
         (FUELING, "Fueling action"),
         (TRANSFER, "Transfer"),
         (CLOSE, "Close account"),
         (INVESTMENT, "Investment"),
-        (REWARD, "Beneficiary reward")
+        (REWARD, "Beneficiary reward"),
+        (FACILITATOR_FEE, "Facilitator fee")
     )
 
     ALGO = 0
@@ -122,7 +124,7 @@ class Transaction(models.Model):
                 receiver,
                 amount)
 
-        logger.debug("Prepare transaction, amount: %s, fee: %s", amount, fee)
+        logger.debug("Prepare transaction, amount: %s, fee: %s", (amount * 1000000), fee)
 
         return (txn, Transaction(
             from_account=sender,
