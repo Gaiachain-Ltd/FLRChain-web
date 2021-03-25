@@ -54,12 +54,12 @@ class Account(models.Model):
                     Transaction.prepare_transfer(
                         main_account,
                         created_account,
-                        1000,
+                        0.01,
                         action=Transaction.FUELING),
                     Transaction.prepare_transfer(
                         main_account,
                         created_account,
-                        1000000,  # 1x USDC
+                        1,
                         currency=Transaction.USDC,
                         action=Transaction.FUELING)]
             else:

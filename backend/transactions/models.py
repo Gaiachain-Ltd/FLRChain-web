@@ -43,8 +43,10 @@ class Transaction(models.Model):
     txid = models.CharField(max_length=64)
     action = models.PositiveSmallIntegerField(choices=ACTIONS)
     currency = models.PositiveSmallIntegerField(choices=CURRENCIES)
-    amount = models.BigIntegerField()
-    fee = models.BigIntegerField()  # Always in algos
+    amount = models.DecimalField(
+        max_digits=26, decimal_places=6, default=0)
+    fee = models.DecimalField(
+        max_digits=26, decimal_places=6, default=0)  # Always in algos
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
     confirmed = models.BooleanField(default=False)

@@ -21,7 +21,8 @@ class Project(models.Model):
 class Task(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     action = models.CharField(max_length=255)
-    reward = models.PositiveIntegerField(default=0)
+    reward = models.DecimalField(
+        max_digits=26, decimal_places=6, default=0)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 

@@ -18,4 +18,5 @@ class Investment(models.Model):
     modified = models.DateTimeField(auto_now=True)
     start = models.DateField()
     end = models.DateField()
-    amount = models.PositiveIntegerField(default=0)
+    amount = models.DecimalField(
+        max_digits=26, decimal_places=6, default=0)

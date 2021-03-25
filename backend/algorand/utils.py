@@ -55,41 +55,45 @@ def wait_for_confirmation(txid):
 
 def transfer_algos(sender, receiver, amount, close_remainder_to=None):
     params = CLIENT.suggested_params()
-    txn = PaymentTxn(sender.address, params, receiver.address, amount,
+    txn = PaymentTxn(sender.address, params, receiver.address, int(amount * 1000000),
                      close_remainder_to=close_remainder_to.address if close_remainder_to else None)
     if sender.type == accounts.models.Account.SMART_CONTRACT_ACCOUNT:
         signed_txn = sender.smart_contract.sign(txn)
     else:
         signed_txn = txn.sign(sender.private_key)
-    return CLIENT.send_transaction(signed_txn), params.min_fee if params.fee == 0 else params.fee
+    fee = (params.min_fee if params.fee == 0 else params.fee) / 1000000
+    return CLIENT.send_transaction(signed_txn), fee
 
 
 def transfer_assets(sender, receiver, amount, 
                     asset=settings.ALGO_ASSET, close_assets_to=None):
     params = CLIENT.suggested_params()
-    atxn = AssetTransferTxn(sender.address, params, receiver.address, amount, asset, 
+    atxn = AssetTransferTxn(sender.address, params, receiver.address, int(amount * 1000000), asset, 
                             close_assets_to=close_assets_to.address if close_assets_to else None)
     if sender.type == accounts.models.Account.SMART_CONTRACT_ACCOUNT:
         signed_atxn = sender.smart_contract.sign(atxn)
     else:
         signed_atxn = atxn.sign(sender.private_key)
-    return CLIENT.send_transaction(signed_atxn), params.min_fee if params.fee == 0 else params.fee
+    fee = (params.min_fee if params.fee == 0 else params.fee) / 1000000
+    return CLIENT.send_transaction(signed_atxn), fee
 
 
 def prepare_transfer_algos(sender, receiver, amount, 
                           close_remainder_to=None):
     params = CLIENT.suggested_params()
-    txn = PaymentTxn(sender.address, params, receiver.address, amount,
+    txn = PaymentTxn(sender.address, params, receiver.address, int(amount * 1000000),
                      close_remainder_to=close_remainder_to.address if close_remainder_to else None)
-    return txn, params.min_fee if params.fee == 0 else params.fee
+    fee = (params.min_fee if params.fee == 0 else params.fee) / 1000000
+    return txn, fee
 
 
 def prepare_transfer_assets(sender, receiver, amount, 
                     asset=settings.ALGO_ASSET, close_assets_to=None):
     params = CLIENT.suggested_params()
-    atxn = AssetTransferTxn(sender.address, params, receiver.address, amount, asset, 
+    atxn = AssetTransferTxn(sender.address, params, receiver.address, int(amount * 1000000), asset, 
                             close_assets_to=close_assets_to.address if close_assets_to else None)
-    return atxn, params.min_fee if params.fee == 0 else params.fee
+    fee = (params.min_fee if params.fee == 0 else params.fee) / 1000000
+    return atxn, fee
 
 
 def atomic_transfer(txns):

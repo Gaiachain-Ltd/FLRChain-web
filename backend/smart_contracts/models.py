@@ -45,11 +45,10 @@ class SmartContract(models.Model):
                 Transaction.prepare_transfer(
                     investment.investor.account,
                     smart_contract_account,
-                    investment.amount * 1000000,  # USDC
+                    investment.amount,  # USDC
                     currency=Transaction.USDC,
                     action=Transaction.INVESTMENT)
             ])
-            
         
     def compile(self):
         def _logic(secret, facililator_address, investor_address, deadline):

@@ -5,6 +5,7 @@ from django.db import transaction
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
 from drf_yasg.utils import swagger_auto_schema
+from accounts.models import Account
 
 
 @swagger_auto_schema(
@@ -18,7 +19,10 @@ def user_register(request):
     with transaction.atomic():
         serializer = CustomUserSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save()
+        user = serializer.save()
+
+        Account.generate(user)
+
         return Response(status=status.HTTP_201_CREATED)
 
 @swagger_auto_schema(
