@@ -56,7 +56,7 @@ def wait_for_confirmation(txid):
 def transfer_algos(sender, receiver, amount, close_remainder_to=None):
     params = CLIENT.suggested_params()
     txn = PaymentTxn(sender.address, params, receiver.address, amount,
-                     close_remainder_to=close_remainder_to.address)
+                     close_remainder_to=close_remainder_to.address if close_remainder_to else None)
     if sender.type == accounts.models.Account.SMART_CONTRACT_ACCOUNT:
         signed_txn = sender.smart_contract.sign(txn)
     else:
@@ -68,7 +68,7 @@ def transfer_assets(sender, receiver, amount,
                     asset=settings.ALGO_ASSET, close_assets_to=None):
     params = CLIENT.suggested_params()
     atxn = AssetTransferTxn(sender.address, params, receiver.address, amount, asset, 
-                            close_assets_to=close_assets_to.address)
+                            close_assets_to=close_assets_to.address if close_assets_to else None)
     if sender.type == accounts.models.Account.SMART_CONTRACT_ACCOUNT:
         signed_atxn = sender.smart_contract.sign(atxn)
     else:
@@ -80,7 +80,7 @@ def prepare_transfer_algos(sender, receiver, amount,
                           close_remainder_to=None):
     params = CLIENT.suggested_params()
     txn = PaymentTxn(sender.address, params, receiver.address, amount,
-                     close_remainder_to=close_remainder_to)
+                     close_remainder_to=close_remainder_to.address if close_remainder_to else None)
     return txn, params.min_fee if params.fee == 0 else params.fee
 
 
@@ -88,7 +88,7 @@ def prepare_transfer_assets(sender, receiver, amount,
                     asset=settings.ALGO_ASSET, close_assets_to=None):
     params = CLIENT.suggested_params()
     atxn = AssetTransferTxn(sender.address, params, receiver.address, amount, asset, 
-                            close_assets_to=close_assets_to)
+                            close_assets_to=close_assets_to.address if close_assets_to else None)
     return atxn, params.min_fee if params.fee == 0 else params.fee
 
 

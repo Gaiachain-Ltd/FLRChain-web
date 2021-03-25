@@ -13,12 +13,14 @@ class Transaction(models.Model):
     TRANSFER = 2
     CLOSE = 3
     INVESTMENT = 4
+    REWARD = 5
     ACTIONS = (
         (OPT_IN, "Opt-In action"),
         (FUELING, "Fueling action"),
         (TRANSFER, "Transfer"),
         (CLOSE, "Close account"),
-        (INVESTMENT, "Investment")
+        (INVESTMENT, "Investment"),
+        (REWARD, "Beneficiary reward")
     )
 
     ALGO = 0
@@ -92,7 +94,10 @@ class Transaction(models.Model):
                 amount,
                 close_assets_to=close if close else None)
 
-        Transaction.objects.create(
+        logger.debug("Sent transaction %s, amount: %s, fee: %s",
+                     txid, amount, fee)
+
+        return Transaction.objects.create(
             txid=txid,
             from_account=sender,
             to_account=receiver,
@@ -100,9 +105,6 @@ class Transaction(models.Model):
             currency=currency,
             amount=amount,
             fee=fee)
-
-        logger.debug("Sent transaction %s, amount: %s, fee: %s",
-                     txid, amount, fee)
 
     @staticmethod
     def prepare_transfer(sender, receiver, amount,

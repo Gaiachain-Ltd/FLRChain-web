@@ -1,5 +1,6 @@
 import secrets
 import base64
+import logging
 from django.db import models
 from pyteal import *
 from accounts.models import Account
@@ -11,17 +12,20 @@ from algosdk import logic
 from transactions.models import Transaction
 
 
+logger = logging.getLogger(__name__)
+
+
 def default_secret():
     return secrets.token_hex(16)
 
 
 class SmartContract(models.Model):
-    investment = models.ForeignKey(
+    investment = models.OneToOneField(
         'investments.Investment', on_delete=models.CASCADE)
-    project = models.ForeignKey(
+    project = models.OneToOneField(
         'projects.Project', on_delete=models.CASCADE)
     secret = models.CharField(max_length=32, default=default_secret)
-    program = models.BinaryField(blank=True, null=True)
+    program = models.TextField(blank=True, null=True)
 
     @staticmethod
     def generate(investment):
@@ -83,15 +87,17 @@ class SmartContract(models.Model):
             Mode.Signature)
 
         compile_reply = utils.compile(source_teal)
-        self.program = base64.decodebytes(compile_reply['result'].encode())
+        self.program = compile_reply['result']
+        self.save()
         
-        return LogicSig(self.program).address()
+        return LogicSig(base64.decodebytes(self.program.encode())).address()
 
     def sign(self, transaction):
+        decoded_program = base64.decodebytes(self.program.encode())
         arg1 = logic.teal_sign_from_program(
             self.project.owner.account.private_key, 
             self.secret.encode(), 
-            self.program)
+            decoded_program)
 
-        lsig = LogicSig(self.program, args=[arg1])
+        lsig = LogicSig(decoded_program, args=[arg1])
         return LogicSigTransaction(transaction, lsig)

@@ -61,8 +61,7 @@ class Account(models.Model):
                         created_account,
                         1000000,  # 1x USDC
                         currency=Transaction.USDC,
-                        action=Transaction.FUELING)
-                ]
+                        action=Transaction.FUELING)]
             else:
                 chained = []
 
