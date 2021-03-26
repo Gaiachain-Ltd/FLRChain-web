@@ -6,6 +6,7 @@ from django.conf import settings
 from algosdk.v2client import *
 from algosdk import account
 from algosdk.future.transaction import PaymentTxn, AssetTransferTxn, calculate_group_id
+from decimal import *
 
 
 logger = logging.getLogger(__name__)
@@ -17,8 +18,26 @@ def generate_account():
     return account.generate_account()
 
 
-def check_balance(address):
-    return CLIENT.account_info(address)['amount']
+def check_balance_info(address):
+    return CLIENT.account_info(address)
+
+
+def usdc_balance(address):
+    getcontext().prec = 6
+    info = check_balance_info(address)
+    assets = info.get('assets', [])
+    for asset in assets:
+        if asset.get('asset-id', None) != settings.ALGO_ASSET:
+            continue
+
+        return Decimal(asset.get('amount', 0)) / Decimal(1000000)
+
+    return Decimal(0)
+
+
+def algo_balance(address):
+    info = check_balance_info(address)
+    return Decimal(info.get('amount', 0) / 1000000)
 
 
 def params():

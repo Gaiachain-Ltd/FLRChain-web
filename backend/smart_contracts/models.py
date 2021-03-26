@@ -52,14 +52,16 @@ class SmartContract(models.Model):
                     investment.project.owner.account,
                     facilitator_fee,
                     currency=Transaction.USDC,
-                    action=Transaction.FACILITATOR_FEE
+                    action=Transaction.FACILITATOR_FEE,
+                    project=investment.project
                 ),
                 Transaction.prepare_transfer(
                     investment.investor.account,
                     smart_contract_account,
                     investment_amount,
                     currency=Transaction.USDC,
-                    action=Transaction.INVESTMENT)
+                    action=Transaction.INVESTMENT,
+                    project=investment.project)
             ])
         
     def compile(self):

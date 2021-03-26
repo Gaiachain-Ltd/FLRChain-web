@@ -42,6 +42,10 @@ class Transaction(models.Model):
         on_delete=models.CASCADE,
         null=True,
         related_name='receiver')
+    project = models.ForeignKey(
+        'projects.Project',
+        on_delete=models.SET_NULL,
+        null=True)
     txid = models.CharField(max_length=64)
     action = models.PositiveSmallIntegerField(choices=ACTIONS)
     currency = models.PositiveSmallIntegerField(choices=CURRENCIES)
@@ -84,7 +88,8 @@ class Transaction(models.Model):
 
     @staticmethod
     def transfer(sender, receiver, amount,
-                 currency=0, action=2, close=None):
+                 currency=0, action=2, close=None, 
+                 project=None):
         if currency == Transaction.ALGO:
             txid, fee = utils.transfer_algos(
                 sender,
@@ -108,11 +113,12 @@ class Transaction(models.Model):
             action=action,
             currency=currency,
             amount=amount,
-            fee=fee)
+            fee=fee,
+            project=project)
 
     @staticmethod
     def prepare_transfer(sender, receiver, amount,
-                         currency=0, action=2):
+                         currency=0, action=2, project=None):
         if currency == Transaction.ALGO:
             txn, fee = utils.prepare_transfer_algos(
                 sender,
@@ -133,7 +139,8 @@ class Transaction(models.Model):
             currency=currency,
             amount=amount,
             fee=fee,
-            atomic=True))
+            atomic=True,
+            project=project))
 
     @staticmethod
     def close_account(sender, receiver):

@@ -50,7 +50,8 @@ class ActivityView(CommonView):
                 request.user.account,
                 task.reward,
                 Transaction.USDC,
-                Transaction.REWARD)
+                Transaction.REWARD,
+                project=project)
 
             activity.transfer = transfer
             activity.save()

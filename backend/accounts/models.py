@@ -76,5 +76,5 @@ class Account(models.Model):
             chain)
         logger.debug("Opt-In transaction for %s account.", self.address)
 
-    def balance(self):
-        return utils.check_balance(self.address)
+    def usdc_balance(self):
+        return utils.usdc_balance(self.address)

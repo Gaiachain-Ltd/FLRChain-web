@@ -6,7 +6,7 @@ from drf_yasg.utils import swagger_auto_schema
 decorated_token_view = swagger_auto_schema(
       operation_summary="Login user",
       method='POST',
-      tags=['users', 'facililator', 'beneficiary'])(obtain_auth_token)
+      tags=['users', 'facililator', 'beneficiary', 'investor'])(obtain_auth_token)
 
 urlpatterns = [
     path('login/', decorated_token_view, name='login'),

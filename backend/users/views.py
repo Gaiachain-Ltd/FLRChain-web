@@ -12,7 +12,7 @@ from accounts.models import Account
     operation_summary="Register user",
     method='POST',
     request_body=CustomUserSerializer,
-    tags=['users', 'facililator', 'beneficiary'])
+    tags=['users', 'facililator', 'beneficiary', 'investor'])
 @api_view(['POST'])
 @permission_classes([])
 def user_register(request):
@@ -28,7 +28,7 @@ def user_register(request):
 @swagger_auto_schema(
     operation_summary="User info",
     method='GET',
-    tags=['users', 'facililator', 'beneficiary'])
+    tags=['users', 'facililator', 'beneficiary', 'investor'])
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def user_info(request):
