@@ -1,14 +1,14 @@
 <template>
-  <v-layout row full-width ma-0>
-    <v-flex xs3>
+  <v-layout row shrink ma-0>
+    <v-flex xs3 shrink>
       <BalanceCard :value="total" label="All USDC"></BalanceCard>
     </v-flex>
     <v-spacer></v-spacer>
-    <v-flex xs3>
+    <v-flex xs3 shrink>
       <BalanceCard :value="spent" label="Invested USDC"></BalanceCard>
     </v-flex>
     <v-spacer></v-spacer>
-    <v-flex xs3>
+    <v-flex xs3 shrink>
       <BalanceCard :value="balance" label="Balance USDC"></BalanceCard>
     </v-flex>
   </v-layout>
