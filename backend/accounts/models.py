@@ -23,7 +23,8 @@ class Account(models.Model):
     user = models.OneToOneField(
         'users.CustomUser', on_delete=models.CASCADE, null=True)
     smart_contract = models.OneToOneField(
-        'smart_contracts.SmartContract', on_delete=models.CASCADE, null=True)
+        'smart_contracts.SmartContract', on_delete=models.CASCADE, 
+        null=True, blank=True)
     private_key = models.CharField(max_length=128, blank=True, null=True)
     address = models.CharField(max_length=58)
     type = models.PositiveSmallIntegerField(
