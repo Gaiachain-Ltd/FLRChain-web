@@ -20,5 +20,6 @@ class TransactionView(CommonView):
     def list(self, request):
         transactions = Transaction.objects.filter(
             Q(from_account=request.user.account) | Q(to_account=request.user.account),
+            ~Q(action__in=[Transaction.OPT_IN]),
             currency=Transaction.USDC)
         return self.paginated_response(transactions, request)
