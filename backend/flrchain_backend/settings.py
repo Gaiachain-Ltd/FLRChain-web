@@ -59,7 +59,8 @@ INSTALLED_APPS = [
     'transactions',
     'investments',
     'activities',
-    'django_filters'
+    'django_filters',
+    'django_celery_beat',
 ]
 
 MIDDLEWARE = [
@@ -165,6 +166,12 @@ REST_FRAMEWORK = {
     ],
     'PAGE_SIZE': 100
 }
+
+# Celery
+
+CELERY_BROKER_URL = "redis://redis:6379"
+CELERY_RESULT_BACKEND = "redis://redis:6379"
+
 
 # Logging
 LOGGING = {
