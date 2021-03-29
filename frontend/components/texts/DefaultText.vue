@@ -21,7 +21,7 @@ export default {
       default: "",
     },
     size: {
-      type: Number,
+      type: Number | String,
       default: 16,
     },
     clickable: {
