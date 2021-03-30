@@ -7,41 +7,56 @@
         :title="firstTitle"
         :color="$vuetify.theme.themes.light.secondary"
         :query="firstQuery"
-      ></ProjectList>
+      >
+        <template v-slot:delegate="{ project }">
+          <DetailsProjectDelegate
+            :project="project"
+            :description="!isFacililator"
+          ></DetailsProjectDelegate>
+        </template>
+      </ProjectList>
       <ProjectList
         class="mt-10 ml-6"
         :title="secondTitle"
         :color="$vuetify.theme.themes.light.primary"
         :query="secondQuery"
-      ></ProjectList>
+      >
+        <template v-slot:delegate="{ project }">
+          <InvestedProjectDelegate :project="project"></InvestedProjectDelegate>
+        </template>
+      </ProjectList>
     </v-layout>
     <v-spacer></v-spacer>
   </v-layout>
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapGetters } from "vuex";
 
 export default {
   components: {
     ToolBar: () => import("@/components/toolbar/ToolBar"),
     ProjectList: () => import("@/components/lists/ProjectList"),
+    DetailsProjectDelegate: () =>
+      import("@/components/delegates/DetailsProjectDelegate"),
+    InvestedProjectDelegate: () =>
+      import("@/components/delegates/InvestedProjectDelegate"),
   },
   computed: {
-    ...mapGetters(['isFacililator']),
+    ...mapGetters(["isFacililator"]),
     firstTitle() {
-      return this.isFacililator ? 'My projects' : 'Projects to invest';
+      return this.isFacililator ? "My projects" : "Projects to invest";
     },
     firstQuery() {
       return { investment__isnull: true };
     },
     secondTitle() {
-      return this.isFacililator ? 'My active projects' : 'Donated projects';
+      return this.isFacililator ? "My active projects" : "Donated projects";
     },
     secondQuery() {
       return { investment__isnull: false };
-    }
-  }
+    },
+  },
 };
 </script>
 

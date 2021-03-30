@@ -2,13 +2,17 @@
   <v-layout column fill-height>
     <v-layout column fill-height>
       <DefaultText :size="24" :color="color">{{ title }}</DefaultText>
-      <v-layout column mt-6 class="list-style">
-        <DefaultProjectDelegate
-          class="mb-6 ml-1 mr-3"
+      <v-layout column ma-0 mt-6 class="list-style">
+        <v-flex
+          class="ma-0 mb-6 ml-1 mr-3"
           v-for="project in projects"
           :key="project.id"
-          :project="project"
-        ></DefaultProjectDelegate>
+          shrink
+        >
+          <slot name="delegate" v-bind:project="project">
+            <DefaultProjectDelegate :project="project"></DefaultProjectDelegate>
+          </slot>
+        </v-flex>
         <v-flex>
           <div class="placeholder"></div>
         </v-flex>
@@ -28,8 +32,8 @@ export default {
     },
     query: {
       type: Object,
-      default: undefined
-    }
+      default: undefined,
+    },
   },
   data() {
     return {
@@ -44,7 +48,7 @@ export default {
   async fetch() {
     // TODO: Handle error!
     this.projects = await this.$axios
-      .get("projects/", {params: this.query})
+      .get("projects/", { params: this.query })
       .then((reply) => reply.data.results);
   },
 };
