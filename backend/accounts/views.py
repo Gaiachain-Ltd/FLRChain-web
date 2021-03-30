@@ -23,15 +23,16 @@ class AccountView(CommonView):
             currency=Transaction.USDC).aggregate(
                 total_spent=Sum('amount')).get('total_spent', 0)
         received = Transaction.objects.filter(
-            to_account=request.user.account,
-            currency=Transaction.USDC).aggregate(
+            Q(to_account=request.user.account,
+              currency=Transaction.USDC) &
+            ~Q(action=Transaction.FUELING)).aggregate(
                 total_received=Sum('amount')).get('total_received', 0)
 
         return Response(
             {
                 'balance': balance,
-                'spent': spent,
+                'spent': spent - received,
                 'received': received,
-                'total': balance + spent
+                'total': balance + (spent - received)
             },
             status=status.HTTP_200_OK)

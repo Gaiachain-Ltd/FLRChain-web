@@ -15,6 +15,7 @@ class Transaction(models.Model):
     INVESTMENT = 4
     REWARD = 5
     FACILITATOR_FEE = 6
+    RETURN_INVESTMENT = 7
     ACTIONS = (
         (OPT_IN, "Opt-In action"),
         (FUELING, "Fueling action"),
@@ -22,7 +23,8 @@ class Transaction(models.Model):
         (CLOSE, "Close account"),
         (INVESTMENT, "Investment"),
         (REWARD, "Beneficiary reward"),
-        (FACILITATOR_FEE, "Facilitator fee")
+        (FACILITATOR_FEE, "Facilitator fee"),
+        (RETURN_INVESTMENT, "Return investment")
     )
 
     ALGO = 0

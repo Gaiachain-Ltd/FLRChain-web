@@ -17,9 +17,12 @@
     <v-spacer></v-spacer>
     <v-layout column ma-0 align-center>
       <DefaultText size="14">{{ actionText }}</DefaultText>
-      <DefaultText size="16" v-if="transaction.project_name">{{
-        transaction.project_name
-      }}</DefaultText>
+      <DefaultText
+        size="18"
+        :color="$vuetify.theme.themes.light.octonary"
+        v-if="transaction.project_name"
+        >{{ transaction.project_name }}</DefaultText
+      >
     </v-layout>
     <v-spacer></v-spacer>
     <DefaultText
@@ -70,6 +73,8 @@ export default {
           return "Invest in project";
         case 6:
           return "Facililator fee";
+        case 7:
+          return "Return from investment";
         default:
           return `Action: ${this.transaction.action}`;
       }
@@ -84,6 +89,8 @@ export default {
           return false;
         case 6:
           return this.isFacililator ? true : false;
+        case 7:
+          return true;
         default:
           return true;
       }

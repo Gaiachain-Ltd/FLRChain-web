@@ -3,7 +3,7 @@ from rest_framework import serializers
 
 
 class TransactionSerializer(serializers.ModelSerializer):
-    project_name = serializers.CharField(source='project.name', required=False)
+    project_name = serializers.CharField(source='project.title', required=False)
     
     class Meta:
         model = Transaction
