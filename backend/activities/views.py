@@ -53,7 +53,7 @@ class ActivityView(CommonView):
                 Transaction.REWARD,
                 project=project)
 
-            activity.transfer = transfer
+            activity.transaction = transfer
             activity.save()
 
             serializer = self.serializer_class(activity)

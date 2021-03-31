@@ -15,7 +15,7 @@
       </v-flex>
       <v-spacer></v-spacer>
       <v-flex shrink>
-        <DefaultText>{{ task.reward }}</DefaultText>
+        <DefaultText>{{ parseFloat(task.reward) }}</DefaultText>
       </v-flex>
     </v-layout>
   </v-layout>

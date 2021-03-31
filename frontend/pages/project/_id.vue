@@ -2,8 +2,8 @@
   <v-layout column mt-2>
     <ToolBar title="Project details"></ToolBar>
     <DefaultTitle class="mt-10 mb-5">{{ project.title }}</DefaultTitle>
-    <v-layout row ma-0>
-      <v-flex xs8>
+    <v-layout row ma-0 shrink>
+      <v-flex xs8 shrink>
         <v-layout column mr-3>
           <DetailsProjectCard
             class="mb-6"
@@ -12,7 +12,7 @@
           <DetailsTasksCard :tasks="project.tasks"></DetailsTasksCard>
         </v-layout>
       </v-flex>
-      <v-flex xs4>
+      <v-flex xs4 shrink>
         <v-layout column ml-3 xs4>
           <client-only v-if="isFacililator" placeholder="Loading...">
             <BeneficiariesCard class="mb-6"></BeneficiariesCard>
@@ -35,6 +35,8 @@
         </v-layout>
       </v-flex>
     </v-layout>
+    <WorkHistoryCard class="mt-6"></WorkHistoryCard>
+    <v-spacer></v-spacer>
   </v-layout>
 </template>
 
@@ -60,6 +62,7 @@ export default {
       import("@/components/cards/project/InputInvestmentCard"),
     DetailsInvestmentCard: () =>
       import("@/components/cards/project/DetailsInvestmentCard"),
+    WorkHistoryCard: () => import("@/components/cards/project/WorkHistoryCard"),
   },
   computed: {
     ...mapGetters(["isFacililator"]),
