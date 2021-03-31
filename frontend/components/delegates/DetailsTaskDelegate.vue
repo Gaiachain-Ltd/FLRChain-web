@@ -15,7 +15,7 @@
       </v-flex>
       <v-spacer></v-spacer>
       <v-flex shrink>
-        <DefaultText>{{ parseFloat(task.reward) }}</DefaultText>
+        <DefaultText>{{ reward }}</DefaultText>
       </v-flex>
     </v-layout>
   </v-layout>
@@ -24,7 +24,12 @@
 <script>
 export default {
   props: {
-      task: {}
+    task: {},
+  },
+  computed: {
+    reward() {
+      return `${parseFloat(this.task.reward)} USDC`;
+    },
   },
   components: {
     DefaultText: () => import("@/components/texts/DefaultText"),

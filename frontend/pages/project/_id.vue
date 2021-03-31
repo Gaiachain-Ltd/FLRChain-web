@@ -9,7 +9,7 @@
             class="mb-6"
             :project="project"
           ></DetailsProjectCard>
-          <DetailsTasksCard :tasks="project.tasks"></DetailsTasksCard>
+          <DetailsTasksCard class="mb-6" :tasks="project.tasks"></DetailsTasksCard>
         </v-layout>
       </v-flex>
       <v-flex xs4 shrink>
@@ -35,7 +35,7 @@
         </v-layout>
       </v-flex>
     </v-layout>
-    <WorkHistoryCard class=""></WorkHistoryCard>
+    <WorkHistoryCard v-if="project.investment"></WorkHistoryCard>
     <v-spacer></v-spacer>
   </v-layout>
 </template>
