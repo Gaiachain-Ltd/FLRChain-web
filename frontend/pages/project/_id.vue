@@ -14,6 +14,12 @@
       </v-flex>
       <v-flex xs4 shrink>
         <v-layout column ml-3 xs4>
+          <client-only v-if="project.investment" placeholder="Loading...">
+            <DetailsInvestmentCard class="mb-6"></DetailsInvestmentCard>
+          </client-only>
+          <client-only v-if="project.investment" placeholder="Loading...">
+            <DetailsInvestorsCard class="mb-6"></DetailsInvestorsCard>
+          </client-only>
           <client-only v-if="isFacililator" placeholder="Loading...">
             <BeneficiariesCard class="mb-6"></BeneficiariesCard>
           </client-only>
@@ -26,16 +32,10 @@
               @refresh="$fetch"
             ></InputInvestmentCard>
           </client-only>
-          <client-only
-            v-if="!isFacililator && project.investment"
-            placeholder="Loading..."
-          >
-            <DetailsInvestmentCard class="mb-6"></DetailsInvestmentCard>
-          </client-only>
         </v-layout>
       </v-flex>
     </v-layout>
-    <WorkHistoryCard class="mt-6"></WorkHistoryCard>
+    <WorkHistoryCard class=""></WorkHistoryCard>
     <v-spacer></v-spacer>
   </v-layout>
 </template>
@@ -63,6 +63,8 @@ export default {
     DetailsInvestmentCard: () =>
       import("@/components/cards/project/DetailsInvestmentCard"),
     WorkHistoryCard: () => import("@/components/cards/project/WorkHistoryCard"),
+    DetailsInvestorsCard: () =>
+      import("@/components/cards/project/DetailsInvestorsCard"),
   },
   computed: {
     ...mapGetters(["isFacililator"]),

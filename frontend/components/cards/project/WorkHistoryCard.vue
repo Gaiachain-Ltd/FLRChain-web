@@ -1,5 +1,5 @@
 <template>
-  <DefaultCardWithTitle title="Work history">
+  <DefaultCardWithTitle title="Work history:">
     <v-layout column ma-0>
       <v-simple-table>
         <template v-slot:default>
