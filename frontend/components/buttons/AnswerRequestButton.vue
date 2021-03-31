@@ -1,5 +1,5 @@
 <template>
-  <DefaultPopup>
+  <DefaultPopup :show.sync="showPopup">
     <template v-slot="{ on, attrs }">
       <v-btn
         v-bind="attrs"
@@ -35,6 +35,11 @@ export default {
   props: {
     assignment: {},
   },
+  data() {
+    return {
+      showPopup: false,
+    };
+  },
   computed: {
     name() {
       return `${this.assignment.beneficiary.first_name} ${this.assignment.beneficiary.last_name}`;
@@ -46,19 +51,21 @@ export default {
     BlockButton: () => import("@/components/buttons/BlockButton"),
   },
   methods: {
-    accept() {
-      this.$axios
+    async accept() {
+      await this.$axios
         .put(`projects/assignments/${this.assignment.id}/`, {
           status: 1,
         })
-        .then(this.$emit("refresh"));
+        .then(() => this.$emit("refresh"));
+      this.showPopup = false;
     },
-    reject() {
-      this.$axios
+    async reject() {
+      await this.$axios
         .put(`projects/assignments/${this.assignment.id}/`, {
           status: 0,
         })
-        .then(this.$emit("refresh"));
+        .then(() => this.$emit("refresh"));
+      this.showPopup = false;
     },
   },
 };

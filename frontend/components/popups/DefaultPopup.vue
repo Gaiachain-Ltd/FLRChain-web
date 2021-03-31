@@ -26,11 +26,19 @@ export default {
     text: {
       type: String,
     },
+    show: {
+      type: Boolean,
+    },
   },
-  data() {
-    return {
-      dialog: false,
-    };
+  computed: {
+    dialog: {
+      get() {
+        return this.show;
+      },
+      set(value) {
+        this.$emit("update:show", value);
+      },
+    },
   },
   components: {
     DefaultText: () => import("@/components/texts/DefaultText"),
