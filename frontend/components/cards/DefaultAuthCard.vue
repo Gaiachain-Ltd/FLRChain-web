@@ -1,22 +1,25 @@
 <template>
-  <v-card min-width="500">
-    <v-card-title class="px-6">
-      <div class="auth-title">{{ title }}</div>
-    </v-card-title>
-    <v-card-subtitle class="px-6">
-      <DefaultText class="mt-1">{{ subtitle }}</DefaultText>
-    </v-card-subtitle>
-    <v-card-text class="px-6">
-      <v-divider></v-divider>
-      <slot name="content"></slot>
-      <v-divider></v-divider>
-    </v-card-text>
-    <v-card-actions class="px-6">
-      <v-layout column align-center>
-        <slot name="footer"></slot>
-      </v-layout>
-    </v-card-actions>
-  </v-card>
+  <div>
+    <v-card min-width="500">
+      <v-card-title class="px-6">
+        <div class="auth-title">{{ title }}</div>
+      </v-card-title>
+      <v-card-subtitle class="px-6">
+        <DefaultText class="mt-1">{{ subtitle }}</DefaultText>
+      </v-card-subtitle>
+      <v-card-text class="px-6">
+        <v-divider></v-divider>
+        <slot name="content"></slot>
+        <v-divider></v-divider>
+      </v-card-text>
+      <v-card-actions class="px-6">
+        <v-layout column align-center>
+          <slot name="footer"></slot>
+        </v-layout>
+      </v-card-actions>
+    </v-card>
+    <ErrorPopup v-if="errorPopupVisible" :value.sync="errorPopupVisible"></ErrorPopup>
+  </div>
 </template>
 
 <script>
@@ -29,9 +32,20 @@ export default {
       type: String,
     },
   },
+  data() {
+    return {
+      errorPopupVisible: false,
+    };
+  },
   components: {
     DefaultText: () => import("@/components/texts/DefaultText"),
+    ErrorPopup: () => import("@/components/popups/ErrorPopup"),
   },
+  methods: {
+    showErrorPopup(text) {
+      this.errorPopupVisible = true;
+    }
+  }
 };
 </script>
 

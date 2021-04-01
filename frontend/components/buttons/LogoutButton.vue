@@ -59,7 +59,7 @@ export default {
     };
   },
   components: {
-    DefaulText: () => import("@/components/texts/DefaultText"),
+    DefaultText: () => import("@/components/texts/DefaultText"),
     DefaultSVGIcon: () => import("@/components/icons/DefaultSVGIcon"),
     DefaultPopup: () => import("@/components/popups/DefaultPopup"),
     BlockButton: () => import("@/components/buttons/BlockButton"),

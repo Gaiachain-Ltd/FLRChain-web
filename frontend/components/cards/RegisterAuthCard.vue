@@ -1,5 +1,6 @@
 <template>
   <DefaultAuthCard
+    ref="card"
     title="Register"
     subtitle="Fill the form, make sure it's correct"
   >
@@ -135,10 +136,12 @@ export default {
       if (this.isValid && !this.passwordsNotTheSame) {
         this.resetExternalErrors();
         this.$axios.post("register/", this.user).catch(({ response }) => {
-          if (response.data.email !== undefined) {
+          if (response && response.data.email !== undefined) {
             this.usedEmail = true;
             this.externalError =
               "Email is already taken, please enter a different email address";
+          } else {
+            this.$refs.card.showErrorPopup();
           }
         });
       }
