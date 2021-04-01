@@ -39,7 +39,7 @@ class Assignment(models.Model):
     )
 
     beneficiary = models.ForeignKey(
-        'users.CustomUser', on_delete=models.CASCADE)
+        'users.CustomUser', on_delete=models.SET_NULL, null=True)
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     status = models.PositiveSmallIntegerField(default=2, choices=STATUS)
     created = models.DateTimeField(auto_now_add=True)

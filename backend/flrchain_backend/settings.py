@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 
 from pathlib import Path
 import os
+from celery.schedules import crontab
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -171,7 +172,16 @@ REST_FRAMEWORK = {
 
 CELERY_BROKER_URL = "redis://redis:6379"
 CELERY_RESULT_BACKEND = "redis://redis:6379"
-
+CELERY_BEAT_SCHEDULE = {
+    "transfer_back_funds": {
+        "task": "accounts.tasks.transfer_back_funds",
+        "schedule": crontab(minute="*/1")
+    },
+    "finish_investment": {
+        "task": "investments.tasks.finish_investment",
+        "schedule": crontab(minute="*/1")
+    }
+}
 
 # Logging
 LOGGING = {

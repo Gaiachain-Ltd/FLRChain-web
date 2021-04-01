@@ -14,7 +14,7 @@ class Investment(models.Model):
     )
 
     investor = models.ForeignKey(
-        'users.CustomUser', on_delete=models.CASCADE)
+        'users.CustomUser', on_delete=models.SET_NULL, null=True)
     project = models.OneToOneField('projects.Project', on_delete=models.CASCADE)
     status = models.PositiveSmallIntegerField(default=1, choices=STATUS)
     created = models.DateTimeField(auto_now_add=True)
@@ -25,9 +25,6 @@ class Investment(models.Model):
         max_digits=26, decimal_places=6, default=0)
 
     def finish(self):
-        # if (self.end + datetime.timedelta(days=1)) > datetime.datetime.now().date():
-        #     return
-
         with transaction.atomic():
             smart_contract = self.smartcontract
 

@@ -36,12 +36,12 @@ class Transaction(models.Model):
 
     from_account = models.ForeignKey(
         'accounts.Account',
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         null=True,
         related_name='sender')
     to_account = models.ForeignKey(
         'accounts.Account',
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         null=True,
         related_name='receiver')
     project = models.ForeignKey(

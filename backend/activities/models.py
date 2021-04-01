@@ -2,7 +2,7 @@ from django.db import models
 
 
 class Activity(models.Model):
-    user = models.ForeignKey('users.CustomUser', on_delete=models.CASCADE)
+    user = models.ForeignKey('users.CustomUser', on_delete=models.SET_NULL, null=True)
     task = models.ForeignKey('projects.Task', on_delete=models.CASCADE)
     project = models.ForeignKey('projects.Project', on_delete=models.CASCADE)
     transaction = models.ForeignKey(
