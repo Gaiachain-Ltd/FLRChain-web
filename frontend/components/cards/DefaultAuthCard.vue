@@ -1,17 +1,17 @@
 <template>
   <v-card min-width="500">
-    <v-card-title>
+    <v-card-title class="px-6">
       <div class="auth-title">{{ title }}</div>
     </v-card-title>
-    <v-card-subtitle>
+    <v-card-subtitle class="px-6">
       <DefaultText class="mt-1">{{ subtitle }}</DefaultText>
     </v-card-subtitle>
-    <v-card-text>
+    <v-card-text class="px-6">
       <v-divider></v-divider>
       <slot name="content"></slot>
       <v-divider></v-divider>
     </v-card-text>
-    <v-card-actions>
+    <v-card-actions class="px-6">
       <v-layout column align-center>
         <slot name="footer"></slot>
       </v-layout>

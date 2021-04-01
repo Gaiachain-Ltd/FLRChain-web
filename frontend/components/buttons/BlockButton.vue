@@ -6,6 +6,7 @@
     height="50"
     :color="color"
     :loading="loading"
+    :disabled="disabled"
     ><slot></slot
   ></v-btn>
 </template>
@@ -20,6 +21,10 @@ export default {
     color: {
       type: String,
       default: "primary",
+    },
+    disabled: {
+      type: Boolean,
+      default: false,
     },
   },
 };
