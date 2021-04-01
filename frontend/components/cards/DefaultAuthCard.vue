@@ -18,7 +18,15 @@
         </v-layout>
       </v-card-actions>
     </v-card>
-    <ErrorPopup v-if="errorPopupVisible" :value.sync="errorPopupVisible"></ErrorPopup>
+    <ErrorPopup
+      v-if="errorPopupVisible"
+      :value.sync="errorPopupVisible"
+    ></ErrorPopup>
+    <SuccessPopup
+      v-if="successPopupVisible"
+      :value.sync="successPopupVisible"
+      :text="successPopupText"
+    ></SuccessPopup>
   </div>
 </template>
 
@@ -35,17 +43,24 @@ export default {
   data() {
     return {
       errorPopupVisible: false,
+      successPopupVisible: false,
+      successPopupText: "",
     };
   },
   components: {
     DefaultText: () => import("@/components/texts/DefaultText"),
     ErrorPopup: () => import("@/components/popups/ErrorPopup"),
+    SuccessPopup: () => import("@/components/popups/SuccessPopup"),
   },
   methods: {
-    showErrorPopup(text) {
+    showErrorPopup() {
       this.errorPopupVisible = true;
-    }
-  }
+    },
+    showSuccessPopup(text) {
+      this.successPopupText = text;
+      this.successPopupVisible = true;
+    },
+  },
 };
 </script>
 

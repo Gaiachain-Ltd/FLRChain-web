@@ -1,3 +1,7 @@
+export const state = () => ({
+    regEmail: ''
+})
+
 export const getters = {
     isAuthenticated(state) {
         return state.auth.loggedIn
@@ -14,4 +18,21 @@ export const getters = {
     isInvestor(state) {
         return state.auth.user.type === 2;
     },
+
+    regEmail(state) {
+        return state.regEmail;
+    }
+}
+
+export const mutations = {
+
+    setRegEmail(state, email) {
+        state.regEmail = email;
+    }
+}
+
+export const actions = {
+    updateRegEmail({ commit }, email) {
+        commit('setRegEmail', email);
+    }
 }

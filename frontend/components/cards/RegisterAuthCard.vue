@@ -96,6 +96,7 @@
 
 <script>
 import ValidatorMixin from "@/validators";
+import { mapActions } from 'vuex';
 
 export default {
   mixins: [ValidatorMixin],
@@ -132,10 +133,18 @@ export default {
     DefaultText: () => import("@/components/texts/DefaultText"),
   },
   methods: {
+    ...mapActions(["updateRegEmail"]),
     register() {
       if (this.isValid && !this.passwordsNotTheSame) {
         this.resetExternalErrors();
-        this.$axios.post("register/", this.user).catch(({ response }) => {
+        this.$axios.post("register/", this.user)
+        .then(
+          () => {
+            this.updateRegEmail(this.user.email);
+            this.$router.push("/login");
+          }
+        )
+        .catch(({ response }) => {
           if (response && response.data.email !== undefined) {
             this.usedEmail = true;
             this.externalError =

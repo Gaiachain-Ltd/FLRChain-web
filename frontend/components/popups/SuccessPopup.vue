@@ -2,7 +2,7 @@
   <DefaultPopup :show.sync="show">
     <v-flex slot="icon">
       <DefaultSVGIcon
-        :icon="require('@/assets/popup/error.svg')"
+        :icon="require('@/assets/popup/success.svg')"
         :size="70"
       ></DefaultSVGIcon>
     </v-flex>
@@ -12,7 +12,7 @@
         :size="22"
         color="#253F50"
         family="open-sans"
-        >Something went wrong. Please try again later.</DefaultText
+        >{{ text }}</DefaultText
       >
     </v-flex>
     <v-layout slot="buttons" column ma-0 style="width: 100%">
@@ -28,6 +28,9 @@ export default {
   props: {
     value: {
       type: Boolean,
+    },
+    text: {
+      type: String,
     },
   },
   computed: {
