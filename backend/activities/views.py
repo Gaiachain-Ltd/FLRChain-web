@@ -9,6 +9,7 @@ from rest_framework.response import Response
 from activities.models import Activity
 from django.db import transaction
 from transactions.models import Transaction
+from users.models import CustomUser
 
 
 class ActivityView(CommonView):
@@ -19,7 +20,10 @@ class ActivityView(CommonView):
         operation_summary="History activity",
         tags=['activities', 'beneficiary', 'investor', 'facililator'])
     def list(self, request, pk=None):
-        activities = Activity.objects.filter(project=pk)
+        if request.user.type == CustomUser.BENEFICIARY:
+            activities = Activity.objects.filter(project=pk, user=request.user)
+        else:
+            activities = Activity.objects.filter(project=pk)
         return self.paginated_response(activities, request)
 
     @swagger_auto_schema(
