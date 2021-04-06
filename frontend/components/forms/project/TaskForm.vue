@@ -7,7 +7,7 @@
         }}</DefaultText>
         <v-spacer></v-spacer>
         <DefaultIconButton
-          v-if="index != 0"
+          v-if="showDeleteBtn"
           :config="deleteBtnConf"
           @clicked="$emit('delete', index)"
         ></DefaultIconButton>
@@ -46,6 +46,10 @@ export default {
       type: Number,
       default: 1,
     },
+    showDeleteBtn: {
+      type: Boolean,
+      default: false
+    }
   },
   data() {
     return {

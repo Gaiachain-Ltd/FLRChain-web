@@ -23,6 +23,7 @@ class Task(models.Model):
     action = models.CharField(max_length=255)
     reward = models.DecimalField(
         max_digits=26, decimal_places=6, default=0)
+    deleted = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 

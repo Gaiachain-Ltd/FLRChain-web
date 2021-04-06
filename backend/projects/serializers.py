@@ -5,11 +5,18 @@ from users.serializers import CustomUserSerializer
 from investments.serializers import InvestmentSerializer
 
 
+class TaskListSerializer(serializers.ListSerializer):
+    def to_representation(self, data):
+        data = data.filter(deleted=False)
+        return super(TaskListSerializer, self).to_representation(data)
+
+
 class TaskSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(required=False)
     class Meta:
+        list_serializer_class = TaskListSerializer
         model = Task
-        fields = ('id', 'action', 'reward')
+        fields = ('id', 'action', 'reward', 'deleted')
         read_only_fields = ('id',)
 
 
@@ -53,6 +60,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             instance.start = validated_data['start']
             instance.end = validated_data['end']
 
+            tasks_dict = {task.id: task for task in instance.tasks.all()}
             for task in validated_data['tasks']:
                 if task.get('id', None):
                     task_obj = Task.objects.get(
@@ -61,12 +69,17 @@ class ProjectSerializer(serializers.ModelSerializer):
                     task_obj.action = task['action']
                     task_obj.reward = task['reward']
                     task_obj.save()
+                    del tasks_dict[task_obj.id]
                 else:
                     task_obj = Task.objects.create(
                         project=instance,
                         action=task['action'],
                         reward=task['reward'])
                     instance.tasks.add(task_obj)
+
+            for task in tasks_dict.values():
+                task.deleted = True
+                task.save()
 
             instance.save()
             return instance

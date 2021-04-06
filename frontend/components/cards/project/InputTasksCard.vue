@@ -6,6 +6,7 @@
         <TaskForm
           ref="taskForms"
           :index="index"
+          :showDeleteBtn="project.tasks.length > 1"
           :task.sync="project.tasks[index]"
           @delete="deleteTask"
         ></TaskForm>
@@ -48,7 +49,9 @@ export default {
     },
     deleteTask(index) {
       this.project.tasks.splice(index, 1);
-      this.$set(this.project, "tasks", this.project.tasks);
+      this.$emit('update:project', this.project);
+      // this.$set(this.project, "tasks", this.project.tasks);
+
     },
     validate() {
       for (let index = 0; index < this.$refs.taskForms.length; index++) {
