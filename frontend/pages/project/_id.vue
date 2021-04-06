@@ -1,18 +1,39 @@
 <template>
   <v-layout column mt-2>
-    <ToolBar title="Project details"></ToolBar>
-    <DefaultTitle class="mt-10 mb-5">{{ project.title }}</DefaultTitle>
+    <ToolBar title="Project details"> </ToolBar>
+    <v-layout row align-center ma-0>
+      <DefaultTitle class="mt-10 mb-5">{{ project.title }}</DefaultTitle>
+      <v-spacer></v-spacer>
+      <ActionButton
+        class="white--text"
+        :label="edit ? 'Save project' : 'Edit project'"
+        :color="edit ? 'primary' : 'septenary'"
+        @clicked="handleEdit"
+      ></ActionButton>
+    </v-layout>
     <v-layout row ma-0 shrink>
       <v-flex xs8 shrink>
         <v-layout column mr-3>
           <DetailsProjectCard
+            v-if="!edit"
             class="mb-6"
             :project="project"
           ></DetailsProjectCard>
+          <InputProjectCard
+            v-else
+            class="mb-6"
+            :project.sync="project"
+          ></InputProjectCard>
           <DetailsTasksCard
+            v-if="!edit"
             class="mb-6"
             :tasks="project.tasks"
           ></DetailsTasksCard>
+          <InputTasksCard
+            v-else
+            class="mb-6"
+            :project.sync="project"
+          ></InputTasksCard>
         </v-layout>
       </v-flex>
       <v-flex xs4 shrink>
@@ -42,6 +63,10 @@
     </v-layout>
     <WorkHistoryCard v-if="project.investment"></WorkHistoryCard>
     <v-spacer></v-spacer>
+    <ErrorPopup
+      v-if="errorPopupVisible"
+      :value.sync="errorPopupVisible"
+    ></ErrorPopup>
   </v-layout>
 </template>
 
@@ -51,7 +76,9 @@ import { mapGetters } from "vuex";
 export default {
   data() {
     return {
+      errorPopupVisible: false,
       project: {},
+      edit: false,
     };
   },
   components: {
@@ -70,14 +97,31 @@ export default {
     WorkHistoryCard: () => import("@/components/cards/project/WorkHistoryCard"),
     DetailsInvestorsCard: () =>
       import("@/components/cards/project/DetailsInvestorsCard"),
+    InputProjectCard: () =>
+      import("@/components/cards/project/InputProjectCard"),
+    InputTasksCard: () => import("@/components/cards/project/InputTasksCard"),
+    ActionButton: () => import("@/components/buttons/ActionButton"),
+    ErrorPopup: () => import("@/components/popups/ErrorPopup"),
   },
   computed: {
     ...mapGetters(["isFacililator"]),
   },
+  methods: {
+    handleEdit() {
+      if (this.edit) {
+        this.$axios
+          .put(`projects/${this.$route.params.id}/`, this.project)
+          .then((reply) => (this.project = reply.data))
+          .catch(() => (this.errorPopupVisible = true));
+      }
+      this.edit = !this.edit;
+    },
+  },
   async fetch() {
     this.project = await this.$axios
       .get(`projects/${this.$route.params.id}/`)
-      .then((reply) => reply.data);
+      .then((reply) => reply.data)
+      .catch(() => (this.errorPopupVisible = true));
   },
 };
 </script>

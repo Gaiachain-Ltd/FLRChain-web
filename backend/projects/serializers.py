@@ -6,9 +6,11 @@ from investments.serializers import InvestmentSerializer
 
 
 class TaskSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(required=False)
     class Meta:
         model = Task
         fields = ('id', 'action', 'reward')
+        read_only_fields = ('id',)
 
 
 class ProjectSerializer(serializers.ModelSerializer):
@@ -43,6 +45,31 @@ class ProjectSerializer(serializers.ModelSerializer):
 
             project.save()
             return project
+
+    def update(self, instance, validated_data):
+        with transaction.atomic():
+            instance.title = validated_data['title']
+            instance.description = validated_data['description']
+            instance.start = validated_data['start']
+            instance.end = validated_data['end']
+
+            for task in validated_data['tasks']:
+                if task.get('id', None):
+                    task_obj = Task.objects.get(
+                        id=task['id'],
+                        project=instance)
+                    task_obj.action = task['action']
+                    task_obj.reward = task['reward']
+                    task_obj.save()
+                else:
+                    task_obj = Task.objects.create(
+                        project=instance,
+                        action=task['action'],
+                        reward=task['reward'])
+                    instance.tasks.add(task_obj)
+
+            instance.save()
+            return instance
 
 
 class AssignmentSerializer(serializers.ModelSerializer):

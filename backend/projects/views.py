@@ -57,6 +57,17 @@ class ProjectView(CommonView):
         serializer = self.serializer_class(project)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    @swagger_auto_schema(
+        operation_summary="Project update",
+        tags=['projects', 'facililator'])
+    def update(self, request, pk=None):
+        project = get_object_or_404(Project, pk=pk)
+        serializer = self.serializer_class(project, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 class AssignmentView(CommonView):
     serializer_class = AssignmentSerializer
