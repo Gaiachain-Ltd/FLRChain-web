@@ -25,6 +25,8 @@
           solo
           flat
           readonly
+          :required="required"
+          :rules="rules"
         >
           <v-layout
             column
@@ -53,11 +55,21 @@
 <script>
 export default {
   props: {
+    text: {
+      type: String,
+    },
     label: {
       type: String,
       default: "",
     },
-    text: {},
+    required: {
+      type: Boolean,
+      default: false,
+    },
+    rules: {
+      type: Array,
+      default: () => [],
+    },
   },
   data() {
     return {

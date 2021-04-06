@@ -23,6 +23,18 @@ export default {
             ],
             passwordRules: [
                 (v) => !!v || "Password is required",
+            ],
+            requiredRules: [
+                (v) => !!v || "Field is required",
+            ],
+            dateRules: [
+                (v) => this.$moment(v, "YYYY-MM-DD").isValid() || "Incorrect format (YYYY-MM-DD)"
+            ],
+            decimalRules: [
+                (v) => {
+                    const pattern = /^[0-9]+\.?[0-9]{0,6}$/;
+                    return pattern.test(v) || 'Invalid value';
+                }
             ]
         };
     },

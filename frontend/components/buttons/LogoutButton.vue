@@ -11,9 +11,9 @@
         v-on="on"
       >
         <v-layout column ma-0>
-          <DefaulText :color="$vuetify.theme.themes.light.quinary">{{
+          <DefaultText :color="$vuetify.theme.themes.light.quinary">{{
             `${$auth.user.first_name} ${$auth.user.last_name}`
-          }}</DefaulText>
+          }}</DefaultText>
           <div class="account-type-text">{{ accountType }}</div>
         </v-layout>
         <v-flex class="logout-icon-style" shrink ml-4>

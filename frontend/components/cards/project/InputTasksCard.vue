@@ -4,6 +4,7 @@
       <v-layout column v-for="(task, index) in project.tasks" :key="task.id">
         <v-divider class="mb-6" v-if="index != 0"></v-divider>
         <TaskForm
+          ref="taskForms"
           :index="index"
           :task.sync="project.tasks[index]"
           @delete="deleteTask"
@@ -48,6 +49,15 @@ export default {
     deleteTask(index) {
       this.project.tasks.splice(index, 1);
       this.$set(this.project, "tasks", this.project.tasks);
+    },
+    validate() {
+      for (let index = 0; index < this.$refs.taskForms.length; index++) {
+        const taskForm = this.$refs.taskForms[index];
+        if (!taskForm.validate()) {
+          return false;
+        }
+      }
+      return true;
     },
   },
 };
