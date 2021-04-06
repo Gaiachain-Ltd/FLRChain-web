@@ -26,7 +26,7 @@
           <TextInput
             label="Reward*"
             :text.sync="task.reward"
-            :rules="[...requiredRules, ...decimalRules]"
+            :rules="[...requiredRules, ...decimalRules, ...nonZeroDecimalRules]"
             required
           ></TextInput>
         </v-flex>
