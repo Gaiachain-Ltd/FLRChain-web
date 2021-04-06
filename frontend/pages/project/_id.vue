@@ -9,7 +9,10 @@
             class="mb-6"
             :project="project"
           ></DetailsProjectCard>
-          <DetailsTasksCard class="mb-6" :tasks="project.tasks"></DetailsTasksCard>
+          <DetailsTasksCard
+            class="mb-6"
+            :tasks="project.tasks"
+          ></DetailsTasksCard>
         </v-layout>
       </v-flex>
       <v-flex xs4 shrink>
@@ -28,8 +31,10 @@
             placeholder="Loading..."
           >
             <InputInvestmentCard
+              v-if="project.start"
               class="mb-6"
               @refresh="$fetch"
+              :project="project"
             ></InputInvestmentCard>
           </client-only>
         </v-layout>

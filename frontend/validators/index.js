@@ -35,6 +35,9 @@ export default {
                     const pattern = /^[0-9]+\.?[0-9]{0,6}$/;
                     return pattern.test(v) || 'Invalid value';
                 }
+            ],
+            nonZeroDecimalRules: [
+                (v) => parseFloat(v) > 0.0 || "Value has to be greater than 0",
             ]
         };
     },
