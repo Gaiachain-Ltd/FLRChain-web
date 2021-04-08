@@ -14,6 +14,7 @@
             :description="!isFacililator"
           ></DetailsProjectDelegate>
         </template>
+        <ProjectsInfoLabel class="mr-3"></ProjectsInfoLabel>
       </ProjectList>
       <ProjectList
         class="mt-10 ml-6"
@@ -64,6 +65,7 @@ export default {
       import("@/components/delegates/InvestedProjectDelegate"),
     FilterProjectButton: () =>
       import("@/components/buttons/FilterProjectButton"),
+    ProjectsInfoLabel: () => import("@/components/texts/ProjectsInfoLabel"),
   },
   computed: {
     ...mapGetters(["isFacililator"]),
