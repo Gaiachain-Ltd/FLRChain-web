@@ -15,7 +15,9 @@
         </v-layout>
         <v-spacer></v-spacer>
         <v-flex shrink class="mb-6">
-          <AccountWidget></AccountWidget>
+          <client-only>
+            <AccountWidget></AccountWidget>
+          </client-only>
         </v-flex>
       </v-layout>
     </v-navigation-drawer>

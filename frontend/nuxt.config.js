@@ -42,6 +42,9 @@ module.exports = {
     '@nuxtjs/auth',
     '@nuxtjs/moment',
   ],
+  plugins: [
+    { src: '~/plugins/vue-timers', mode: 'client' }
+  ],
   publicRuntimeConfig: {
     axios: {
       baseURL: process.env.BASE_URL + 'api/v1/'

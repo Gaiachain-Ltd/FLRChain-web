@@ -40,6 +40,9 @@
 import { mapGetters } from "vuex";
 
 export default {
+  timers: {
+    refresh: { time: 30000, autostart: true, repeat: true },
+  },
   data() {
     return {
       total: 0,
@@ -56,6 +59,11 @@ export default {
     DefaultText: () => import("@/components/texts/DefaultText"),
     AccountWidgetDelegate: () =>
       import("@/components/delegates/AccountWidgetDelegate"),
+  },
+  methods: {
+    refresh() {
+      this.$fetch();
+    },
   },
   async fetch() {
     const balanceInfo = await this.$axios
