@@ -71,7 +71,6 @@ export default {
     this.transactions = this.processTransactions(
       await this.$axios.get("transactions/").then((reply) => reply.data.results)
     );
-    console.log("TRANS", this.transactions);
   },
 };
 </script>

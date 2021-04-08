@@ -1,11 +1,11 @@
 <template>
   <v-app class="background-style">
     <v-navigation-drawer app class="background-style">
-      <v-layout column align-center>
+      <v-layout column align-center fill-height>
         <v-flex shrink mt-6>
           <img :src="logo" />
         </v-flex>
-        <v-layout shrink column ml-10 mt-6>
+        <v-layout shrink column mt-6>
           <SideMenuItem
             class="my-3"
             v-for="item in items"
@@ -14,6 +14,9 @@
           ></SideMenuItem>
         </v-layout>
         <v-spacer></v-spacer>
+        <v-flex shrink class="mb-6">
+          <AccountWidget></AccountWidget>
+        </v-flex>
       </v-layout>
     </v-navigation-drawer>
     <v-main>
@@ -73,6 +76,7 @@ export default {
   },
   components: {
     SideMenuItem: () => import("@/components/sidemenu/SideMenuItem"),
+    AccountWidget: () => import("@/components/widgets/AccountWidget"),
   },
 };
 </script>
