@@ -5,7 +5,7 @@
         <v-flex shrink mt-6>
           <img :src="logo" />
         </v-flex>
-        <v-layout shrink column mt-6>
+        <v-layout shrink column ml-10 mt-6>
           <SideMenuItem
             class="my-3"
             v-for="item in items"

@@ -5,7 +5,7 @@
     }}</DefaultText>
     <v-spacer></v-spacer>
     <DefaultText
-      class="ml-3"
+      class="ml-6"
       :size="12"
       :color="$vuetify.theme.themes.light.quinary"
       >{{ formattedValue }}</DefaultText
