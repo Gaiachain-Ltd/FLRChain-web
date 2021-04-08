@@ -67,6 +67,11 @@
       v-if="errorPopupVisible"
       :value.sync="errorPopupVisible"
     ></ErrorPopup>
+        <SuccessPopup
+      v-if="successPopupVisible"
+      :value.sync="successPopupVisible"
+      text="Project has been saved successfully."
+    ></SuccessPopup>
   </v-layout>
 </template>
 
@@ -77,6 +82,7 @@ export default {
   data() {
     return {
       errorPopupVisible: false,
+      successPopupVisible: false,
       project: {},
       edit: false,
     };
@@ -102,6 +108,7 @@ export default {
     InputTasksCard: () => import("@/components/cards/project/InputTasksCard"),
     ActionButton: () => import("@/components/buttons/ActionButton"),
     ErrorPopup: () => import("@/components/popups/ErrorPopup"),
+    SuccessPopup: () => import("@/components/popups/SuccessPopup"),
   },
   computed: {
     ...mapGetters(["isFacililator"]),
@@ -111,8 +118,10 @@ export default {
       if (this.edit) {
         this.$axios
           .put(`projects/${this.$route.params.id}/`, this.project)
-          .then((reply) => (this.project = reply.data))
-          .catch(() => (this.errorPopupVisible = true));
+          .then((reply) => {
+            this.project = reply.data;
+            this.successPopupVisible = true;
+          }).catch(() => (this.errorPopupVisible = true));
       }
       this.edit = !this.edit;
     },
