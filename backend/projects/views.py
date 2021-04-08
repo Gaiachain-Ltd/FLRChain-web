@@ -13,7 +13,8 @@ from django_filters import rest_framework as filters
 class ProjectView(CommonView):
     serializer_class = ProjectSerializer
     filterset_fields = {
-        'investment': ['isnull',]
+        'investment': ['isnull',],
+        'investment__status': ['exact',]
     }
 
     @swagger_auto_schema(

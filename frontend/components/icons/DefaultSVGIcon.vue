@@ -1,6 +1,6 @@
 <template>
   <v-flex shrink :style="iconStyle">
-    <img :src="icon" :style="iconStyle" />
+    <v-img :src="icon" :style="iconStyle" />
   </v-flex>
 </template>
 

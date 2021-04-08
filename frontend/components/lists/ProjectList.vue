@@ -1,7 +1,11 @@
 <template>
   <v-layout column fill-height>
     <v-layout column fill-height>
-      <DefaultText :size="24" :color="color">{{ title }}</DefaultText>
+      <v-layout row ma-0 shrink>
+        <DefaultText :size="24" :color="color">{{ title }}</DefaultText>
+        <v-spacer></v-spacer>
+        <slot></slot>
+      </v-layout>
       <v-layout column ma-0 mt-6 class="list-style">
         <v-flex
           class="ma-0 mb-6 ml-1 mr-3"
@@ -33,6 +37,11 @@ export default {
     query: {
       type: Object,
       default: undefined,
+    },
+  },
+  watch: {
+    query() {
+      this.$fetch();
     },
   },
   data() {

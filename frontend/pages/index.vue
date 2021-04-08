@@ -24,6 +24,22 @@
         <template v-slot:delegate="{ project }">
           <InvestedProjectDelegate :project="project"></InvestedProjectDelegate>
         </template>
+        <v-layout row ma-0 shrink align-center mr-3>
+          <v-btn-toggle v-model="activeFilter">
+            <v-flex shrink mr-3>
+              <FilterProjectButton
+                label="Ongoing"
+                activeProjects
+              ></FilterProjectButton>
+            </v-flex>
+            <v-flex shrink>
+              <FilterProjectButton
+                label="Finished"
+                inactiveProjects
+              ></FilterProjectButton>
+            </v-flex>
+          </v-btn-toggle>
+        </v-layout>
       </ProjectList>
     </v-layout>
     <v-spacer></v-spacer>
@@ -34,6 +50,11 @@
 import { mapGetters } from "vuex";
 
 export default {
+  data() {
+    return {
+      activeFilter: undefined,
+    };
+  },
   components: {
     ToolBar: () => import("@/components/toolbar/ToolBar"),
     ProjectList: () => import("@/components/lists/ProjectList"),
@@ -41,6 +62,8 @@ export default {
       import("@/components/delegates/DetailsProjectDelegate"),
     InvestedProjectDelegate: () =>
       import("@/components/delegates/InvestedProjectDelegate"),
+    FilterProjectButton: () =>
+      import("@/components/buttons/FilterProjectButton"),
   },
   computed: {
     ...mapGetters(["isFacililator"]),
@@ -54,7 +77,14 @@ export default {
       return this.isFacililator ? "My active projects" : "Donated projects";
     },
     secondQuery() {
-      return { investment__isnull: false };
+      if (this.activeFilter === undefined) {
+        return { investment__isnull: false };
+      } else {
+        return {
+          investment__isnull: false,
+          investment__status: this.activeFilter === 0 ? 1 : 0,
+        };
+      }
     },
   },
 };
