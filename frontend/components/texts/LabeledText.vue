@@ -5,9 +5,14 @@
         label
       }}</DefaultText>
     </v-flex>
-    <v-flex>
-      <DefaultText :size="14">{{ text }}</DefaultText>
-    </v-flex>
+    <v-layout row shrink ma-0 align-center>
+      <v-flex v-if="icon" shrink mb-1 mr-2>
+        <DefaultSVGIcon :icon="icon" :size="16"></DefaultSVGIcon>
+      </v-flex>
+      <v-flex>
+        <DefaultText :size="14">{{ text }}</DefaultText>
+      </v-flex>
+    </v-layout>
   </v-layout>
 </template>
 
@@ -20,9 +25,13 @@ export default {
     text: {
       type: String,
     },
+    icon: {
+      type: String,
+    },
   },
   components: {
     DefaultText: () => import("@/components/texts/DefaultText"),
+    DefaultSVGIcon: () => import("@/components/icons/DefaultSVGIcon"),
   },
 };
 </script>

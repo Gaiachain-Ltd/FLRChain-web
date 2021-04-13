@@ -1,10 +1,11 @@
 <template>
   <v-layout column mt-2>
     <ToolBar title="Project details"> </ToolBar>
-    <v-layout row align-center ma-0>
+    <v-layout row align-center ma-0 shrink>
       <DefaultTitle class="mt-10 mb-5">{{ project.title }}</DefaultTitle>
       <v-spacer></v-spacer>
       <ActionButton
+        v-if="!isFinished && isFacililator"
         class="white--text"
         :label="edit ? 'Save project' : 'Edit project'"
         :color="edit ? 'primary' : 'septenary'"
@@ -112,6 +113,9 @@ export default {
   },
   computed: {
     ...mapGetters(["isFacililator"]),
+    isFinished() {
+      return this.project.investment && this.project.investment.status === 0;
+    }
   },
   methods: {
     handleEdit() {

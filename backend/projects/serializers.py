@@ -26,12 +26,18 @@ class ProjectSerializer(serializers.ModelSerializer):
     tasks = TaskSerializer(many=True)
     investment = InvestmentSerializer(required=False, read_only=True)
     assignment_status = serializers.IntegerField(required=False)
+    facililator = serializers.SerializerMethodField(required=False, read_only=True)
 
     class Meta:
         model = Project
         fields = ('id', 'title', 'description', 'start', 'end',
-                  'tasks', 'assignment_status', 'investment')
-        read_only_fields = ('assignment_status', 'investment')
+                  'tasks', 'assignment_status', 'investment',
+                  'facililator')
+        read_only_fields = ('assignment_status', 'investment',
+                            'facililator')
+
+    def get_facililator(self, obj):
+        return f"{obj.owner.first_name} {obj.owner.last_name}"
 
     def create(self, validated_data):
         with transaction.atomic():

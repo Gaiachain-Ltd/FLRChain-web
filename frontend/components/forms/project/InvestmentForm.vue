@@ -24,6 +24,7 @@
           label="Coins for investment*"
           :text.sync="investment.amount"
           :rules="[...requiredRules, ...decimalRules, ...nonZeroDecimalRules]"
+          :icon="icon"
           required
         ></TextInput>
       </v-flex>
@@ -39,6 +40,11 @@ export default {
   props: {
     investment: {},
   },
+  data() {
+    return {
+      icon: require("@/assets/icons/currency.svg"),
+    };
+  },
   components: {
     TextInput: () => import("@/components/inputs/TextInput"),
     DateInput: () => import("@/components/inputs/DateInput"),
@@ -46,8 +52,8 @@ export default {
   methods: {
     validate() {
       return this.$refs.form.validate();
-    }
-  }
+    },
+  },
 };
 </script>
 

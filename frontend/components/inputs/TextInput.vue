@@ -17,7 +17,11 @@
       :required="required"
       :rules="rules"
       @blur="validate"
-    ></v-text-field>
+    >
+      <v-layout v-if="icon" column pr-2 mb-1 align-center slot="prepend-inner">
+        <DefaultSVGIcon :icon="icon"></DefaultSVGIcon>
+      </v-layout>
+    </v-text-field>
   </v-layout>
 </template>
 
@@ -50,6 +54,9 @@ export default {
     error: {
       type: Boolean,
       default: false,
+    },
+    icon: {
+      type: String,
     },
   },
   data() {
@@ -98,6 +105,7 @@ export default {
   },
   components: {
     DefaultText: () => import("@/components/texts/DefaultText"),
+    DefaultSVGIcon: () => import("@/components/icons/DefaultSVGIcon"),
   },
 };
 </script>

@@ -13,7 +13,7 @@
         ></DefaultIconButton>
       </v-layout>
       <v-layout row ma-0>
-        <v-flex xs9>
+        <v-flex grow>
           <TextInput
             label="Action*"
             :text.sync="task.action"
@@ -22,11 +22,12 @@
             required
           ></TextInput>
         </v-flex>
-        <v-flex ml-6>
+        <v-flex ml-6 shrink>
           <TextInput
             label="Reward*"
             :text.sync="task.reward"
             :rules="[...requiredRules, ...decimalRules, ...nonZeroDecimalRules]"
+            :icon="icon"
             required
           ></TextInput>
         </v-flex>
@@ -48,8 +49,8 @@ export default {
     },
     showDeleteBtn: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
   data() {
     return {
@@ -59,6 +60,7 @@ export default {
         enabled: true,
         colorEnabled: this.$vuetify.theme.themes.light.error,
       },
+      icon: require("@/assets/icons/currency.svg"),
     };
   },
   components: {
