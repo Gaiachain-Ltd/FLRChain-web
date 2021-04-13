@@ -12,24 +12,24 @@
       </v-layout>
       <v-layout row mb-6 ma-0>
         <v-flex>
-          <DefaultText>Facililator fee (10%)</DefaultText>
+          <DefaultText>{{ facililatorFeeLabel }}</DefaultText>
         </v-flex>
         <v-spacer></v-spacer>
         <v-flex shrink>
           <DefaultText>{{ facililatorFee }}</DefaultText>
         </v-flex>
       </v-layout>
-      <v-layout row mb-6 ma-0>
+      <v-layout row ma-0 :class="!isFacililator ? 'mb-6' : ''">
         <v-flex>
-          <DefaultText>Spent</DefaultText>
+          <DefaultText>{{ spentLabel }}</DefaultText>
         </v-flex>
         <v-spacer></v-spacer>
         <v-flex shrink>
           <DefaultText>{{ spent }}</DefaultText>
         </v-flex>
       </v-layout>
-      <v-divider class="mb-6"></v-divider>
-      <v-layout row ma-0 shrink>
+      <v-divider v-if="!isFacililator" class="mb-6"></v-divider>
+      <v-layout row ma-0 shrink v-if="!isFacililator">
         <v-flex shrink>
           <DefaultText>Balance</DefaultText>
         </v-flex>
@@ -59,8 +59,14 @@ export default {
     total() {
       return `${parseFloat(this.investment.total)} USDC`;
     },
+    facililatorFeeLabel() {
+      return this.isFacililator ? "Earned fee (10%)" : "Facililator fee (10%)";
+    },
     facililatorFee() {
       return `${parseFloat(this.investment.facililator_fee)} USDC`;
+    },
+    spentLabel() {
+      return this.isFacililator ? "Tasks rewards" : "Spent";
     },
     spent() {
       return `${parseFloat(this.investment.spent)} USDC`;
