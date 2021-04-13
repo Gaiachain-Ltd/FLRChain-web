@@ -1,8 +1,9 @@
 <template>
   <v-layout column mt-2>
     <ToolBar title="Project details"> </ToolBar>
-    <v-layout row align-center ma-0 shrink>
-      <DefaultTitle class="mt-10 mb-5">{{ project.title }}</DefaultTitle>
+    <v-layout row align-center ma-0 shrink mt-10 mb-5 >
+      <DefaultTitle class="mr-3">{{ project.title }}</DefaultTitle>
+      <ProjectStatusLabel :status="projectStatus"></ProjectStatusLabel>
       <v-spacer></v-spacer>
       <ActionButton
         v-if="!isFinished && isFacililator"
@@ -68,7 +69,7 @@
       v-if="errorPopupVisible"
       :value.sync="errorPopupVisible"
     ></ErrorPopup>
-        <SuccessPopup
+    <SuccessPopup
       v-if="successPopupVisible"
       :value.sync="successPopupVisible"
       text="Project has been saved successfully."
@@ -110,12 +111,24 @@ export default {
     ActionButton: () => import("@/components/buttons/ActionButton"),
     ErrorPopup: () => import("@/components/popups/ErrorPopup"),
     SuccessPopup: () => import("@/components/popups/SuccessPopup"),
+    ProjectStatusLabel: () => import("@/components/texts/ProjectStatusLabel"),
   },
   computed: {
     ...mapGetters(["isFacililator"]),
     isFinished() {
       return this.project.investment && this.project.investment.status === 0;
-    }
+    },
+    projectStatus() {
+      if (this.project.investment) {
+        if (this.isFinished) {
+          return "Finished";
+        } else {
+          return "Ongoing";
+        }
+      } else {
+        return "Waiting for investor";
+      }
+    },
   },
   methods: {
     handleEdit() {
@@ -125,7 +138,8 @@ export default {
           .then((reply) => {
             this.project = reply.data;
             this.successPopupVisible = true;
-          }).catch(() => (this.errorPopupVisible = true));
+          })
+          .catch(() => (this.errorPopupVisible = true));
       }
       this.edit = !this.edit;
     },

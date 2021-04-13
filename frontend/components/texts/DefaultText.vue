@@ -6,7 +6,7 @@
     :style="{
       color: color || $vuetify.theme.themes.light.quaternary,
       fontSize: `${size}px !important`,
-      fontFamily: family
+      fontFamily: family,
     }"
   >
     <slot></slot>
