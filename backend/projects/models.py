@@ -1,5 +1,5 @@
 from django.db import models
-from projects.managers import ProjectManager
+from projects.managers import ProjectManager, ProjectQuerySet
 
 
 class Project(models.Model):
@@ -15,7 +15,7 @@ class Project(models.Model):
         'users.CustomUser', through='Assignment', related_name='beneficiary_list')
     tasks = models.ManyToManyField('projects.Task', related_name='tasks')
 
-    objects = ProjectManager()
+    objects = ProjectManager.from_queryset(ProjectQuerySet)()
 
 
 class Task(models.Model):

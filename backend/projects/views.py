@@ -25,9 +25,11 @@ class ProjectView(CommonView):
             projects = Project.objects.with_beneficiary_assignment_status(
                 request.user)
         elif request.user.type == CustomUser.FACILITATOR:
-            projects = Project.objects.filter(owner=request.user)
+            projects = Project.objects.filter(
+                owner=request.user).with_sum_spent_transactions()
         else:
-            projects = Project.objects.for_investor(request.user)
+            projects = Project.objects.for_investor(
+                request.user).with_sum_spent_transactions()
 
         return self.paginated_response(projects, request)
 

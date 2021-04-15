@@ -27,14 +27,15 @@ class ProjectSerializer(serializers.ModelSerializer):
     investment = InvestmentSerializer(required=False, read_only=True)
     assignment_status = serializers.IntegerField(required=False)
     facililator = serializers.SerializerMethodField(required=False, read_only=True)
+    spent = serializers.DecimalField(max_digits=26, decimal_places=6, required=False, read_only=True)
 
     class Meta:
         model = Project
         fields = ('id', 'title', 'description', 'start', 'end',
                   'tasks', 'assignment_status', 'investment',
-                  'facililator')
+                  'facililator', 'spent')
         read_only_fields = ('assignment_status', 'investment',
-                            'facililator')
+                            'facililator', 'spent')
 
     def get_facililator(self, obj):
         return f"{obj.owner.first_name} {obj.owner.last_name}"

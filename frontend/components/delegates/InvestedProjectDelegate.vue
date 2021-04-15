@@ -60,7 +60,6 @@ export default {
     };
   },
   components: {
-    ...mapGetters(["isFacililator"]),
     DefaultText: () => import("@/components/texts/DefaultText"),
     DefaultSVGIcon: () => import("@/components/icons/DefaultSVGIcon"),
     LabeledTextWithIcon: () => import("@/components/texts/LabeledTextWithIcon"),
@@ -68,6 +67,7 @@ export default {
       import("@/components/delegates/DefaultProjectDelegate"),
   },
   computed: {
+    ...mapGetters(["isFacililator"]),
     investmentTime() {
       return `${this.project.investment.start} - ${this.project.investment.end}`;
     },
@@ -75,7 +75,7 @@ export default {
       return this.formattedValue(this.project.investment.amount);
     },
     spentAmount() {
-      return this.formattedValue(this.project.investment.amount);
+      return this.formattedValue(this.project.spent);
     },
     icon() {
       return this.project.investment.status
