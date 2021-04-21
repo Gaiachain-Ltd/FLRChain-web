@@ -80,7 +80,6 @@ class Transaction(models.Model):
             Transaction.OPT_IN))
 
         txns.extend(chain)
-
         utils.atomic_transfer(txns)
 
         # TODO: batch_create

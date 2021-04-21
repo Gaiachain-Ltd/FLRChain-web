@@ -130,6 +130,6 @@ def atomic_transfer(txns):
             sgtxns.append(signed)
 
         txn[1].txid = signed.get_txid()
-
+        
     CLIENT.send_transactions(sgtxns)
     return base64.b64encode(gtxn).decode('ascii')

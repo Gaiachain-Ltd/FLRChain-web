@@ -5,8 +5,8 @@ from users.models import CustomUser
 class CustomUserSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField(required=False)
     last_name = serializers.CharField(required=False)
-    phone = serializers.CharField(required=False)
-    village = serializers.CharField(required=False)
+    phone = serializers.CharField(required=False, allow_blank=True)
+    village = serializers.CharField(required=False, allow_blank=True)
 
     class Meta:
         model = CustomUser
