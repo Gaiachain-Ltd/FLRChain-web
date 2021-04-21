@@ -1,4 +1,5 @@
 static
 media
 .env
+accounts/fixtures/main_account.json
 **/__pycache__/
