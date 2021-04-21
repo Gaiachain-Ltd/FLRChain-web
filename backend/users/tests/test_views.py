@@ -18,6 +18,12 @@ class RegisterViewTest(TestCase):
         self.user.set_password('test12345')
         self.user.save()
 
+    def tearDown(self):
+        from accounts.tasks import transfer_back_funds
+
+        CustomUser.objects.all().delete()
+        transfer_back_funds()
+
     def test_register(self):
         def _register(data, status):
             reply = client.post(
