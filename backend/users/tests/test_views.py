@@ -7,7 +7,7 @@ from rest_framework import status
 client = APIClient()
 
 
-class RegisterViewTest(TestCase):
+class UsersViewTest(TestCase):
     fixtures = ['main_account.json', ]
 
     def setUp(self):
