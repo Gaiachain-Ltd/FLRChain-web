@@ -8,6 +8,7 @@ from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from users.models import CustomUser
 from django_filters import rest_framework as filters
+from users.permissions import *
 
 
 class ProjectView(CommonView):
@@ -16,6 +17,11 @@ class ProjectView(CommonView):
         'investment': ['isnull',],
         'investment__status': ['exact',]
     }
+
+    def get_permissions(self):
+        if self.request.method in ["POST", "PUT"]:
+            return [permission() for permission in [*self.permission_classes, isFacilitator]]
+        return [permission() for permission in self.permission_classes]
 
     @swagger_auto_schema(
         operation_summary="Full project list",
