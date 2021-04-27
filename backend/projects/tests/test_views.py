@@ -66,19 +66,9 @@ class ProjectsViewTest(TestCase):
 
         client.force_authenticate(user=self.facililator)
 
-        # Incorrect start/end:
-        #TODO: Handle it!
-        _create({
-                'start': "2021-03-01",
-                'end': "2020-03-01",
-                'title': "My project",
-                'description': "Test",
-                'tasks': []
-                }, status.HTTP_201_CREATED)
-
         # Tasks:
         _create({
-            'start': "2021-03-01",
+            'start': "2020-03-01",
             'end': "2020-03-01",
             'title': "My project",
             'description': "Test",
@@ -114,7 +104,7 @@ class ProjectsViewTest(TestCase):
             client.force_authenticate(user=data[0])
 
             _update({
-                'start': "2021-03-01",
+                'start': "2020-03-01",
                 'end': "2020-03-01",
                 'title': "My project",
                 'description': "Test",

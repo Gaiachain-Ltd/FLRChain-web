@@ -40,6 +40,14 @@ class ProjectSerializer(serializers.ModelSerializer):
     def get_facililator(self, obj):
         return f"{obj.owner.first_name} {obj.owner.last_name}"
 
+    def validate(self, data):
+        """
+        Check that the start is before the end.
+        """
+        if data['start'] > data['end']:
+            raise serializers.ValidationError({"end": "end must occur after start"})
+        return data
+
     def create(self, validated_data):
         with transaction.atomic():
             project = Project.objects.create(
