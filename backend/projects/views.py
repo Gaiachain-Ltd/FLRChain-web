@@ -19,6 +19,9 @@ class ProjectView(CommonView):
     }
 
     def get_permissions(self):
+        """
+        Only facililator can make and update projects.
+        """
         if self.request.method in ["POST", "PUT"]:
             return [permission() for permission in [*self.permission_classes, isFacilitator]]
         return [permission() for permission in self.permission_classes]
@@ -81,6 +84,18 @@ class ProjectView(CommonView):
 class AssignmentView(CommonView):
     serializer_class = AssignmentSerializer
 
+    def get_permissions(self):
+        """
+        Only beneficiary can make join request.
+        Only facililator can get list of pending beneficiaries.
+        Only facililator can accept/reject join request.
+        """
+        if self.request.method == "POST":
+            return [permission() for permission in [*self.permission_classes, isBeneficiary]]
+        elif self.request.method in ["GET", "PUT"]:
+            return [permission() for permission in [*self.permission_classes, isFacilitator]]
+        return [permission() for permission in self.permission_classes]
+
     @swagger_auto_schema(
         operation_summary="Beneficiary list",
         tags=['assignment', 'facililator'])
@@ -105,7 +120,7 @@ class AssignmentView(CommonView):
         operation_summary="Accept or reject join request",
         request_body=AssignmentSerializer,
         tags=['assignment', 'facililator'])
-    def patrial_update(self, request, pk=None):
+    def update(self, request, pk=None):
         assignment = get_object_or_404(Assignment, pk=pk)
         serializer = self.serializer_class(assignment, data=request.data)
         serializer.is_valid(raise_exception=True)

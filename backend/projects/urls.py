@@ -5,5 +5,5 @@ urlpatterns = [
     path('projects/', ProjectView.as_view({'get': 'list', 'post': 'create'})),
     path('projects/<int:pk>/', ProjectView.as_view({'get': 'retrieve', 'put': 'update'})),
     path('projects/<int:pk>/assignments/', AssignmentView.as_view({'get': 'list', 'post': 'create'})),
-    path('projects/assignments/<int:pk>/', AssignmentView.as_view({'put': 'patrial_update'})),
+    path('projects/assignments/<int:pk>/', AssignmentView.as_view({'put': 'update'})),
 ]
