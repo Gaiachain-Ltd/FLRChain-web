@@ -90,7 +90,40 @@ class ProjectsViewTest(TestCase):
 
     def test_retrieve(self):
         def _retrieve(status):
-            reply = client.get(f'/api/v1/project/{self.project.id}/')
+            reply = client.get(
+                f'/api/v1/projects/{self.project.id}/', format='json')
             self.assertEqual(reply.status_code, status)
 
+        client.force_authenticate(user=self.facililator)
         
+        _retrieve(status.HTTP_200_OK)
+
+
+    def test_update(self):
+        def _update(data, status):
+            reply = client.put(
+                f'/api/v1/projects/{self.project.id}/', data, format='json')
+            self.assertEqual(reply.status_code, status)
+        
+
+        for data in [
+            (self.beneficiary, status.HTTP_403_FORBIDDEN),
+            (self.facililator, status.HTTP_200_OK),
+            (self.investor, status.HTTP_403_FORBIDDEN)]:
+
+            client.force_authenticate(user=data[0])
+
+            _update({
+                'start': "2021-03-01",
+                'end': "2020-03-01",
+                'title': "My project",
+                'description': "Test",
+                'tasks': [{
+                    'action': "Task1",
+                    'reward': 0.0001
+                },
+                {
+                    'action': "Task2",
+                    'reward': 0.0002
+                }]
+            }, data[1])
