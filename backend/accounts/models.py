@@ -72,11 +72,11 @@ class Account(models.Model):
 
     def opt_in(self, chain=[]):
         main_account = Account.get_main_account()
-        Transaction.opt_in(
+        logger.debug("Opt-In transaction for %s account.", self.address)
+        return Transaction.opt_in(
             self,
             main_account,
             chain)
-        logger.debug("Opt-In transaction for %s account.", self.address)
 
     def usdc_balance(self):
         return utils.usdc_balance(self.address)

@@ -46,7 +46,7 @@ class SmartContract(models.Model):
             facilitator_fee = investment.amount * Decimal(settings.FACILITATOR_FEE)
             investment_amount = investment.amount - facilitator_fee
             
-            smart_contract_account.opt_in([
+            return (smart_contract_account.opt_in([
                 Transaction.prepare_transfer(
                     investment.investor.account,
                     investment.project.owner.account,
@@ -62,7 +62,7 @@ class SmartContract(models.Model):
                     currency=Transaction.USDC,
                     action=Transaction.INVESTMENT,
                     project=investment.project)
-            ])
+            ]), smart_contract_account)
         
     def compile(self):
         def _logic(secret, facililator_address, investor_address, deadline):
