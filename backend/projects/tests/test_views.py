@@ -1,6 +1,7 @@
 from users.models import CustomUser
-from common.tests import CommonTestCase
+from rest_framework import status
 from projects.models import Project, Assignment
+from common.tests import CommonTestCase
 
 
 class ProjectsViewTest(CommonTestCase):
