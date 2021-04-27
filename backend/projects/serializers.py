@@ -3,6 +3,7 @@ from projects.models import *
 from django.db import transaction
 from users.serializers import CustomUserSerializer
 from investments.serializers import InvestmentSerializer
+from decimal import *
 
 
 class TaskListSerializer(serializers.ListSerializer):
@@ -18,6 +19,11 @@ class TaskSerializer(serializers.ModelSerializer):
         model = Task
         fields = ('id', 'action', 'reward', 'deleted')
         read_only_fields = ('id',)
+
+    def validate(self, data):
+        if Decimal(data['reward']) < 0:
+            raise serializers.ValidationError({"reward": "reward must be greater than zero"})
+        return data
 
 
 class ProjectSerializer(serializers.ModelSerializer):
