@@ -5,6 +5,7 @@ from accounts.models import Account
 
 
 class TransactionsViewTest(CommonTestCase):
+
     def setUp(self):
         self.beneficiary = CustomUser.objects.create(
             email="beneficiary@test.com",

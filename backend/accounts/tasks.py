@@ -14,7 +14,12 @@ def transfer_back_funds():
         smart_contract__isnull=True,
         type=Account.NORMAL_ACCOUNT)[:10]
 
-    main = Account.get_main_account()
+    try:
+        main = Account.get_main_account()
+    except Exception as e:
+        logger.error("Error: %s", e)
+        return
+        
     for account in accounts:
         try:
             Transaction.transfer(
@@ -33,6 +38,6 @@ def transfer_back_funds():
                 main)
 
             account.delete()
-            logging.warning("Account %s closed.", account.address)
+            logger.warning("Account %s closed.", account.address)
         except Exception as e:
-            logging.error("Error: %s", e)
+            logger.error("Error: %s", e)

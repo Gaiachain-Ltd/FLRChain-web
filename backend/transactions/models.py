@@ -87,6 +87,8 @@ class Transaction(models.Model):
             trans = tx[1]
             trans.save()
 
+        return [tx[1].txid for tx in txns]
+
     @staticmethod
     def transfer(sender, receiver, amount,
                  currency=0, action=2, close=None, 
