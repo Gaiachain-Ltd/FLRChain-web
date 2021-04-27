@@ -1,6 +1,6 @@
 from users.models import CustomUser
 from rest_framework import status
-from projects.models import Project
+from projects.models import Project, Assignment
 from common.tests import CommonTestCase
 
 
@@ -105,6 +105,12 @@ class AssignmentViewTest(CommonTestCase):
             last_name="beneficiaryt",
             type=CustomUser.BENEFICIARY)
 
+        self.beneficiary2 = CustomUser.objects.create(
+            email="beneficiary@test2.com",
+            first_name="beneficiary",
+            last_name="beneficiaryt",
+            type=CustomUser.BENEFICIARY)
+
         self.facililator = CustomUser.objects.create(
             email="facililator@test.com",
             first_name="facililator",
@@ -124,6 +130,11 @@ class AssignmentViewTest(CommonTestCase):
             title="Ma project",
             description="Test")
 
+        self.assignment = Assignment.objects.create(
+            beneficiary=self.beneficiary,
+            project=self.project,
+            status=Assignment.WAITING)
+
     def test_list(self):
         self._list(
             self.facililator,
@@ -142,7 +153,7 @@ class AssignmentViewTest(CommonTestCase):
 
     def test_create(self):
         self._create(
-            self.beneficiary,
+            self.beneficiary2,
             f"/api/v1/projects/{self.project.id}/assignments/",
             {},
             status.HTTP_201_CREATED)
@@ -158,3 +169,34 @@ class AssignmentViewTest(CommonTestCase):
             f"/api/v1/projects/{self.project.id}/assignments/",
             {},
             status.HTTP_403_FORBIDDEN)
+
+    def test_update(self):
+        self._update(
+            self.beneficiary,
+            f"/api/v1/projects/assignments/{self.assignment.id}/",
+            {
+                "beneficiary": {
+                    "id": self.beneficiary.id,
+                },
+                "status": Assignment.REJECTED
+            }, status.HTTP_403_FORBIDDEN)
+
+        self._update(
+            self.investor,
+            f"/api/v1/projects/assignments/{self.assignment.id}/",
+            {
+                "beneficiary": {
+                    "id": self.beneficiary.id,
+                },
+                "status": Assignment.REJECTED
+            }, status.HTTP_403_FORBIDDEN)
+
+        self._update(
+            self.facililator,
+            f"/api/v1/projects/assignments/{self.assignment.id}/",
+            {
+                "beneficiary": {
+                    "id": self.beneficiary.id,
+                },
+                "status": Assignment.REJECTED
+            }, status.HTTP_200_OK)

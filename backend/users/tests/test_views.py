@@ -1,11 +1,6 @@
-from django.test import TestCase
-from rest_framework.test import APIClient
 from users.models import CustomUser
 from rest_framework import status
 from common.tests import CommonTestCase
-
-
-client = APIClient()
 
 
 class UsersViewTest(CommonTestCase):
