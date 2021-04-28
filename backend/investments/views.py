@@ -9,10 +9,13 @@ from investments.models import Investment
 from rest_framework.response import Response
 from django.db import transaction
 from smart_contracts.models import SmartContract
+from users.permissions import isInvestor
+from rest_framework.permissions import IsAuthenticated
 
 
 class InvestmentView(CommonView):
     serializer_class = InvestmentSerializer
+    permission_classes = [IsAuthenticated, isInvestor]
 
     @swagger_auto_schema(
         operation_summary="Invest in project",
