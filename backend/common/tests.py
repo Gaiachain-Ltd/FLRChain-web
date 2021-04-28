@@ -14,23 +14,24 @@ class CommonTestCase(TestCase):
     def _auth(self, user):
         client.force_authenticate(user=user)
 
-    def _create(self, user, url, data, status):
+    def _create(self, user, url, data, status, format='json'):
         self._auth(user)
-        reply = client.post(url, data, format='json')
+        reply = client.post(url, data, format=format)
+        print(reply.data)
         self.assertEqual(reply.status_code, status)
 
-    def _update(self, user, url, data, status):
+    def _update(self, user, url, data, status, format='json'):
         self._auth(user)
-        reply = client.put(url, data, format='json')
+        reply = client.put(url, data, format=format)
         self.assertEqual(reply.status_code, status)
 
-    def _list(self, user, url, status):
+    def _list(self, user, url, status, format='json'):
         self._auth(user)
-        reply = client.get(url, format='json')
+        reply = client.get(url, format=format)
         self.assertEqual(reply.status_code, status)
 
-    def _retrieve(self, user, url, status):
+    def _retrieve(self, user, url, status, format='json'):
         self._auth(user)
-        reply = client.get(url, format='json')
+        reply = client.get(url, format=format)
         self.assertEqual(reply.status_code, status)
 

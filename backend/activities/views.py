@@ -10,11 +10,21 @@ from activities.models import Activity
 from django.db import transaction
 from transactions.models import Transaction
 from users.models import CustomUser
+from users.permissions import isBeneficiary
 
 
 class ActivityView(CommonView):
     serializer_class = ActivitySerializer
     parser_classes = (MultiPartParser,)
+
+    def get_permissions(self):
+        """
+        Only facililator can make and update projects.
+        """
+        if self.request.method == "POST":
+            return [permission() for permission in [*self.permission_classes, isBeneficiary]]
+        return [permission() for permission in self.permission_classes]
+
 
     @swagger_auto_schema(
         operation_summary="History activity",
@@ -36,7 +46,7 @@ class ActivityView(CommonView):
                 Project.objects.with_beneficiary_assignment_status(request.user),
                 assignment_status=Assignment.ACCEPTED,
                 pk=project_pk)
-            
+                
             task = get_object_or_404(
                 Task, 
                 project=project, 
@@ -61,4 +71,4 @@ class ActivityView(CommonView):
             activity.save()
 
             serializer = self.serializer_class(activity)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
