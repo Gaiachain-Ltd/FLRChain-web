@@ -1,9 +1,9 @@
-from django.test import TestCase
+from common.tests import CommonTestCase
 from users.models import CustomUser
 from projects.serializers import ProjectSerializer, TaskSerializer
 
 
-class ProjectSerializerTest(TestCase):
+class ProjectSerializerTest(CommonTestCase):
     def test_validate(self):
         serializer = ProjectSerializer(data={
             'start': "2022-03-01",
@@ -24,7 +24,7 @@ class ProjectSerializerTest(TestCase):
         self.assertEqual(serializer.is_valid(), True)
 
 
-class TaskSerializerTest(TestCase):
+class TaskSerializerTest(CommonTestCase):
     def test_validate(self):
         serializer = TaskSerializer(data={
             'action': "Test",

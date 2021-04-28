@@ -41,7 +41,7 @@ class Investment(models.Model):
             tx1.amount = usdc_balance
             tx1.save()
 
-            Transaction.transfer(
+            tx2 = Transaction.transfer(
                 smart_contract.account,
                 self.investor.account,
                 0,
@@ -52,3 +52,5 @@ class Investment(models.Model):
 
             self.status = Investment.FINISHED
             self.save()
+
+            return [tx1.txid, tx2.txid]
