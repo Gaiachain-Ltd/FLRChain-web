@@ -25,7 +25,6 @@ class ActivityView(CommonView):
             return [permission() for permission in [*self.permission_classes, isBeneficiary]]
         return [permission() for permission in self.permission_classes]
 
-
     @swagger_auto_schema(
         operation_summary="History activity",
         tags=['activities', 'beneficiary', 'investor', 'facililator'])
@@ -46,7 +45,7 @@ class ActivityView(CommonView):
                 Project.objects.with_beneficiary_assignment_status(request.user),
                 assignment_status=Assignment.ACCEPTED,
                 pk=project_pk)
-                
+
             task = get_object_or_404(
                 Task, 
                 project=project, 
