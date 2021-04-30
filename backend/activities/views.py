@@ -11,6 +11,7 @@ from django.db import transaction
 from transactions.models import Transaction
 from users.models import CustomUser
 from users.permissions import isBeneficiary
+from algorand import utils
 
 
 class ActivityView(CommonView):
@@ -51,12 +52,20 @@ class ActivityView(CommonView):
                 project=project, 
                 pk=task_pk)
 
+            # Check if smartcontract got sufficient balance to pay reward:
+            if not project.smartcontract.check_if_sufficient_balance(task.reward):
+                return Response(
+                    { "reward": "Insufficient balance." }, status=status.HTTP_400_BAD_REQUEST)
+
             serializer = self.serializer_class(data=request.data)
             serializer.is_valid(raise_exception=True)
             activity = serializer.save(
                 user=request.user,
                 project=project,
                 task=task)
+
+            # Check balance before transfer to determine if after reward investment should be closed:
+            balance_check = project.smartcontract.check_if_sufficient_balance(extra=task.reward)
 
             transfer = Transaction.transfer(
                 project.smartcontract.account,
@@ -68,6 +77,9 @@ class ActivityView(CommonView):
 
             activity.transaction = transfer
             activity.save()
+
+            if not balance_check:
+                project.investment.finish()
 
             serializer = self.serializer_class(activity)
             return Response(serializer.data, status=status.HTTP_201_CREATED)

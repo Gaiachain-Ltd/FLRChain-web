@@ -66,7 +66,7 @@ def wait_for_confirmation(transaction_id, timeout=1000):
         dict: pending transaction information, or throws an error if the transaction
             is not confirmed or rejected in the next timeout rounds
     """
-    start_round = CLIENT.status()["last-round"] + 1;
+    start_round = CLIENT.status()["last-round"] + 1
     current_round = start_round
 
     while current_round < start_round + timeout:
@@ -78,7 +78,8 @@ def wait_for_confirmation(transaction_id, timeout=1000):
             return pending_txn
         elif pending_txn["pool-error"]:  
             raise Exception(
-                'pool error: {}'.format(pending_txn["pool-error"]))            
+                'pool error: {}'.format(pending_txn["pool-error"])) 
+        CLIENT.status_after_block(current_round)                   
         current_round += 1
     raise Exception(
         'pending tx not found in timeout rounds, timeout value = : {}'.format(timeout))

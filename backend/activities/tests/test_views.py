@@ -6,6 +6,7 @@ from rest_framework import status
 from accounts.models import Account
 from investments.models import Investment
 from smart_contracts.models import SmartContract
+from transactions.models import Transaction
 from algorand import utils
 from django.core.files.uploadedfile import SimpleUploadedFile
 
@@ -48,7 +49,7 @@ class ActivitiesViewTest(CommonTestCase):
         self.task = Task.objects.create(
             project=self.project,
             action="Test",
-            reward="0.001")
+            reward="0.05")
 
         self.project.tasks.add(self.task)
         self.project.save()
@@ -121,3 +122,19 @@ class ActivitiesViewTest(CommonTestCase):
                 "photo": file,
             },
             status.HTTP_201_CREATED, 'multipart')
+
+        transaction = Transaction.objects.get(
+            to_account=self.beneficiary_account, action=Transaction.REWARD)
+        utils.wait_for_confirmation(transaction.txid)
+
+        file = SimpleUploadedFile('small.jpg', small_jpg, content_type='image/jpeg')
+        self._create(
+            self.beneficiary,
+            f"/api/v1/projects/{self.project.id}/tasks/{self.task.id}/activities/",
+            {
+                "photo": file,
+            },
+            status.HTTP_400_BAD_REQUEST, 'multipart')
+
+        self.investment.refresh_from_db()
+        self.assertEqual(self.investment.status,Investment.FINISHED)

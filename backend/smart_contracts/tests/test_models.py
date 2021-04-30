@@ -1,7 +1,7 @@
 from common.tests import CommonTestCase
 from users.models import CustomUser
 from accounts.models import Account
-from projects.models import Project
+from projects.models import Project, Task
 from investments.models import Investment
 from smart_contracts.models import SmartContract
 from transactions.models import Transaction
@@ -41,6 +41,13 @@ class SmartContractModelTest(CommonTestCase):
             title="Ma project",
             description="Test")
 
+        self.task = Task.objects.create(
+            project=self.project,
+            action="TEST",
+            reward="0.00005")
+
+        self.project.tasks.add(self.task)
+
         self.investment = Investment.objects.create(
             investor=self.investor,
             project=self.project,
@@ -49,8 +56,9 @@ class SmartContractModelTest(CommonTestCase):
             end="2021-03-01",
             amount="0.0001")
 
-    def test_smart_contract(self):
         self.investment.refresh_from_db()
+
+    def test_smart_contract(self):
         txids, smart_contract_account = SmartContract.generate(self.investment)
 
         for txid in txids:
@@ -84,4 +92,33 @@ class SmartContractModelTest(CommonTestCase):
 
         print("INFO", utils.wait_for_confirmation(txid.txid))
 
+    def test_smart_contract_balance(self):
+        txids, smart_contract_account = SmartContract.generate(self.investment)
 
+        for txid in txids:
+            utils.wait_for_confirmation(txid)
+        
+        sm = SmartContract.objects.first()
+        self.assertTrue(sm.check_if_sufficient_balance())
+
+        txid = Transaction.transfer(
+            smart_contract_account, 
+            self.beneficiary_account, 
+            0.00004, 
+            Transaction.USDC, 
+            Transaction.REWARD)
+
+        utils.wait_for_confirmation(txid.txid)
+
+        self.assertTrue(sm.check_if_sufficient_balance())
+
+        txid = Transaction.transfer(
+            smart_contract_account, 
+            self.beneficiary_account, 
+            0.00005, 
+            Transaction.USDC, 
+            Transaction.REWARD)
+
+        utils.wait_for_confirmation(txid.txid)
+
+        self.assertFalse(sm.check_if_sufficient_balance())

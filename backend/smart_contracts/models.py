@@ -114,3 +114,16 @@ class SmartContract(models.Model):
 
         lsig = LogicSig(decoded_program, args=[arg1])
         return LogicSigTransaction(transaction, lsig)
+
+    def check_if_sufficient_balance(self, amount=None, extra=0):
+        balance = self.account.usdc_balance()
+
+        if amount:
+            return amount <= balance
+        else:
+            for reward in [task.reward for task in self.project.tasks.all()]:
+                print("REW/BAL", reward, balance)
+                if reward + extra <= balance:
+                    return True
+
+            return False
