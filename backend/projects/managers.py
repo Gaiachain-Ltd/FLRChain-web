@@ -11,7 +11,7 @@ class ProjectQuerySet(models.QuerySet):
                     models.Q(action=Transaction.REWARD) | models.Q(
                         action=Transaction.FACILITATOR_FEE),
                     project=models.OuterRef('pk')).values('amount').annotate(
-                        total_spent=models.Sum('amount')).values('total_spent')))
+                        total_spent=models.Sum('amount')).values('total_spent')[:1]))
 
 
 class ProjectManager(models.Manager):
