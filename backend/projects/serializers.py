@@ -81,7 +81,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             instance.start = validated_data['start']
             instance.end = validated_data['end']
 
-            tasks_dict = {task.id: task for task in instance.tasks.all()}
+            tasks_dict = {task.id: task for task in instance.tasks.filter(deleted=False)}
             for task in validated_data['tasks']:
                 if task.get('id', None):
                     task_obj = Task.objects.get(

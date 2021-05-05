@@ -121,7 +121,7 @@ class SmartContract(models.Model):
         if amount:
             return amount <= balance
         else:
-            for reward in [task.reward for task in self.project.tasks.all()]:
+            for reward in [task.reward for task in self.project.tasks.filter(deleted=False)]:
                 print("REW/BAL", reward, balance)
                 if reward + extra <= balance:
                     return True
