@@ -51,3 +51,30 @@ class TransactionModelTest(CommonTestCase):
         txid = Transaction.transfer(main_account, self.user_account, 0.1, Transaction.ALGO, Transaction.OPT_IN)
         # TODO:
         print("INFO", utils.wait_for_confirmation(txid.txid))
+
+    def test_retry(self):
+        main_account = Account.get_main_account()
+        txn = Transaction.objects.create(
+            from_account=main_account,
+            to_account=self.user_account,
+            amount=0.1,
+            currency=Transaction.ALGO,
+            action=Transaction.FUELING,
+            retries=3)
+        
+        with self.assertRaises(Exception):
+            txn.retry()
+
+        txn.retries = 0
+        txn.save()
+
+        with self.assertRaises(Exception):
+            txn.retry()
+
+        txn.status = Transaction.REJECTED
+        t = txn.retry()
+        print("INFO", utils.wait_for_confirmation(t.txid))
+
+
+        
+        

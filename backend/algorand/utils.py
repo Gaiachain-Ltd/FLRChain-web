@@ -22,6 +22,10 @@ def check_balance_info(address):
     return CLIENT.account_info(address)
 
 
+def status():
+    return CLIENT.status()
+
+
 def usdc_balance(address):
     getcontext().prec = 6
     info = check_balance_info(address)
@@ -53,6 +57,10 @@ def date_time_to_blocks(date_time):
     now = datetime.datetime.now()
     diff = (date_time - now.date()).seconds
     return _params.first + int(diff / 4.5)
+
+
+def transaction_info(txid):
+    return CLIENT.pending_transaction_info(txid)
 
 
 def wait_for_confirmation(transaction_id, timeout=1000):

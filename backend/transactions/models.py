@@ -2,6 +2,7 @@ import logging
 from django.db import models
 from django.conf import settings
 from algorand import utils
+from django.db import transaction
 
 
 logger = logging.getLogger(__name__)
@@ -34,6 +35,17 @@ class Transaction(models.Model):
         (USDC, "USDC")
     )
 
+    REJECTED = 0
+    CONFIRMED = 1
+    PENDING = 2
+    STATUS = (
+        (REJECTED, "Rejected"),
+        (CONFIRMED, "Confirmed"),
+        (PENDING, "Pending")
+    )
+
+    MAX_RETRIES = 3
+
     from_account = models.ForeignKey(
         'accounts.Account',
         on_delete=models.SET_NULL,
@@ -57,9 +69,34 @@ class Transaction(models.Model):
         max_digits=26, decimal_places=6, default=0)  # Always in algos
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
-    confirmed = models.BooleanField(default=False)
-    atomic = models.BooleanField(default=False)
+    status = models.PositiveSmallIntegerField(choices=STATUS, default=PENDING)
+    retries = models.PositiveSmallIntegerField(default=0)
+    repeated_for = models.ForeignKey('self', on_delete=models.SET_NULL, null=True)
+    
+    def retry(self):
+        if self.status != Transaction.REJECTED:
+            raise Exception({"status": "Cannot retry non-rejected transaction."})
 
+        if self.retries + 1 > Transaction.MAX_RETRIES:
+            raise Exception({"retries": "Cannot retry this transaction."})
+        
+        t = None
+        with transaction.atomic():
+            t = Transaction.transfer(
+                self.from_account,
+                self.to_account,
+                self.amount,
+                self.currency,
+                self.action,
+                self.to_account if self.action == Transaction.CLOSE else None,
+                self.project)
+
+            t.retries = self.retries + 1
+            t.repeated_for = self
+            t.save()
+        
+        return t
+        
     @staticmethod
     def opt_in(to_account, from_account, chain=[]):
         txns = list()
