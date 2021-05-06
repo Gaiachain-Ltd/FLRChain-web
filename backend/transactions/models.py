@@ -179,7 +179,6 @@ class Transaction(models.Model):
             currency=currency,
             amount=amount,
             fee=fee,
-            atomic=True,
             project=project))
 
     @staticmethod

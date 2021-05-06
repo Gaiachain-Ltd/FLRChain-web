@@ -22,11 +22,13 @@ class AccountView(CommonView):
         balance = account.usdc_balance()
         spent = Transaction.objects.filter(
             from_account=request.user.account,
-            currency=Transaction.USDC).aggregate(
+            currency=Transaction.USDC,
+            status__in=[Transaction.CONFIRMED, Transaction.PENDING]).aggregate(
                 total_spent=Sum('amount')).get('total_spent', 0)
         received = Transaction.objects.filter(
             Q(to_account=request.user.account,
-              currency=Transaction.USDC) &
+              currency=Transaction.USDC,
+              status__in=[Transaction.CONFIRMED, Transaction.PENDING]) &
             ~Q(action=Transaction.FUELING)).aggregate(
                 total_received=Sum('amount')).get('total_received', 0)
 
@@ -53,10 +55,12 @@ class AccountView(CommonView):
         spent = Transaction.objects.filter(
             from_account=account,
             action=Transaction.REWARD,
+            status__in=[Transaction.CONFIRMED, Transaction.PENDING],
             project=project).aggregate(
                 total_spent=Sum('amount')).get('total_spent', 0)
         facililator_fee = Transaction.objects.get(
             action=Transaction.FACILITATOR_FEE,
+            status__in=[Transaction.CONFIRMED, Transaction.PENDING],
             project=project).amount
 
         return Response({
