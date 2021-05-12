@@ -17,11 +17,15 @@ def verify_transactions():
         status = utils.status()
         info = utils.transaction_info(pending_transaction.txid)
         
-        confirmed_round = info.get("confirmed-round", 0)
+        if info:
+            confirmed_round = info.get("confirmed-round", 0)
+        else:
+            confirmed_round = 0
+            
         if confirmed_round > 0 and confirmed_round <= status['last-round']:
             pending_transaction.status = Transaction.CONFIRMED
             pending_transaction.save()
-        elif info['pool-error'] or info['txn']['txn']['lv'] < status['last-round']:
+        elif info is None or info['pool-error'] or info['txn']['txn']['lv'] < status['last-round']:
             pending_transaction.status = Transaction.REJECTED
             pending_transaction.save()
 

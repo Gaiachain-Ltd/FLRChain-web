@@ -60,7 +60,11 @@ def date_time_to_blocks(date_time):
 
 
 def transaction_info(txid):
-    return CLIENT.pending_transaction_info(txid)
+    try:
+        return CLIENT.pending_transaction_info(txid)
+    except Exception as e:
+        logger.error(e)
+        return None
 
 
 def wait_for_confirmation(transaction_id, timeout=1000):
