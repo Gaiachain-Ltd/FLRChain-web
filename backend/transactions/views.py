@@ -21,5 +21,5 @@ class TransactionView(CommonView):
         transactions = Transaction.objects.filter(
             Q(from_account=request.user.account) | Q(to_account=request.user.account),
             ~Q(action__in=[Transaction.OPT_IN]),
-            currency=Transaction.USDC)
+            currency=Transaction.USDC).order_by('-created')
         return self.paginated_response(transactions, request)

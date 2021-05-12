@@ -4,6 +4,7 @@
     class="action-btn-style text-none elevation-0"
     height="50"
     :color="color"
+    :disabled="disabled"
     >{{ label }}</v-btn
   >
 </template>
@@ -18,6 +19,10 @@ export default {
       type: String,
       default: "primary",
     },
+    disabled: {
+      type: Boolean,
+      default: false
+    }
   },
 };
 </script>

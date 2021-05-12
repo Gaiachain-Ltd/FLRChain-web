@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from users.models import CustomUser
+from transactions.models import Transaction
 
 
 class CustomUserSerializer(serializers.ModelSerializer):
@@ -7,12 +8,13 @@ class CustomUserSerializer(serializers.ModelSerializer):
     last_name = serializers.CharField(required=False)
     phone = serializers.CharField(required=False, allow_blank=True)
     village = serializers.CharField(required=False, allow_blank=True)
+    opted_in = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = CustomUser
         fields = ('id', 'password', 'email', 'type',
                   'first_name', 'last_name', 'phone',
-                  'village')
+                  'village', 'opted_in')
         write_only_fields = ('password',)
         read_only_fields = ('id',)
         extra_kwargs = {
@@ -30,3 +32,6 @@ class CustomUserSerializer(serializers.ModelSerializer):
             village=validated_data.get('village', ""))
 
         return user
+
+    def get_opted_in(self, obj):
+        return obj.opted_in

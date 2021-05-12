@@ -14,6 +14,9 @@
       "
       >{{ formattedValue }}</DefaultText
     >
+    <DefaultText size="14" :color="statusColor" class="ml-10">
+      {{ status }}
+    </DefaultText>
     <v-spacer></v-spacer>
     <v-layout column ma-0 align-center>
       <DefaultText size="14">{{ actionText }}</DefaultText>
@@ -93,6 +96,26 @@ export default {
           return true;
         default:
           return true;
+      }
+    },
+    status() {
+      switch (this.transaction.status) {
+        case 0:
+          return "Rejected";
+        case 1:
+          return "Confirmed";
+        default:
+          return "Pending";
+      }
+    },
+    statusColor() {
+      switch (this.transaction.status) {
+        case 0:
+          return this.$vuetify.theme.themes.light.error;
+        case 1:
+          return this.$vuetify.theme.themes.light.primary;
+        default:
+          return this.$vuetify.theme.themes.light.septenary;
       }
     },
     transactionIcon() {

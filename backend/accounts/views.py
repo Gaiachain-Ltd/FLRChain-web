@@ -8,6 +8,7 @@ from transactions.models import Transaction
 from django.db.models import Sum, Q
 from projects.models import Project
 from django.shortcuts import  get_object_or_404
+from decimal import *
 
 
 logger = logging.getLogger(__name__)
@@ -31,7 +32,18 @@ class AccountView(CommonView):
               status__in=[Transaction.CONFIRMED, Transaction.PENDING]) &
             ~Q(action=Transaction.FUELING)).aggregate(
                 total_received=Sum('amount')).get('total_received', 0)
+        
+        if not received:
+            received = Decimal(0)
+        else:
+            received = Decimal(received)
 
+        if not spent:
+            spent = Decimal(0)
+        else:
+            spent = Decimal(spent)
+
+        getcontext().prec = 6
         return Response(
             {
                 'balance': balance,

@@ -9,7 +9,9 @@
           ></InvestmentForm>
         </v-flex>
         <v-flex>
-          <BlockButton @clicked="invest">Invest</BlockButton>
+          <BlockButton :disabled="disabled" @clicked="invest"
+            >Invest</BlockButton
+          >
         </v-flex>
       </v-layout>
     </DefaultCardWithTitle>
@@ -24,6 +26,10 @@
 export default {
   props: {
     project: {},
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -31,7 +37,7 @@ export default {
       investment: {
         amount: "0",
         start: this.project.start,
-        end: this.project.end
+        end: this.project.end,
       },
     };
   },
@@ -54,6 +60,6 @@ export default {
           .catch(() => (this.errorPopupVisible = true));
       }
     },
-  }
+  },
 };
 </script>
