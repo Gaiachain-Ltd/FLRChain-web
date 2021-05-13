@@ -121,6 +121,17 @@ class ActivitiesViewTest(CommonTestCase):
             {
                 "photo": file,
             },
+            status.HTTP_403_FORBIDDEN, 'multipart')
+
+        Transaction.objects.all().update(status=Transaction.CONFIRMED)
+
+        file = SimpleUploadedFile('small.jpg', small_jpg, content_type='image/jpeg')
+        self._create(
+            self.beneficiary,
+            f"/api/v1/projects/{self.project.id}/tasks/{self.task.id}/activities/",
+            {
+                "photo": file,
+            },
             status.HTTP_201_CREATED, 'multipart')
 
         transaction = Transaction.objects.get(

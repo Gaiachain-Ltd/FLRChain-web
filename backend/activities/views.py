@@ -10,7 +10,7 @@ from activities.models import Activity
 from django.db import transaction
 from transactions.models import Transaction
 from users.models import CustomUser
-from users.permissions import isBeneficiary
+from users.permissions import isBeneficiary, isOptedIn
 from algorand import utils
 
 
@@ -23,7 +23,8 @@ class ActivityView(CommonView):
         Only facililator can make and update projects.
         """
         if self.request.method == "POST":
-            return [permission() for permission in [*self.permission_classes, isBeneficiary]]
+            return [permission() for permission in [
+                *self.permission_classes, isBeneficiary, isOptedIn]]
         return [permission() for permission in self.permission_classes]
 
     @swagger_auto_schema(

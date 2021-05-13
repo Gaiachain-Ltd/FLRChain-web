@@ -23,7 +23,8 @@ class ProjectView(CommonView):
         Only facililator can make and update projects.
         """
         if self.request.method in ["POST", "PUT"]:
-            return [permission() for permission in [*self.permission_classes, isFacilitator]]
+            return [permission() for permission in [
+                *self.permission_classes, isFacilitator, isOptedIn]]
         return [permission() for permission in self.permission_classes]
 
     @swagger_auto_schema(

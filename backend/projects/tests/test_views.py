@@ -2,9 +2,13 @@ from users.models import CustomUser
 from rest_framework import status
 from projects.models import Project, Assignment
 from common.tests import CommonTestCase
+from transactions.models import Transaction
+from accounts.models import Account
 
 
 class ProjectsViewTest(CommonTestCase):
+    fixtures = ['main_account.json', ]
+    
     def setUp(self):
         self.beneficiary = CustomUser.objects.create(
             email="beneficiary@test.com",
@@ -30,6 +34,9 @@ class ProjectsViewTest(CommonTestCase):
             end="2021-03-01",
             title="Ma project",
             description="Test")
+            
+        self.facililator_account = Account.generate(self.facililator)
+        Transaction.objects.all().update(status=Transaction.CONFIRMED)
 
     def test_list(self):
         self._list(
