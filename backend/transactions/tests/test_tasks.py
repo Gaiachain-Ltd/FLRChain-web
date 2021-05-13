@@ -31,7 +31,7 @@ class TransactionTasksTest(CommonTestCase):
             0.1,
             Transaction.ALGO,
             Transaction.OPT_IN)
-        print("INFO", utils.wait_for_confirmation(tx.txid))
+        self.assertTrue(utils.wait_for_confirmation(tx.txid))
         verify_transactions()
         tx.refresh_from_db()
         self.assertEqual(tx.status, Transaction.CONFIRMED)
@@ -46,7 +46,7 @@ class TransactionTasksTest(CommonTestCase):
                 0.1,
                 Transaction.ALGO,
                 Transaction.OPT_IN)
-            print("INFO", utils.wait_for_confirmation(tx.txid))
+            self.assertTrue(utils.wait_for_confirmation(tx.txid))
             verify_transactions()
             tx.refresh_from_db()
             self.assertEqual(tx.status, Transaction.REJECTED)
@@ -63,8 +63,40 @@ class TransactionTasksTest(CommonTestCase):
                 0.1,
                 Transaction.ALGO,
                 Transaction.OPT_IN)
-            print("INFO", utils.wait_for_confirmation(tx.txid))
+            self.assertTrue(utils.wait_for_confirmation(tx.txid))
             verify_transactions()
             tx.refresh_from_db()
             self.assertEqual(tx.status, Transaction.REJECTED)
             self.assertEqual(Transaction.objects.count(), 2)
+
+    def test_rejected_atomic(self):
+        main_account = Account.get_main_account()
+        with patch('algorand.utils.transaction_info') as mock_transaction_info:
+            mock_transaction_info.return_value = {
+                'pool-error': '', 'txn': {'txn': {'lv': utils.status()['last-round']-1000}}}
+            tx0 = Transaction.prepare_transfer(
+                main_account,
+                self.user_account,
+                0.21,
+                Transaction.ALGO,
+                Transaction.OPT_IN)
+            tx1 = Transaction.prepare_transfer(
+                self.user_account,
+                self.user_account,
+                0,
+                Transaction.USDC,
+                Transaction.OPT_IN)
+            tx2 = Transaction.prepare_transfer(
+                main_account,
+                self.user_account,
+                0.1,
+                Transaction.USDC,
+                Transaction.OPT_IN)
+            txids = Transaction.atomic_transfer([tx0, tx1, tx2])
+            for txid in txids:
+                self.assertTrue(utils.wait_for_confirmation(txid))
+
+            verify_transactions()
+
+            self.assertEqual(Transaction.objects.filter(status=Transaction.REJECTED).count(), 3)
+            self.assertEqual(Transaction.objects.count(), 6)

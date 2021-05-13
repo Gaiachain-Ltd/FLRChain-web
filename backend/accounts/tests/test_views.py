@@ -69,7 +69,7 @@ class AccountsViewTest(CommonTestCase):
 
         txids, _ = SmartContract.generate(self.investment)
         for txid in txids:
-            utils.wait_for_confirmation(txid)
+            self.assertTrue(utils.wait_for_confirmation(txid))
 
         self._retrieve(
             self.beneficiary, 

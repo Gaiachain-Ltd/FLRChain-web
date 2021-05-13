@@ -44,13 +44,13 @@ class InvestmentModelTest(CommonTestCase):
         self.investment.refresh_from_db()
         txids, _ = SmartContract.generate(self.investment)
         for txid in txids:
-            utils.wait_for_confirmation(txid)
+            self.assertTrue(utils.wait_for_confirmation(txid))
 
         self.investment.refresh_from_db()
         txids = self.investment.finish()
 
         for txid in txids:
-            utils.wait_for_confirmation(txid)
+            self.assertTrue(utils.wait_for_confirmation(txid))
 
         self.investment.refresh_from_db()
         self.assertEqual(self.investment.status, Investment.FINISHED)

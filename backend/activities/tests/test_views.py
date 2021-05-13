@@ -89,7 +89,7 @@ class ActivitiesViewTest(CommonTestCase):
 
         txids, _ = SmartContract.generate(self.investment)
         for txid in txids:
-            utils.wait_for_confirmation(txid)
+            self.assertTrue(utils.wait_for_confirmation(txid))
 
         small_jpg = (
             b'\x47\x49\x46\x38\x39\x61\x01\x00\x01\x00\x00\x00\x00\x21\xf9\x04'
@@ -125,7 +125,7 @@ class ActivitiesViewTest(CommonTestCase):
 
         transaction = Transaction.objects.get(
             to_account=self.beneficiary_account, action=Transaction.REWARD)
-        utils.wait_for_confirmation(transaction.txid)
+        self.assertTrue(utils.wait_for_confirmation(transaction.txid))
 
         file = SimpleUploadedFile('small.jpg', small_jpg, content_type='image/jpeg')
         self._create(

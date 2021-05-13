@@ -29,7 +29,8 @@ def verify_transactions():
             pending_transaction.status = Transaction.REJECTED
             pending_transaction.save()
 
-            try:
-                pending_transaction.retry()
-            except Exception as e:
-                logger.error(e)
+            if pending_transaction.atomic_prev is None:
+                try:
+                    pending_transaction.retry()
+                except Exception as e:
+                    logger.error(e)

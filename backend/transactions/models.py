@@ -70,33 +70,75 @@ class Transaction(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
     status = models.PositiveSmallIntegerField(choices=STATUS, default=PENDING)
+
+    # Retry field
     retries = models.PositiveSmallIntegerField(default=0)
-    repeated_for = models.ForeignKey('self', on_delete=models.SET_NULL, null=True)
-    
+    repeated_for = models.ForeignKey(
+        'self', on_delete=models.SET_NULL, null=True, related_name='rep_transaction')
+
+    # Atomic fields
+    atomic = models.BooleanField(default=False)
+    atomic_prev = models.ForeignKey(
+        'self', on_delete=models.SET_NULL, null=True, related_name='prev_atomic_transaction')
+
     def retry(self):
         if self.status != Transaction.REJECTED:
-            raise Exception({"status": "Cannot retry non-rejected transaction."})
+            raise Exception(
+                {"status": "Cannot retry non-rejected transaction."})
 
         if self.retries + 1 > Transaction.MAX_RETRIES:
             raise Exception({"retries": "Cannot retry this transaction."})
-        
-        t = None
-        with transaction.atomic():
-            t = Transaction.transfer(
-                self.from_account,
-                self.to_account,
-                self.amount,
-                self.currency,
-                self.action,
-                self.to_account if self.action == Transaction.CLOSE else None,
-                self.project)
 
-            t.retries = self.retries + 1
-            t.repeated_for = self
-            t.save()
-        
-        return t
-        
+        if self.atomic and self.atomic_prev:
+            raise Exception({"atomic": "Cannot retry this transaction."})
+
+        with transaction.atomic():
+            if self.atomic and self.atomic_prev is None:
+
+                origin = Transaction.prepare_transfer(
+                    self.from_account,
+                    self.to_account,
+                    self.amount,
+                    self.currency,
+                    self.action,
+                    self.project)
+                origin[1].repeated_for = self
+                origin[1].retries = self.retries + 1
+
+                chain = [origin,]
+                next_transaction = Transaction.objects.filter(
+                    atomic=True, atomic_prev=self).first()
+                while next_transaction:
+                    t = Transaction.prepare_transfer(
+                        next_transaction.from_account,
+                        next_transaction.to_account,
+                        next_transaction.amount,
+                        next_transaction.currency,
+                        next_transaction.action,
+                        next_transaction.project)
+                    t[1].repeated_for = next_transaction
+                    t[1].retries = self.retries + 1
+                    chain.append(t)
+                    next_transaction = Transaction.objects.filter(
+                        atomic=True, atomic_prev=next_transaction).first()
+
+                return Transaction.atomic_transfer(chain)
+            else:
+                t = Transaction.transfer(
+                    self.from_account,
+                    self.to_account,
+                    self.amount,
+                    self.currency,
+                    self.action,
+                    self.to_account if self.action == Transaction.CLOSE else None,
+                    self.project)
+
+                t.retries = self.retries + 1
+                t.repeated_for = self
+                t.save()
+
+                return t.txid
+
     @staticmethod
     def opt_in(to_account, from_account, chain=[]):
         txns = list()
@@ -117,18 +159,28 @@ class Transaction(models.Model):
             Transaction.OPT_IN))
 
         txns.extend(chain)
+        return Transaction.atomic_transfer(txns)
+
+    @staticmethod
+    def atomic_transfer(txns):
+        if len(txns) == 0:
+            raise Exception(
+                {"transfer": "Atomic transfer has to have at least 1 transfer"})
+
         utils.atomic_transfer(txns)
 
-        # TODO: batch_create
-        for tx in txns:
-            trans = tx[1]
-            trans.save()
+        last = None
+        for txn, transaction in txns:
+            transaction.atomic = True
+            transaction.atomic_prev = last
+            transaction.save()
+            transaction.refresh_from_db()
 
-        return [tx[1].txid for tx in txns]
+        return [transaction.txid for _, transaction in txns]
 
     @staticmethod
     def transfer(sender, receiver, amount,
-                 currency=0, action=2, close=None, 
+                 currency=0, action=2, close=None,
                  project=None):
         if currency == Transaction.ALGO:
             txid, fee = utils.transfer_algos(
@@ -170,7 +222,8 @@ class Transaction(models.Model):
                 receiver,
                 amount)
 
-        logger.debug("Prepare transaction, amount: %s, fee: %s", (amount * 1000000), fee)
+        logger.debug("Prepare transaction, amount: %s, fee: %s",
+                     (amount * 1000000), fee)
 
         return (txn, Transaction(
             from_account=sender,
@@ -203,7 +256,7 @@ class Transaction(models.Model):
             receiver,
             0,
             receiver)
-            
+
         Transaction.objects.create(
             txid=txid,
             from_account=None,
