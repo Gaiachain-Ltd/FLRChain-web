@@ -7,12 +7,16 @@ from decimal import *
 class InvestmentSerializer(serializers.ModelSerializer):
     investor = CustomUserSerializer(required=False, read_only=True)
     status = serializers.IntegerField(required=False)
+    confirmed = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Investment
         fields = ('id', 'investor', 'status', 'start',
-                  'end', 'amount')
-        read_only_fields = ('investor', 'status')
+                  'end', 'amount', 'confirmed')
+        read_only_fields = ('investor', 'status', 'confirmed')
+
+    def get_confirmed(self, obj):
+        return obj.confirmed
 
     def validate(self, data):
         if Decimal(data['amount']) < 0:

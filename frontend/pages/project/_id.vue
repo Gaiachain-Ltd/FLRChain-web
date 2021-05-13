@@ -79,7 +79,7 @@
     <InfoPopup
       v-if="infoPopupVisible"
       :value.sync="infoPopupVisible"
-      text="Your account is not active yet. Please try again later."
+      :text="info"
     ></InfoPopup>
   </v-layout>
 </template>
@@ -90,6 +90,7 @@ import { mapGetters } from "vuex";
 export default {
   data() {
     return {
+      info: "",
       infoPopupVisible: false,
       errorPopupVisible: false,
       successPopupVisible: false,
@@ -162,9 +163,13 @@ export default {
     if (!this.$auth.user.opted_in) {
       this.$auth.fetchUser().then(() => {
         if (!this.$auth.user.opted_in) {
+          this.info = "Your account is not active yet. Please try again later.";
           this.infoPopupVisible = true;
         }
       });
+    } else if (this.project.investment && !this.project.investment.confirmed) {
+      this.info = "Investment has not been confirmed yet.";
+      this.infoPopupVisible = true;
     }
   },
 };
