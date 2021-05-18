@@ -175,6 +175,7 @@ class Transaction(models.Model):
             transaction.atomic_prev = last
             transaction.save()
             transaction.refresh_from_db()
+            last = transaction
 
         return [transaction.txid for _, transaction in txns]
 

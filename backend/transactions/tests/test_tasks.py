@@ -100,3 +100,11 @@ class TransactionTasksTest(CommonTestCase):
 
             self.assertEqual(Transaction.objects.filter(status=Transaction.REJECTED).count(), 3)
             self.assertEqual(Transaction.objects.count(), 6)
+
+            one_without_prev = False
+            for txn in Transaction.objects.filter(retries=1):
+                if not one_without_prev and txn.atomic_prev is None:
+                    one_without_prev = True
+                    continue
+                
+                self.assertFalse(txn.atomic_prev is None)
