@@ -43,7 +43,7 @@ module.exports = {
     '@nuxtjs/moment',
   ],
   plugins: [
-    { src: '~/plugins/vue-timers', mode: 'client' }
+    { src: '@/plugins/vue-timers', mode: 'client' },
   ],
   publicRuntimeConfig: {
     axios: {
