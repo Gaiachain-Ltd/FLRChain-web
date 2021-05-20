@@ -25,8 +25,7 @@ class TransactionModelTest(CommonTestCase):
         main_account = Account.get_main_account()
         txids = Transaction.opt_in(self.user_account, main_account)
         for txid in txids:
-            # TODO:
-            print("INFO", utils.wait_for_confirmation(txid))
+            self.assertTrue(utils.wait_for_confirmation(txid))
 
     def test_opt_in_chain(self):
         main_account = Account.get_main_account()
@@ -43,11 +42,66 @@ class TransactionModelTest(CommonTestCase):
             ])
 
         for txid in txids:
-            # TODO:
-            print("INFO", utils.wait_for_confirmation(txid))
+            self.assertTrue(utils.wait_for_confirmation(txid))
 
     def test_transfer(self):
         main_account = Account.get_main_account()
         txid = Transaction.transfer(main_account, self.user_account, 0.1, Transaction.ALGO, Transaction.OPT_IN)
-        # TODO:
-        print("INFO", utils.wait_for_confirmation(txid.txid))
+        self.assertTrue(utils.wait_for_confirmation(txid.txid))
+
+    def test_retry_single(self):
+        main_account = Account.get_main_account()
+        txn = Transaction.objects.create(
+            from_account=main_account,
+            to_account=self.user_account,
+            amount=0.1,
+            currency=Transaction.ALGO,
+            action=Transaction.FUELING,
+            retries=3)
+        
+        with self.assertRaises(Exception):
+            txn.retry()
+
+        txn.retries = 0
+        txn.save()
+
+        with self.assertRaises(Exception):
+            txn.retry()
+
+        txn.status = Transaction.REJECTED
+        txid = txn.retry()
+        self.assertTrue(utils.wait_for_confirmation(txid))
+
+    
+    def test_retry_atomic(self):
+        main_account = Account.get_main_account()
+        txn0 = Transaction.objects.create(
+            from_account=main_account,
+            to_account=self.user_account,
+            amount=0.21,
+            currency=Transaction.ALGO,
+            action=Transaction.OPT_IN,
+            status=Transaction.REJECTED,
+            atomic=True,)
+        txn1 = Transaction.objects.create(
+            from_account=self.user_account,
+            to_account=self.user_account,
+            amount=0,
+            currency=Transaction.USDC,
+            action=Transaction.OPT_IN,
+            atomic=True,
+            atomic_prev=txn0)
+        txn2 = Transaction.objects.create(
+            from_account=main_account,
+            to_account=self.user_account,
+            amount=0.1,
+            currency=Transaction.USDC,
+            action=Transaction.FUELING,
+            atomic=True,
+            atomic_prev=txn1)
+
+        txids = txn0.retry()
+        for txid in txids:
+            self.assertTrue(utils.wait_for_confirmation(txid))
+
+        self.assertEqual(Transaction.objects.count(), 6)

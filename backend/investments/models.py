@@ -2,6 +2,7 @@ import datetime
 from django.db import models, transaction
 from transactions.models import Transaction
 from accounts.models import Account
+from django.core.exceptions import ObjectDoesNotExist
 
 
 class Investment(models.Model):
@@ -16,7 +17,7 @@ class Investment(models.Model):
     investor = models.ForeignKey(
         'users.CustomUser', on_delete=models.SET_NULL, null=True)
     project = models.OneToOneField('projects.Project', on_delete=models.CASCADE)
-    status = models.PositiveSmallIntegerField(default=1, choices=STATUS)
+    status = models.PositiveSmallIntegerField(default=INVESTED, choices=STATUS)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
     start = models.DateField()
@@ -54,3 +55,13 @@ class Investment(models.Model):
             self.save()
 
             return [tx1.txid, tx2.txid]
+
+    @property
+    def confirmed(self):
+        try:
+            return Transaction.objects.filter(
+                to_account=self.smartcontract.account,
+                status=Transaction.CONFIRMED,
+                action=Transaction.INVESTMENT).exists()
+        except ObjectDoesNotExist:
+            return False

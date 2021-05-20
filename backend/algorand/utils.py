@@ -22,6 +22,10 @@ def check_balance_info(address):
     return CLIENT.account_info(address)
 
 
+def status():
+    return CLIENT.status()
+
+
 def usdc_balance(address):
     getcontext().prec = 6
     info = check_balance_info(address)
@@ -55,6 +59,14 @@ def date_time_to_blocks(date_time):
     return _params.first + int(diff / 4.5)
 
 
+def transaction_info(txid):
+    try:
+        return CLIENT.pending_transaction_info(txid)
+    except Exception as e:
+        logger.error(e)
+        return None
+
+
 def wait_for_confirmation(transaction_id, timeout=1000):
     """
     Wait until the transaction is confirmed or rejected, or until 'timeout'
@@ -73,16 +85,14 @@ def wait_for_confirmation(transaction_id, timeout=1000):
         try:
             pending_txn = CLIENT.pending_transaction_info(transaction_id)
         except Exception:
-            return 
+            return False
         if pending_txn.get("confirmed-round", 0) > 0:
-            return pending_txn
+            return True
         elif pending_txn["pool-error"]:  
-            raise Exception(
-                'pool error: {}'.format(pending_txn["pool-error"])) 
+            return False
         CLIENT.status_after_block(current_round)                   
         current_round += 1
-    raise Exception(
-        'pending tx not found in timeout rounds, timeout value = : {}'.format(timeout))
+    return False
 
 
 def transfer_algos(sender, receiver, amount, close_remainder_to=None):

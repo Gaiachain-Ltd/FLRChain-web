@@ -10,11 +10,20 @@
     <InputTasksCard ref="inputTasks" :project.sync="project"></InputTasksCard>
     <v-spacer></v-spacer>
     <div class="placeholder"></div>
-    <ActionBarCard @save="handleCreate" @cancel="handleCancel"></ActionBarCard>
+    <ActionBarCard
+      :disabled="!$auth.user.opted_in"
+      @save="handleCreate"
+      @cancel="handleCancel"
+    ></ActionBarCard>
     <ErrorPopup
       v-if="errorPopupVisible"
       :value.sync="errorPopupVisible"
     ></ErrorPopup>
+    <InfoPopup
+      v-if="infoPopupVisible"
+      :value.sync="infoPopupVisible"
+      text="Your account is not active yet. Please try again later."
+    ></InfoPopup>
   </v-layout>
 </template>
 
@@ -22,6 +31,7 @@
 export default {
   data() {
     return {
+      infoPopupVisible: false,
       errorPopupVisible: false,
       project: {
         title: "",
@@ -45,6 +55,12 @@ export default {
     ActionBarCard: () => import("@/components/cards/project/ActionBarCard"),
     DefaultTitle: () => import("@/components/texts/DefaultTitle"),
     ErrorPopup: () => import("@/components/popups/ErrorPopup"),
+    InfoPopup: () => import("@/components/popups/InfoPopup"),
+  },
+  computed: {
+    blocked() {
+      return this.$auth.user.opted_in;
+    },
   },
   methods: {
     handleCreate() {
@@ -61,6 +77,15 @@ export default {
     handleCancel() {
       this.$router.back();
     },
+  },
+  async fetch() {
+    if (!this.$auth.user.opted_in) {
+      this.$auth.fetchUser().then(() => {
+        if (!this.$auth.user.opted_in) {
+          this.infoPopupVisible = true;
+        }
+      });
+    }
   },
 };
 </script>

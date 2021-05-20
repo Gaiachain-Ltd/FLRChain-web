@@ -11,6 +11,7 @@
         :label="edit ? 'Save project' : 'Edit project'"
         :color="edit ? 'primary' : 'septenary'"
         @clicked="handleEdit"
+        :disabled="!$auth.user.opted_in"
       ></ActionButton>
     </v-layout>
     <v-layout row ma-0 shrink>
@@ -58,6 +59,7 @@
               class="mb-6"
               @refresh="$fetch"
               :project="project"
+              :disabled="!$auth.user.opted_in"
             ></InputInvestmentCard>
           </client-only>
         </v-layout>
@@ -74,6 +76,11 @@
       :value.sync="successPopupVisible"
       text="Project has been saved successfully."
     ></SuccessPopup>
+    <InfoPopup
+      v-if="infoPopupVisible"
+      :value.sync="infoPopupVisible"
+      :text="info"
+    ></InfoPopup>
   </v-layout>
 </template>
 
@@ -83,6 +90,8 @@ import { mapGetters } from "vuex";
 export default {
   data() {
     return {
+      info: "",
+      infoPopupVisible: false,
       errorPopupVisible: false,
       successPopupVisible: false,
       project: {},
@@ -112,6 +121,7 @@ export default {
     ErrorPopup: () => import("@/components/popups/ErrorPopup"),
     SuccessPopup: () => import("@/components/popups/SuccessPopup"),
     ProjectStatusLabel: () => import("@/components/texts/ProjectStatusLabel"),
+    InfoPopup: () => import("@/components/popups/InfoPopup"),
   },
   computed: {
     ...mapGetters(["isFacililator"]),
@@ -149,6 +159,18 @@ export default {
       .get(`projects/${this.$route.params.id}/`)
       .then((reply) => reply.data)
       .catch(() => (this.errorPopupVisible = true));
+
+    if (!this.$auth.user.opted_in) {
+      this.$auth.fetchUser().then(() => {
+        if (!this.$auth.user.opted_in) {
+          this.info = "Your account is not active yet. Please try again later.";
+          this.infoPopupVisible = true;
+        }
+      });
+    } else if (this.project.investment && !this.project.investment.confirmed) {
+      this.info = "Investment has not been confirmed yet.";
+      this.infoPopupVisible = true;
+    }
   },
 };
 </script>

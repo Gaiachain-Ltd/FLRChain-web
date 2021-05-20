@@ -8,7 +8,9 @@ class ProjectQuerySet(models.QuerySet):
         return self.annotate(
             spent=models.Subquery(
                 Transaction.objects.filter(
-                    models.Q(action=Transaction.REWARD) | models.Q(
+                    models.Q(
+                        action=Transaction.REWARD, 
+                        status__in=[Transaction.CONFIRMED, Transaction.PENDING]) | models.Q(
                         action=Transaction.FACILITATOR_FEE),
                     project=models.OuterRef('pk')).values('amount').annotate(
                         total_spent=models.Sum('amount')).values('total_spent')[:1]))

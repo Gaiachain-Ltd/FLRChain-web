@@ -10,7 +10,11 @@
           ></ActionButton>
         </v-flex>
         <v-flex shrink ml-3>
-          <ActionButton label="Save" @clicked="$emit('save')"></ActionButton>
+          <ActionButton
+            :disabled="disabled"
+            label="Save"
+            @clicked="$emit('save')"
+          ></ActionButton>
         </v-flex>
       </v-layout>
     </v-card-text>
@@ -19,6 +23,12 @@
 
 <script>
 export default {
+  props: {
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
+  },
   components: {
     ActionButton: () => import("@/components/buttons/ActionButton"),
   },

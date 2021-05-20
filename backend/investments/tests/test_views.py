@@ -4,6 +4,7 @@ from users.models import CustomUser
 from accounts.models import Account
 from projects.models import Project
 from investments.models import Investment
+from transactions.models import Transaction
 
 
 class InvestmentsViewTest(CommonTestCase):
@@ -50,6 +51,17 @@ class InvestmentsViewTest(CommonTestCase):
                 "start": "2020-03-01",
                 "end": "2021-03-01",
                 "amount": "0.01"
+            }, status.HTTP_403_FORBIDDEN)
+
+        Transaction.objects.all().update(status=Transaction.CONFIRMED)
+
+        self._create(
+            self.investor, 
+            f"/api/v1/projects/{self.project.id}/investments/", 
+            {
+                "start": "2020-03-01",
+                "end": "2021-03-01",
+                "amount": "0.01"
             }, status.HTTP_201_CREATED)
 
     def test_retrieve(self):
@@ -64,6 +76,13 @@ class InvestmentsViewTest(CommonTestCase):
             self.facililator, 
             f"/api/v1/projects/{self.project.id}/investments/",
             status.HTTP_403_FORBIDDEN)
+
+        self._retrieve(
+            self.investor, 
+            f"/api/v1/projects/{self.project.id}/investments/",
+            status.HTTP_403_FORBIDDEN)
+
+        Transaction.objects.all().update(status=Transaction.CONFIRMED)
 
         self._retrieve(
             self.investor, 

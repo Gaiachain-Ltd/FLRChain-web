@@ -8,4 +8,4 @@ class TransactionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Transaction
         fields = ('id', 'txid', 'action', 'fee', 'modified',
-                  'created', 'amount', 'project_name')
+                  'created', 'amount', 'project_name', 'status')

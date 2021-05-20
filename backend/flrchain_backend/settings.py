@@ -180,6 +180,10 @@ CELERY_BEAT_SCHEDULE = {
     "finish_investment": {
         "task": "investments.tasks.finish_investment",
         "schedule": crontab(minute="*/1")
+    },
+    "verify_transactions": {
+        "task": "transactions.tasks.verify_transactions",
+        "schedule": crontab(minute="*/1")
     }
 }
 

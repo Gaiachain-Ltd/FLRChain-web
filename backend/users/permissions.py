@@ -15,3 +15,8 @@ class isFacilitator(BasePermission):
 class isInvestor(BasePermission):
     def has_permission(self, request, view):
         return request.user.type == CustomUser.INVESTOR
+
+
+class isOptedIn(BasePermission):
+    def has_permission(self, request, view):
+        return request.user.opted_in
