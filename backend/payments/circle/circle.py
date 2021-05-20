@@ -24,3 +24,6 @@ class CircleAPI(object):
             return reply.json()
         else:
             return None
+
+    def save_card(self, data):
+        pass

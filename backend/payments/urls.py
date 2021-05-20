@@ -2,5 +2,5 @@ from django.urls import path
 from payments.views import CirclePaymentView
 
 urlpatterns = [
-    path('payment/circle/key/', CirclePaymentView.as_view({'get': 'get_key'})),
+    path('payments/circle/key/', CirclePaymentView.as_view({'get': 'get_key'})),
 ]

@@ -9,6 +9,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
+from payments.serializers import *
 
 
 logger = logging.getLogger(__name__)
@@ -28,5 +29,9 @@ class CirclePaymentView(CommonView):
         circle_reply = circle_client.get_public_key()
         logger.warning("Circle reply: %s", circle_reply)
         return Response({
-            "key": circle_reply.get('data', dict()).get('publicKey', None)
+            **circle_reply['data']
         }, status=status.HTTP_200_OK)
+
+    def save_card(self, request):
+        serializer = SaveCardSerializer(data=request.data)
+        
