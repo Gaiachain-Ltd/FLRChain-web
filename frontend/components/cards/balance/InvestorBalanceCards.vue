@@ -21,7 +21,19 @@
     <PaymentPopup
       :value.sync="paymentPopupVisible"
       v-if="paymentPopupVisible"
+      @success="successPopupVisible = true"
+      @error="errorPopupVisible = true"
     ></PaymentPopup>
+    <SuccessPopup
+    :value.sync="successPopupVisible"
+    v-if="successPopupVisible"
+    text="Payment success.">
+    </SuccessPopup>
+    <ErrorPopup
+    :value.sync="errorPopupVisible"
+    v-if="errorPopupVisible"
+    text="Payment failed.">
+    </ErrorPopup>
   </v-layout>
 </template>
 
@@ -33,12 +45,16 @@ export default {
       spent: 0,
       balance: 0,
       paymentPopupVisible: false,
+      successPopupVisible: false,
+      errorPopupVisible: false,
     };
   },
   components: {
     BalanceCard: () => import("@/components/cards/balance/BalanceCard"),
     ButtonCard: () => import("@/components/cards/balance/ButtonCard"),
     PaymentPopup: () => import("@/components/popups/PaymentPopup"),
+    SuccessPopup: () => import("@/components/popups/SuccessPopup"),
+    ErrorPopup: () => import("@/components/popups/ErrorPopup")
   },
   async fetch() {
     const balanceInfo = await this.$axios

@@ -22,11 +22,29 @@ export default {
   props: {
     value: {},
   },
+  timers: {
+    paymentInfo: { time: 3000, autostart: false, repeat: true }
+  },
   data() {
     return {
       publicKey: null,
       keyId: null,
-      card: {},
+      card: {
+        number: "4007410000000006",
+        expiry: "12/22",
+        phoneNumber: "+48663317345",
+        email: "damian.cholewa.choli@gmail.com",
+        billingDetails: {
+          name: "Damian Cholewa",
+          city: "Lublin",
+          country: "PL",
+          line1: "Text",
+          line2: "Text",
+          district: "DDD",
+          postalCode: "20-303"
+        }
+      },
+      paymentId: null,
       idempotencyKey: uuidv4()
     };
   },
@@ -58,19 +76,54 @@ export default {
         ),
         publicKeys: (await openpgp.key.readArmored(decodedPublicKey)).keys,
       };
-      delete copiedCard.number;
-      delete copiedCard.cvv;
+      // delete copiedCard.number;
+      // delete copiedCard.cvv;
       return await openpgp.encrypt(options).then((ciphertext) => {
         return {
           ...copiedCard,
+          idempotencyKey: this.idempotencyKey,
           encryptedData: btoa(ciphertext.data),
           keyId: this.keyId,
         };
       });
     },
     async saveCard() {
-      console.log("DATA", await this.encryptedCardData());
+      const data = await this.encryptedCardData();
+      await this.$axios.post("payments/circle/card/", data).then(
+        (reply) => {
+          console.log("SAVE CARD:", reply);
+          this.card.cardId = reply.data.data.id;
+          this.createPayment();
+        }
+      )
     },
+    async createPayment() {
+      const data = await this.encryptedCardData();
+      await this.$axios.post("payments/circle/card/payment/", data).then(
+        (reply) => {
+          console.log("CREATE PAYMENT REPLY:", reply);
+          this.paymentId = reply.data.data.id;
+          this.$timer.start('paymentInfo');
+        }
+      )
+    },
+    async paymentInfo() {
+      await this.$axios.get(`payments/circle/card/payment/${this.paymentId}/`).then(
+        (reply) => {
+          console.log("PAYMENT INFO REPLY", reply)
+          const status = reply.data.data.status;
+          if (status != "pending") {
+            this.$timer.stop('paymentInfo');
+            if (status == "failed") {
+              this.$emit('error');
+            } else {
+              this.$emit('success');
+            }
+            this.show = false;
+          }
+        }
+      )
+    }
   },
   async fetch() {
     await this.$axios

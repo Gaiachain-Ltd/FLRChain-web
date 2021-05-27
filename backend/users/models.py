@@ -42,3 +42,7 @@ class CustomUser(AbstractUser):
             from_account__user=self,
             status=Transaction.CONFIRMED,
             action=Transaction.OPT_IN).exists()
+
+    @property
+    def name(self):
+        return f"{self.first_name} {self.last_name}"

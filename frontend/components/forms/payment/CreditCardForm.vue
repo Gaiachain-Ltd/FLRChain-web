@@ -18,25 +18,25 @@
       </v-layout>
       <v-divider class="mb-6"></v-divider>
       <v-flex>
-        <TextInput label="Cardholder name*" :text.sync="card.name"></TextInput>
+        <TextInput label="Cardholder name*" :text.sync="card.billingDetails.name"></TextInput>
       </v-flex>
       <v-flex>
-        <TextInput label="Address line 1*" :text.sync="card.line1"></TextInput>
+        <TextInput label="Address line 1*" :text.sync="card.billingDetails.line1"></TextInput>
       </v-flex>
       <v-flex>
-        <TextInput label="Address line 2" :text.sync="card.line2"></TextInput>
+        <TextInput label="Address line 2" :text.sync="card.billingDetails.line2"></TextInput>
       </v-flex>
       <v-flex>
-        <TextInput label="Postalcode*" :text.sync="card.postalCode"></TextInput>
+        <TextInput label="Postalcode*" :text.sync="card.billingDetails.postalCode"></TextInput>
       </v-flex>
       <v-flex>
-        <TextInput label="District" :text.sync="card.district"></TextInput>
+        <TextInput label="District" :text.sync="card.billingDetails.district"></TextInput>
       </v-flex>
       <v-flex>
-        <TextInput label="City*" :text.sync="card.city"></TextInput>
+        <TextInput label="City*" :text.sync="card.billingDetails.city"></TextInput>
       </v-flex>
       <v-flex>
-        <TextInput label="Country code*" :text.sync="card.country"></TextInput>
+        <TextInput label="Country code*" :text.sync="card.billingDetails.country"></TextInput>
       </v-flex>
       <v-flex>
         <TextInput label="Phone" :text.sync="card.phoneNumber"></TextInput>

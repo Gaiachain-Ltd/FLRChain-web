@@ -12,10 +12,18 @@ class BillingDetailsSerializer(serializers.Serializer):
 
 
 class SaveCardSerializer(serializers.Serializer):
+    idempotencyKey = serializers.CharField()
     keyId = serializers.CharField()
     email = serializers.EmailField()
-    phone = serializers.CharField()
+    phoneNumber = serializers.CharField(required=False)
     expiry = serializers.CharField()
     encryptedData = serializers.CharField()
     billingDetails = BillingDetailsSerializer()
+
+class MakePaymentSerializer(serializers.Serializer):
+    idempotencyKey = serializers.CharField()
+    keyId = serializers.CharField()
+    amount = serializers.DecimalField(max_digits=26, decimal_places=6)
+    cardId = serializers.CharField()
+    encryptedData = serializers.CharField()
 
