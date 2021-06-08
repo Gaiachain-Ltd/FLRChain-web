@@ -16,6 +16,7 @@
       <ButtonCard
         :value="balance"
         @clicked="paymentPopupVisible = true"
+        :disabled="!$auth.user.opted_in"
       ></ButtonCard>
     </v-flex>
     <PaymentPopup
@@ -25,15 +26,22 @@
       @error="errorPopupVisible = true"
     ></PaymentPopup>
     <SuccessPopup
-    :value.sync="successPopupVisible"
-    v-if="successPopupVisible"
-    text="Payment success.">
+      :value.sync="successPopupVisible"
+      v-if="successPopupVisible"
+      text="Your payment is processing."
+    >
     </SuccessPopup>
     <ErrorPopup
-    :value.sync="errorPopupVisible"
-    v-if="errorPopupVisible"
-    text="Payment failed.">
+      :value.sync="errorPopupVisible"
+      v-if="errorPopupVisible"
+      text="Unable to process your payment. Please try again later."
+    >
     </ErrorPopup>
+    <InfoPopup
+      v-if="infoPopupVisible"
+      :value.sync="infoPopupVisible"
+      text="Your account is not active yet."
+    ></InfoPopup>
   </v-layout>
 </template>
 
@@ -47,6 +55,7 @@ export default {
       paymentPopupVisible: false,
       successPopupVisible: false,
       errorPopupVisible: false,
+      infoPopupVisible: false,
     };
   },
   components: {
@@ -54,7 +63,8 @@ export default {
     ButtonCard: () => import("@/components/cards/balance/ButtonCard"),
     PaymentPopup: () => import("@/components/popups/PaymentPopup"),
     SuccessPopup: () => import("@/components/popups/SuccessPopup"),
-    ErrorPopup: () => import("@/components/popups/ErrorPopup")
+    ErrorPopup: () => import("@/components/popups/ErrorPopup"),
+    InfoPopup: () => import("@/components/popups/InfoPopup"),
   },
   async fetch() {
     const balanceInfo = await this.$axios
@@ -63,6 +73,14 @@ export default {
     this.total = balanceInfo.total;
     this.spent = balanceInfo.spent;
     this.balance = balanceInfo.balance;
+
+    if (!this.$auth.user.opted_in) {
+      this.$auth.fetchUser().then(() => {
+        if (!this.$auth.user.opted_in) {
+          this.infoPopupVisible = true;
+        }
+      });
+    }
   },
 };
 </script>

@@ -78,6 +78,8 @@ export default {
           return "Facililator fee";
         case 7:
           return "Return from investment";
+        case 8:
+          return "Top up";
         default:
           return `Action: ${this.transaction.action}`;
       }
@@ -85,6 +87,7 @@ export default {
     isReceived() {
       switch (this.transaction.action) {
         case 1:
+        case 8:
           return true;
         case 3:
           return true;

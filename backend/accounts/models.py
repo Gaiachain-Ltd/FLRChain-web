@@ -33,6 +33,12 @@ class Account(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
+    def __str__(self):
+        if self.user:
+            return f"User: {self.user.name}"
+        else:
+            return f"Project: {self.smart_contract.project.title}"
+
     @staticmethod
     def get_main_account():
         return Account.objects.get(type=Account.MAIN_ACCOUNT)
@@ -49,23 +55,23 @@ class Account(models.Model):
                 address=address)
             logger.debug("Created account for user %s.", user)
 
-            # ONLY FOR TEST PURPOSES!!
-            if user.type == CustomUser.INVESTOR:
-                main_account = Account.get_main_account()
-                chained = [
-                    Transaction.prepare_transfer(
-                        main_account,
-                        created_account,
-                        0.01,
-                        action=Transaction.FUELING),
-                    Transaction.prepare_transfer(
-                        main_account,
-                        created_account,
-                        1,
-                        currency=Transaction.USDC,
-                        action=Transaction.FUELING)]
-            else:
-                chained = []
+            # # ONLY FOR TEST PURPOSES!!
+            # if user.type == CustomUser.INVESTOR:
+            #     main_account = Account.get_main_account()
+            #     chained = [
+            #         Transaction.prepare_transfer(
+            #             main_account,
+            #             created_account,
+            #             0.01,
+            #             action=Transaction.FUELING),
+            #         Transaction.prepare_transfer(
+            #             main_account,
+            #             created_account,
+            #             1,
+            #             currency=Transaction.USDC,
+            #             action=Transaction.FUELING)]
+            # else:
+            chained = []
 
             created_account.opt_in(chained)
             return created_account

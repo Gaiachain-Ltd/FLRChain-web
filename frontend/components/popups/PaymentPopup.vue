@@ -22,9 +22,6 @@ export default {
   props: {
     value: {},
   },
-  timers: {
-    paymentInfo: { time: 3000, autostart: false, repeat: true }
-  },
   data() {
     return {
       publicKey: null,
@@ -103,27 +100,15 @@ export default {
         (reply) => {
           console.log("CREATE PAYMENT REPLY:", reply);
           this.paymentId = reply.data.data.id;
-          this.$timer.start('paymentInfo');
+          this.$emit('success');
+          this.show = false;
+        }
+      ).catch(
+        () => {
+          this.$emit('error');
         }
       )
     },
-    async paymentInfo() {
-      await this.$axios.get(`payments/circle/card/payment/${this.paymentId}/`).then(
-        (reply) => {
-          console.log("PAYMENT INFO REPLY", reply)
-          const status = reply.data.data.status;
-          if (status != "pending") {
-            this.$timer.stop('paymentInfo');
-            if (status == "failed") {
-              this.$emit('error');
-            } else {
-              this.$emit('success');
-            }
-            this.show = false;
-          }
-        }
-      )
-    }
   },
   async fetch() {
     await this.$axios

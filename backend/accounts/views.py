@@ -7,7 +7,7 @@ from drf_yasg.utils import swagger_auto_schema
 from transactions.models import Transaction
 from django.db.models import Sum, Q
 from projects.models import Project
-from django.shortcuts import  get_object_or_404
+from django.shortcuts import get_object_or_404
 from decimal import *
 
 
@@ -20,7 +20,6 @@ class AccountView(CommonView):
         tags=['accounts', 'facililator', 'beneficiary', 'investor'])
     def list(self, request):
         account = request.user.account
-        balance = account.usdc_balance()
         spent = Transaction.objects.filter(
             from_account=request.user.account,
             currency=Transaction.USDC,
@@ -28,11 +27,17 @@ class AccountView(CommonView):
                 total_spent=Sum('amount')).get('total_spent', 0)
         received = Transaction.objects.filter(
             Q(to_account=request.user.account,
-              currency=Transaction.USDC,
-              status__in=[Transaction.CONFIRMED, Transaction.PENDING]) &
-            ~Q(action=Transaction.FUELING)).aggregate(
-                total_received=Sum('amount')).get('total_received', 0)
-        
+            currency=Transaction.USDC,
+            status__in=[Transaction.CONFIRMED, Transaction.PENDING]) &
+            ~Q(action__in=[Transaction.FUELING, Transaction.TOP_UP])).aggregate(
+            total_received=Sum('amount')).get('total_received', 0)
+        top_ups = Transaction.objects.filter(
+            to_account=request.user.account,
+            currency=Transaction.USDC,
+            status__in=[Transaction.CONFIRMED, Transaction.PENDING],
+            action__in=[Transaction.FUELING, Transaction.TOP_UP]).aggregate(
+            total_received=Sum('amount')).get('total_received', 0)
+
         if not received:
             received = Decimal(0)
         else:
@@ -43,23 +48,28 @@ class AccountView(CommonView):
         else:
             spent = Decimal(spent)
 
+        if not top_ups:
+            top_ups = Decimal(0)
+        else:
+            top_ups = Decimal(top_ups)
+
         getcontext().prec = 6
         return Response(
             {
-                'balance': balance,
-                'spent': spent - received,
+                'balance': top_ups + received - spent,
+                'spent': spent,
                 'received': received,
-                'total': balance + (spent - received)
+                'total': top_ups
             },
             status=status.HTTP_200_OK)
-            
+
     @swagger_auto_schema(
         operation_summary="Project balance",
         tags=['accounts', 'facililator', 'investor'])
     def retrieve(self, request, pk=None):
         project = get_object_or_404(
-            Project, 
-            pk=pk, 
+            Project,
+            pk=pk,
             investment__isnull=False)
 
         account = project.smartcontract.account
