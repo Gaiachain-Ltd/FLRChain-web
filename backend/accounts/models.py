@@ -56,22 +56,22 @@ class Account(models.Model):
             logger.debug("Created account for user %s.", user)
 
             # # ONLY FOR TEST PURPOSES!!
-            # if user.type == CustomUser.INVESTOR:
-            #     main_account = Account.get_main_account()
-            #     chained = [
-            #         Transaction.prepare_transfer(
-            #             main_account,
-            #             created_account,
-            #             0.01,
-            #             action=Transaction.FUELING),
-            #         Transaction.prepare_transfer(
-            #             main_account,
-            #             created_account,
-            #             1,
-            #             currency=Transaction.USDC,
-            #             action=Transaction.FUELING)]
-            # else:
-            chained = []
+            if user.type == CustomUser.INVESTOR and settings.TESTING:
+                main_account = Account.get_main_account()
+                chained = [
+                    Transaction.prepare_transfer(
+                        main_account,
+                        created_account,
+                        0.01,
+                        action=Transaction.FUELING),
+                    Transaction.prepare_transfer(
+                        main_account,
+                        created_account,
+                        1,
+                        currency=Transaction.USDC,
+                        action=Transaction.FUELING)]
+            else:
+                chained = []
 
             created_account.opt_in(chained)
             return created_account

@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 
 from pathlib import Path
 import os
+import sys
 from celery.schedules import crontab
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -26,6 +27,8 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'sEk2#K1izjzajAAk22kalsiAAAjzakl')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
+
+TESTING = sys.argv[1:2] == ['test']
 
 if DEBUG:
     ALLOWED_HOSTS = '*'
