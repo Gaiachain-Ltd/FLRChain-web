@@ -41,3 +41,11 @@ class CircleAPI(object):
     def payment_info(self, payment_id):
         url = f"{self.ENVIROMENT_URL}/v1/payments/{payment_id}"
         return self.request("GET", url)
+
+    def transfer_usdc(self, data):
+        url = f"{self.ENVIROMENT_URL}/v1/transfers"
+        return self.request("POST", url, data)
+
+    def transfer_info(self, transfer_id):
+        url = f"{self.ENVIROMENT_URL}/v1/transfers/{transfer_id}"
+        return self.request("GET", url)

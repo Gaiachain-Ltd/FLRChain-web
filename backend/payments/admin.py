@@ -1,3 +1,5 @@
 from django.contrib import admin
+from payments.models import CirclePayment, CircleTransfer
 
-# Register your models here.
+admin.site.register(CirclePayment)
+admin.site.register(CircleTransfer)

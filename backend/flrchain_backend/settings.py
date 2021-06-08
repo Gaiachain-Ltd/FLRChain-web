@@ -185,6 +185,14 @@ CELERY_BEAT_SCHEDULE = {
     "verify_transactions": {
         "task": "transactions.tasks.verify_transactions",
         "schedule": crontab(minute="*/1")
+    },
+    "check_payment_status": {
+        "task": "payments.tasks.check_payment_status",
+        "schedule": crontab(minute="*/1")
+    },
+    "check_transfer_status": {
+        "task": "payments.tasks.check_transfer_status",
+        "schedule": crontab(minute="*/1")
     }
 }
 
@@ -224,6 +232,11 @@ LOGGING = {
             'propagate': True,
             'level': 'DEBUG'
         },
+        'payments': {
+            'handlers': ['console'],
+            'propagate': True,
+            'level': 'DEBUG'
+        }
     },
 }
 
@@ -245,8 +258,9 @@ FACILITATOR_FEE = os.getenv('FACILITATOR_FEE', 0.1)
 ALGO_API_TOKEN = os.getenv('ALGO_API_TOKEN')
 ALGO_API_URL = os.getenv('ALGO_API_URL', 'http://algorand:4161')
 ALGO_OPT_IN_AMOUNT = os.getenv('ALGO_OPT_IN_AMOUNT', 0.3)
-ALGO_ASSET = os.getenv('ALGO_ASSET', 10458941) # Default: TESTnet USDC on ALGO
+ALGO_ASSET = os.getenv('ALGO_ASSET', 10458941)  # Default: TESTnet USDC on ALGO
 
 # Circle
 CIRCLE_API_KEY = os.getenv('CIRCLE_API_KEY', '')
-CIRCLE_API_ENVIROMENT_URL = os.getenv('CIRCLE_API_ENVIROMENT_URL', 'https://api-sandbox.circle.com')
+CIRCLE_API_ENVIROMENT_URL = os.getenv(
+    'CIRCLE_API_ENVIROMENT_URL', 'https://api-sandbox.circle.com')

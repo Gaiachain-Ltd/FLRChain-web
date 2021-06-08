@@ -1,4 +1,5 @@
 import logging
+import uuid
 from django.shortcuts import render
 from common.views import CommonView
 from rest_framework.permissions import IsAuthenticated
@@ -10,7 +11,9 @@ from rest_framework import status
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from payments.serializers import *
-
+from decimal import *
+from payments.models import CirclePayment
+from django.db import transaction
 
 logger = logging.getLogger(__name__)
 
@@ -20,7 +23,7 @@ circle_client = CircleAPI(
 
 
 class CirclePaymentView(CommonView):
-    permission_classes = (IsAuthenticated, isInvestor)
+    permission_classes = (IsAuthenticated,)
 
     @swagger_auto_schema(
         operation_summary="Get Circle public key",
@@ -78,9 +81,9 @@ class CirclePaymentView(CommonView):
         #         "sessionId":"xxx",
         #         "ipAddress":"172.33.222.1"}
         # }
-        print("REQUEST", data)
+        print("REQUEST SAVE CARD", data)
         circle_reply = circle_client.save_card(data)
-        print("REP", circle_reply)
+        print("REP SAVE CARD", circle_reply)
         return Response(circle_reply, status=status.HTTP_200_OK)
 
     def make_payment(self, request):
@@ -92,7 +95,7 @@ class CirclePaymentView(CommonView):
                 'amount': str(serializer.validated_data['amount']),
                 'currency': 'USD'
             },
-            'verification': 'cvv',
+            'verification': 'none',
             'source': {
                 'id': serializer.validated_data['cardId'],
                 'type': 'card'
@@ -107,6 +110,7 @@ class CirclePaymentView(CommonView):
             'encryptedData': serializer.validated_data['encryptedData'],
             'keyId': serializer.validated_data['keyId'],
         }
+
         # data = {
         #     "idempotencyKey": "02ee3fff-3a78-48d5-91b1-6b9da437a6f2",
         #     "amount": {
@@ -128,12 +132,41 @@ class CirclePaymentView(CommonView):
         #     "encryptedData": "LS0tLS1CRUdJTiBQR1AgTUVTU0FHRS0tLS0tDQpWZXJzaW9uOiBPcGVuUEdQLmpzIHY0LjEwLjQNCkNvbW1lbnQ6IGh0dHBzOi8vb3BlbnBncGpzLm9yZw0KDQp3Y0JNQTBYV1NGbEZScFZoQVFmK05yYjU3ZDR3TDNuRVQvMTVjbk5PQy9rdFVxN2Q4NDFWVjA3T25FdzgNClRmUUxmUmJtcS92SVZibTdXNUFxQ085NC92cUg2c0NDQitoUnYvdGVxcDI4TjlvaUdUc0cxdmdhR1lUTg0KNmxZbzhtTDZlcHduSldNZXB4RDRvcXhCd2VlS21YaXFMME84TEtpZUhyZE52VXhJeERHMmRYUzB0UXZtDQpPWFdlQ0x2NTdIMWNUclRmZGd2aEFpUUYwb3V3dkkrZWtHMTBVSTExTnJwZWFEMXRCalNZUzBGcllMNlANClRNcFNaMW01NEpjWHhQTUIyQVJhRHplZUVKMDZXMzAvQjBpTWRxbG1xYkJZZFFQSUdDM2VHNUtHSW1KLw0KVzlIRE0wSmpNdkd3MTJUUUt5VHkxeElqaHJ4RnNlTVZWOXhvOXEzemVoSHlMczFDZDVOeHJvWkJqYkxtDQpqdEpGQWZsRVBBVUY0b3lFZ3pVODJqNUdBd0Jtd1ppL1FWWjVwUlBabVVsa3Buck05RC9BMVMvR1JoeTYNCjRWMTkrRThSL2dtT1JzSWMrQkhkYTRiR3R6aUdFOVBnYWUyVw0KPUs5Y04NCi0tLS0tRU5EIFBHUCBNRVNTQUdFLS0tLS0NCg==",
         #     "keyId": "key1"
         # }
-        print("REQUEST", data)
-        circle_reply = circle_client.create_payment(data)
-        print("REP", circle_reply)
+        print("REQUEST MAKE PAYMENT", data)
+        with transaction.atomic():
+            circle_reply = circle_client.create_payment(data)
+            CirclePayment.objects.create(
+                id=circle_reply['data']['id'],
+                amount=circle_reply['data']['amount']['amount'],
+                user=request.user
+            )
+        print("REP MAKE PAYMENT", circle_reply)
         return Response(circle_reply, status=status.HTTP_200_OK)
 
     def payment_info(self, request, payment_id=None):
         circle_reply = circle_client.payment_info(payment_id)
-        print("REP", circle_reply)
+        print("REPLY PAYMENT INFO", circle_reply)
+        # TODO: TESTING ONLY
+        if circle_reply['data']['status'] == 'confirmed':
+            amount = Decimal(circle_reply['data']['amount']['amount']).quantize(Decimal("0.01"))
+            fee = Decimal(circle_reply['data']['fees']['amount']).quantize(Decimal("0.01"))
+            data = {
+                "idempotencyKey": str(uuid.uuid4()),
+                "source": {
+                    "type": "wallet",
+                    "id": "1000100943",
+                },
+                "destination": {
+                    "type": "blockchain",
+                    "address": request.user.account.address,
+                    "chain": "ALGO"
+                },
+                "amount": {
+                    "amount": str(Decimal(amount - fee).quantize(Decimal("0.01"))),
+                    "currency": "USD"
+                }
+            }
+            print("REQUEST USDC TRANSFER", data)
+            circle_reply2 = circle_client.transfer_usdc(data)
+            print("REPLY USDC TRANSFER", circle_reply2)
         return Response(circle_reply, status=status.HTTP_200_OK)
