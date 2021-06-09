@@ -42,6 +42,17 @@
           :text.sync="billingDetails.country"
         ></CountryAutocomplete>
       </v-flex>
+      <v-flex
+        v-if="billingDetails.country == 'US' || billingDetails.country == 'CA'"
+      >
+        <TextInput
+          label="District*"
+          :text.sync="billingDetails.district"
+          :rules="[...requiredRules]"
+          mask="AA"
+          placeholder="District (2-letter)..."
+        ></TextInput>
+      </v-flex>
     </v-layout>
   </v-form>
 </template>

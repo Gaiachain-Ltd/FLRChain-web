@@ -12,7 +12,7 @@
         :size="22"
         color="#253F50"
         family="open-sans"
-        >Something went wrong. Please try again later.</DefaultText
+        >{{ text }}</DefaultText
       >
     </v-flex>
     <v-layout slot="buttons" column ma-0 style="width: 100%">
@@ -29,6 +29,10 @@ export default {
     value: {
       type: Boolean,
     },
+    text: {
+      type: String,
+      default: "Something went wrong. Please try again later."
+    }
   },
   computed: {
     show: {

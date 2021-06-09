@@ -38,7 +38,7 @@ class CirclePaymentView(CommonView):
             **circle_reply['data']
         }, status=status.HTTP_200_OK)
 
-    def _get_ip(request):
+    def _get_ip(self, request):
         ip = request.META.get('HTTP_X_FORWARDED_FOR', None)
         if ip:
             ip = ip.split(',')[0]
@@ -69,12 +69,14 @@ class CirclePaymentView(CommonView):
                 'country': serializer.validated_data['billingDetails']['country'],
                 'line1': serializer.validated_data['billingDetails']['address'],
                 'postalCode': serializer.validated_data['billingDetails']['postalCode'],
+                'district': serializer.validated_data['billingDetails'].get('district', ""),
             },
             'expMonth': exp_month,
             'expYear': exp_year,
             'metadata': {
                 'email': request.user.email,
-                'sessionId': hashlib.sha256(request.user.id).hexdigest(),
+                'sessionId': hashlib.md5(
+                    str(request.user.id).encode('utf-8')).hexdigest(),
                 'ipAddress': self._get_ip(request)
             }
         }
@@ -105,7 +107,8 @@ class CirclePaymentView(CommonView):
             'description': 'FLRChain top up.',
             'metadata': {
                 'email': request.user.email,
-                'sessionId': hashlib.sha256(request.user.id).hexdigest(),
+                'sessionId': hashlib.md5(
+                    str(request.user.id).encode('utf-8')).hexdigest(),
                 'ipAddress': self._get_ip(request)
             },
             'encryptedData': serializer.validated_data['encryptedData'],

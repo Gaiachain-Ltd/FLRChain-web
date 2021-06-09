@@ -45,10 +45,11 @@ export default {
         cvv: "123",
         billingDetails: {
           name: `${this.$auth.user.first_name} ${this.$auth.user.last_name}`,
-          address: "test",
-          city: "Lublin",
-          country: "PL",
-          postalCode: "20-303",
+          address: "st. Test 1/23",
+          city: "Test",
+          country: "US",
+          postalCode: "12-123",
+          district: "",
         },
       },
       paymentId: null,
@@ -129,24 +130,29 @@ export default {
         return (this.page += 1);
       }
       const data = await this.encryptedCardData();
-      await this.$axios.post("payments/circle/card/", data).then((reply) => {
-        console.log("SAVE CARD:", reply);
-        this.card.cardId = reply.data.data.id;
-        this.createPayment();
-      });
+      await this.$axios
+        .post("payments/circle/card/", data)
+        .then((reply) => {
+          this.card.cardId = reply.data.data.id;
+          this.createPayment();
+        })
+        .catch(() => {
+          this.$emit("error");
+          this.show = false;
+        });
     },
     async createPayment() {
       const data = await this.encryptedCardData();
       await this.$axios
         .post("payments/circle/card/payment/", data)
         .then((reply) => {
-          console.log("CREATE PAYMENT REPLY:", reply);
           this.paymentId = reply.data.data.id;
           this.$emit("success");
           this.show = false;
         })
         .catch(() => {
           this.$emit("error");
+          this.show = false;
         });
     },
   },

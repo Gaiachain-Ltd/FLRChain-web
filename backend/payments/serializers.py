@@ -7,6 +7,7 @@ class BillingDetailsSerializer(serializers.Serializer):
     country = serializers.CharField()
     address = serializers.CharField()
     postalCode = serializers.CharField()
+    district = serializers.CharField(required=False)
 
 
 class SaveCardSerializer(serializers.Serializer):
