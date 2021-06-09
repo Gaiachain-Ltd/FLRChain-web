@@ -5,46 +5,72 @@
         <TextInput
           label="Cardholder name*"
           :text.sync="billingDetails.name"
+          :rules="[...requiredRules]"
+          placeholder="Card holder name..."
         ></TextInput>
       </v-flex>
       <v-flex>
         <TextInput
-          label="Address line 1*"
-          :text.sync="billingDetails.line1"
+          label="Address*"
+          :text.sync="billingDetails.address"
+          :rules="[...requiredRules]"
+          placeholder="Address..."
         ></TextInput>
       </v-flex>
       <v-layout row ma-0>
         <v-flex xs5>
-          <TextInput label="City*" :text.sync="billingDetails.city"></TextInput>
+          <TextInput
+            label="City*"
+            :text.sync="billingDetails.city"
+            :rules="[...requiredRules]"
+            placeholder="City..."
+          ></TextInput>
         </v-flex>
         <v-spacer></v-spacer>
         <v-flex xs5>
           <TextInput
             label="Postalcode*"
             :text.sync="billingDetails.postalCode"
+            :rules="[...requiredRules]"
+            placeholder="Postalcode..."
           ></TextInput>
         </v-flex>
       </v-layout>
       <v-flex>
-        <TextInput
-          label="Country code*"
+        <CountryAutocomplete
+          label="Country*"
           :text.sync="billingDetails.country"
-        ></TextInput>
+        ></CountryAutocomplete>
       </v-flex>
       <v-flex>
-        <TextInput label="Email*" :text.sync="billingDetails.email"></TextInput>
+        <TextInput
+          label="Email*"
+          :text.sync="billingDetails.email"
+          :rules="[...requiredRules, ...emailRules]"
+          placeholder="Email..."
+        ></TextInput>
       </v-flex>
     </v-layout>
   </v-form>
 </template>
 
 <script>
+import ValidatorMixin from "@/validators";
+
 export default {
+  mixins: [ValidatorMixin],
   props: {
     billingDetails: {},
   },
   components: {
     TextInput: () => import("@/components/inputs/TextInput"),
+    CountryAutocomplete: () =>
+      import("@/components/inputs/CountryAutocomplete"),
+  },
+  methods: {
+    validate() {
+      return this.$refs.form.validate();
+    },
   },
 };
 </script>

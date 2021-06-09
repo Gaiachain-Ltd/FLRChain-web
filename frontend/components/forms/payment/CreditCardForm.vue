@@ -52,5 +52,10 @@ export default {
     CCExpInput: () => import("@/components/inputs/CCExpInput"),
     TextInput: () => import("@/components/inputs/TextInput"),
   },
+  methods: {
+    validate() {
+      return this.$refs.form.validate();
+    }
+  }
 };
 </script>

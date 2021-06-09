@@ -1,8 +1,9 @@
 <template>
   <DefaultPopup :show.sync="show">
     <v-layout column slot="content">
-      <CreditCardForm v-if="page === 0" :card.sync="card"></CreditCardForm>
+      <CreditCardForm ref="cardform" v-if="page === 0" :card.sync="card"></CreditCardForm>
       <BillingDetailsForm
+        ref="billingform"
         v-if="page === 1"
         :billingDetails.sync="card.billingDetails"
       ></BillingDetailsForm>
@@ -82,9 +83,9 @@ export default {
   },
   methods: {
     handleNext() {
-      if (this.page === 0) {
+      if (this.page === 0 && this.$refs.cardform.validate()) {
         this.page += 1;
-      } else {
+      } else if (this.page === 1 && this.$refs.billingform.validate()) {
         this.saveCard();
       }
     },
