@@ -10,6 +10,7 @@
       flat
       height="50"
       placeholder="Choose country..."
+      :rules="[...requiredRules]"
       :background-color="$vuetify.theme.themes.light.tertiary"
       v-model="internalText"
     ></v-autocomplete>
@@ -17,10 +18,13 @@
 </template>
 
 <script>
+import ValidatorMixin from "@/validators";
+
 const countries = require("i18n-iso-countries");
 countries.registerLocale(require("i18n-iso-countries/langs/en.json"));
 
 export default {
+  mixins: [ValidatorMixin],
   props: {
     label: {},
     text: {},

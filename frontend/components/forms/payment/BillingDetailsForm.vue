@@ -42,14 +42,6 @@
           :text.sync="billingDetails.country"
         ></CountryAutocomplete>
       </v-flex>
-      <v-flex>
-        <TextInput
-          label="Email*"
-          :text.sync="billingDetails.email"
-          :rules="[...requiredRules, ...emailRules]"
-          placeholder="Email..."
-        ></TextInput>
-      </v-flex>
     </v-layout>
   </v-form>
 </template>

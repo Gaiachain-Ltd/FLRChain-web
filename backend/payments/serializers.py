@@ -5,17 +5,13 @@ class BillingDetailsSerializer(serializers.Serializer):
     name = serializers.CharField()
     city = serializers.CharField()
     country = serializers.CharField()
-    line1 = serializers.CharField()
-    line2 = serializers.CharField(required=False)
-    district = serializers.CharField(required=False)
+    address = serializers.CharField()
     postalCode = serializers.CharField()
 
 
 class SaveCardSerializer(serializers.Serializer):
     idempotencyKey = serializers.CharField()
     keyId = serializers.CharField()
-    email = serializers.EmailField()
-    phoneNumber = serializers.CharField(required=False)
     expiry = serializers.CharField()
     encryptedData = serializers.CharField()
     billingDetails = BillingDetailsSerializer()

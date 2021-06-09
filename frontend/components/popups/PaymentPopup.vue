@@ -1,7 +1,11 @@
 <template>
   <DefaultPopup :show.sync="show">
     <v-layout column slot="content">
-      <CreditCardForm ref="cardform" v-if="page === 0" :card.sync="card"></CreditCardForm>
+      <CreditCardForm
+        ref="cardform"
+        v-if="page === 0"
+        :card.sync="card"
+      ></CreditCardForm>
       <BillingDetailsForm
         ref="billingform"
         v-if="page === 1"
@@ -35,15 +39,16 @@ export default {
       publicKey: null,
       keyId: null,
       card: {
+        amount: "10",
         number: "4007410000000006",
         expiry: "12/2022",
+        cvv: "123",
         billingDetails: {
           name: `${this.$auth.user.first_name} ${this.$auth.user.last_name}`,
+          address: "test",
           city: "Lublin",
           country: "PL",
-          line1: "Text",
           postalCode: "20-303",
-          email: this.$auth.user.email,
         },
       },
       paymentId: null,
