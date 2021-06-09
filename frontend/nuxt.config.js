@@ -44,6 +44,7 @@ module.exports = {
   ],
   plugins: [
     { src: '@/plugins/vue-timers', mode: 'client' },
+    { src: '@/plugins/v-mask', mode: 'client'}
   ],
   publicRuntimeConfig: {
     axios: {

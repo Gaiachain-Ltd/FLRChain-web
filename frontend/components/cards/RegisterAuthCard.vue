@@ -53,7 +53,7 @@
             :text.sync="user.password"
             :rules="passwordRules"
             :error.sync="passwordsNotTheSame"
-            password
+            type="password"
             required
           ></TextInput>
           <v-spacer></v-spacer>
@@ -64,7 +64,7 @@
             :text.sync="repassword"
             :rules="passwordRules"
             :error.sync="passwordsNotTheSame"
-            password
+            type="password"
             required
           ></TextInput>
         </v-layout>

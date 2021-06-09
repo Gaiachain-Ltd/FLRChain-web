@@ -17,7 +17,7 @@
             :rules="passwordRules"
             :error.sync="wrongPassword"
             placeholder="Please enter your password..."
-            password
+            type="password"
             required
           ></TextInput>
         </v-layout>

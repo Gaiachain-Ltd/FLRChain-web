@@ -13,9 +13,10 @@
       "
       height="50"
       v-model="internalText"
-      :type="password ? 'password' : 'text'"
+      :type="type"
       :required="required"
       :rules="rules"
+      v-mask="mask ? `${mask}` : undefined"
       @blur="validate"
     >
       <v-layout v-if="icon" column pr-2 mb-1 align-center slot="prepend-inner">
@@ -39,10 +40,6 @@ export default {
     text: {
       type: String,
     },
-    password: {
-      type: Boolean,
-      default: false,
-    },
     rules: {
       type: Array,
       default: () => [],
@@ -58,6 +55,14 @@ export default {
     icon: {
       type: String,
     },
+    type: {
+      type: String,
+      default: 'text'
+    },
+    mask: {
+      type: String,
+      default: undefined
+    }
   },
   data() {
     return {

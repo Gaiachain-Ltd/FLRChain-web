@@ -1,21 +1,27 @@
 <template>
   <DefaultPopup :show.sync="show">
     <v-layout column slot="content">
-      <CreditCardForm :card.sync="card"></CreditCardForm>
+      <CreditCardForm v-if="page === 0" :card.sync="card"></CreditCardForm>
+      <BillingDetailsForm
+        v-if="page === 1"
+        :billingDetails.sync="card.billingDetails"
+      ></BillingDetailsForm>
     </v-layout>
     <v-layout slot="buttons" column ma-0 style="width: 100%">
       <v-flex mb-3>
-        <BlockButton @clicked="saveCard">Pay</BlockButton>
+        <BlockButton @clicked="handleNext">{{ nextButtonText }}</BlockButton>
       </v-flex>
       <v-flex>
-        <BlockButton color="error" @clicked="show = false">Cancel</BlockButton>
+        <BlockButton color="error" @clicked="handlePrev">{{
+          prevButtonText
+        }}</BlockButton>
       </v-flex>
     </v-layout>
   </DefaultPopup>
 </template>
 
 <script>
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 const openpgp = require("openpgp");
 
 export default {
@@ -24,25 +30,23 @@ export default {
   },
   data() {
     return {
+      page: 0,
       publicKey: null,
       keyId: null,
       card: {
         number: "4007410000000006",
-        expiry: "12/22",
-        phoneNumber: "+48663317345",
-        email: "damian.cholewa.choli@gmail.com",
+        expiry: "12/2022",
         billingDetails: {
-          name: "Damian Cholewa",
+          name: `${this.$auth.user.first_name} ${this.$auth.user.last_name}`,
           city: "Lublin",
           country: "PL",
           line1: "Text",
-          line2: "Text",
-          district: "DDD",
-          postalCode: "20-303"
-        }
+          postalCode: "20-303",
+          email: this.$auth.user.email,
+        },
       },
       paymentId: null,
-      idempotencyKey: uuidv4()
+      idempotencyKey: uuidv4(),
     };
   },
   computed: {
@@ -54,13 +58,43 @@ export default {
         this.$emit("update:value", value);
       },
     },
+    nextButtonText() {
+      if (this.page === 0) {
+        return "Confirm";
+      } else {
+        return "Pay";
+      }
+    },
+    prevButtonText() {
+      if (this.page === 0) {
+        return "Cancel";
+      } else {
+        return "Back";
+      }
+    },
   },
   components: {
     DefaultPopup: () => import("@/components/popups/DefaultPopup"),
     CreditCardForm: () => import("@/components/forms/payment/CreditCardForm"),
+    BillingDetailsForm: () =>
+      import("@/components/forms/payment/BillingDetailsForm"),
     BlockButton: () => import("@/components/buttons/BlockButton"),
   },
   methods: {
+    handleNext() {
+      if (this.page === 0) {
+        this.page += 1;
+      } else {
+        this.saveCard();
+      }
+    },
+    handlePrev() {
+      if (this.page === 0) {
+        this.show = false;
+      } else {
+        this.page -= 1;
+      }
+    },
     async encryptedCardData() {
       let copiedCard = { ...this.card };
       const decodedPublicKey = atob(this.publicKey);
@@ -85,29 +119,29 @@ export default {
       });
     },
     async saveCard() {
+      if (this.page === 0) {
+        return (this.page += 1);
+      }
       const data = await this.encryptedCardData();
-      await this.$axios.post("payments/circle/card/", data).then(
-        (reply) => {
-          console.log("SAVE CARD:", reply);
-          this.card.cardId = reply.data.data.id;
-          this.createPayment();
-        }
-      )
+      await this.$axios.post("payments/circle/card/", data).then((reply) => {
+        console.log("SAVE CARD:", reply);
+        this.card.cardId = reply.data.data.id;
+        this.createPayment();
+      });
     },
     async createPayment() {
       const data = await this.encryptedCardData();
-      await this.$axios.post("payments/circle/card/payment/", data).then(
-        (reply) => {
+      await this.$axios
+        .post("payments/circle/card/payment/", data)
+        .then((reply) => {
           console.log("CREATE PAYMENT REPLY:", reply);
           this.paymentId = reply.data.data.id;
-          this.$emit('success');
+          this.$emit("success");
           this.show = false;
-        }
-      ).catch(
-        () => {
-          this.$emit('error');
-        }
-      )
+        })
+        .catch(() => {
+          this.$emit("error");
+        });
     },
   },
   async fetch() {
