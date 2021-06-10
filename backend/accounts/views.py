@@ -37,6 +37,12 @@ class AccountView(CommonView):
             status__in=[Transaction.CONFIRMED, Transaction.PENDING],
             action__in=[Transaction.FUELING, Transaction.TOP_UP]).aggregate(
             total_received=Sum('amount')).get('total_received', 0)
+        ret = Transaction.objects.filter(
+            to_account=request.user.account,
+            currency=Transaction.USDC,
+            status__in=[Transaction.CONFIRMED, Transaction.PENDING],
+            action=Transaction.RETURN_INVESTMENT).aggregate(
+            total_return=Sum('amount')).get('total_return', 0)
 
         if not received:
             received = Decimal(0)
@@ -53,11 +59,16 @@ class AccountView(CommonView):
         else:
             top_ups = Decimal(top_ups)
 
+        if not ret:
+            ret = Decimal(0)
+        else:
+            ret = Decimal(ret)
+
         getcontext().prec = 6
         return Response(
             {
                 'balance': top_ups + received - spent,
-                'spent': spent,
+                'spent': (spent - ret),
                 'received': received,
                 'total': top_ups
             },
