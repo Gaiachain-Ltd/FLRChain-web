@@ -268,3 +268,4 @@ ALGO_ASSET = os.getenv('ALGO_ASSET', 10458941)  # Default: TESTnet USDC on ALGO
 CIRCLE_API_KEY = os.getenv('CIRCLE_API_KEY', '')
 CIRCLE_API_ENVIROMENT_URL = os.getenv(
     'CIRCLE_API_ENVIROMENT_URL', 'https://api-sandbox.circle.com')
+CIRCLE_ALGO_WALLET_ID = os.getenv('CIRCLE_ALGO_WALLET_ID')

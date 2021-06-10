@@ -34,7 +34,7 @@ def check_payment_status():
                     "idempotencyKey": str(uuid.uuid4()),
                     "source": {
                         "type": "wallet",
-                        "id": "1000100943",
+                        "id": settings.CIRCLE_ALGO_WALLET_ID
                     },
                     "destination": {
                         "type": "blockchain",
