@@ -33,7 +33,7 @@ class CirclePaymentView(CommonView):
         tags=['payments', 'circle', 'investor'])
     def get_key(self, request):
         circle_reply = circle_client.get_public_key()
-        logger.warning("Circle reply: %s", circle_reply)
+        logger.debug("Get key reply: %s", circle_reply)
         return Response({
             **circle_reply['data']
         }, status=status.HTTP_200_OK)

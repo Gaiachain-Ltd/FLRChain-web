@@ -17,21 +17,24 @@ class CommonTestCase(TestCase):
     def _create(self, user, url, data, status, format='json'):
         self._auth(user)
         reply = client.post(url, data, format=format)
-        print(reply.data)
         self.assertEqual(reply.status_code, status)
+        return reply
 
     def _update(self, user, url, data, status, format='json'):
         self._auth(user)
         reply = client.put(url, data, format=format)
         self.assertEqual(reply.status_code, status)
+        return reply
 
     def _list(self, user, url, status, format='json'):
         self._auth(user)
         reply = client.get(url, format=format)
         self.assertEqual(reply.status_code, status)
+        return reply
 
     def _retrieve(self, user, url, status, format='json'):
         self._auth(user)
         reply = client.get(url, format=format)
         self.assertEqual(reply.status_code, status)
+        return reply
 
