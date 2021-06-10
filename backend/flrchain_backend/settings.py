@@ -256,6 +256,7 @@ SWAGGER_SETTINGS = {
 
 # Constants
 FACILITATOR_FEE = os.getenv('FACILITATOR_FEE', 0.1)
+AUTO_INV_FUELING = os.getenv('AUTO_INV_FUELING', 0)
 
 # Algorand
 ALGO_API_TOKEN = os.getenv('ALGO_API_TOKEN')

@@ -102,36 +102,23 @@ export default {
         this.page -= 1;
       }
     },
-    async encryptedCardData() {
-      let copiedCard = { ...this.card };
-      const decodedPublicKey = atob(this.publicKey);
-      const options = {
-        message: openpgp.message.fromText(
-          JSON.stringify({
-            number: copiedCard.number,
-            cvv: copiedCard.cvv,
-          })
-        ),
-        publicKeys: (await openpgp.key.readArmored(decodedPublicKey)).keys,
-      };
-      // delete copiedCard.number;
-      // delete copiedCard.cvv;
-      return await openpgp.encrypt(options).then((ciphertext) => {
-        return {
-          ...copiedCard,
-          idempotencyKey: this.idempotencyKey,
-          encryptedData: btoa(ciphertext.data),
-          keyId: this.keyId,
-        };
-      });
-    },
     async saveCard() {
       if (this.page === 0) {
         return (this.page += 1);
       }
-      const data = await this.encryptedCardData();
+
+      this.card.encryptedData = await this.encryptedData();
+      delete this.card.number;
+      delete this.card.cvv;
+
       await this.$axios
-        .post("payments/circle/card/", data)
+        .post("payments/circle/card/", {
+          idempotencyKey: this.idempotencyKey,
+          keyId: this.keyId,
+          encryptedData: this.card.encryptedData,
+          expiry: this.card.expiry,
+          billingDetails: this.card.billingDetails,
+        })
         .then((reply) => {
           this.card.cardId = reply.data.data.id;
           this.createPayment();
@@ -142,9 +129,14 @@ export default {
         });
     },
     async createPayment() {
-      const data = await this.encryptedCardData();
       await this.$axios
-        .post("payments/circle/card/payment/", data)
+        .post("payments/circle/card/payment/", {
+          idempotencyKey: this.idempotencyKey,
+          keyId: this.keyId,
+          encryptedData: this.card.encryptedData,
+          amount: this.card.amount,
+          cardId: this.card.cardId,
+        })
         .then((reply) => {
           this.paymentId = reply.data.data.id;
           this.$emit("success");
@@ -154,6 +146,32 @@ export default {
           this.$emit("error");
           this.show = false;
         });
+    },
+    async encryptedData() {
+      if (
+        !this.publicKey ||
+        !this.card.number ||
+        !this.card.cvv ||
+        this.card.number.length < 15 ||
+        this.card.cvv.length < 3
+      ) {
+        return null;
+      }
+
+      const decodedPublicKey = atob(this.publicKey);
+      const options = {
+        message: openpgp.message.fromText(
+          JSON.stringify({
+            number: this.card.number,
+            cvv: this.card.cvv,
+          })
+        ),
+        publicKeys: (await openpgp.key.readArmored(decodedPublicKey)).keys,
+      };
+
+      return await openpgp.encrypt(options).then((ciphertext) => {
+        return btoa(ciphertext.data);
+      });
     },
   },
   async fetch() {

@@ -56,7 +56,7 @@ class Account(models.Model):
             logger.debug("Created account for user %s.", user)
 
             # # ONLY FOR TEST PURPOSES!!
-            if user.type == CustomUser.INVESTOR and settings.TESTING:
+            if user.type == CustomUser.INVESTOR and (settings.TESTING or settings.AUTO_INV_FUELING):
                 main_account = Account.get_main_account()
                 chained = [
                     Transaction.prepare_transfer(
