@@ -44,7 +44,7 @@ class Account(models.Model):
         return Account.objects.get(type=Account.MAIN_ACCOUNT)
 
     @staticmethod
-    def generate(user):
+    def generate(user, main=False):
         with transaction.atomic():
             private_key, address = utils.generate_account()
             logger.debug("Generated algorand account for user %s.", user)
@@ -52,11 +52,13 @@ class Account(models.Model):
             created_account = Account.objects.create(
                 user=user,
                 private_key=private_key,
-                address=address)
+                address=address,
+                type=Account.MAIN_ACCOUNT if main else Account.NORMAL_ACCOUNT
+            )
             logger.debug("Created account for user %s.", user)
 
             # # ONLY FOR TEST PURPOSES!!
-            if user.type == CustomUser.INVESTOR and (settings.TESTING or settings.AUTO_INV_FUELING == '1'):
+            if not main and user.type == CustomUser.INVESTOR and (settings.TESTING or settings.AUTO_INV_FUELING == '1'):
                 main_account = Account.get_main_account()
                 chained = [
                     Transaction.prepare_transfer(
