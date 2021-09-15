@@ -33,9 +33,10 @@
 2. Run ``` docker-compose run backend python manage.py generateaddress ```
 3. You will see address and private key in output, please save it.
 4. Go to https://dispenser.testnet.aws.algodev.network/ and paste your address there and click "Dispense".
-5. Run ``` docker-compose run backend python manage.py usdcoptin <ADDRESS> <PRIVATE_KEY> ```.
-6. Go again to https://dispenser.testnet.aws.algodev.network/ and check "100 USDC" and paste your address there and click "Dispense".
-7. Go to django admin panel and add new Accounts/Account. Paste address, private key, set type on "Main account" and set user as superuser.
+5. Run in seprate terminal ``` docker-compose up algorand ```.
+6. Run ``` docker-compose run backend python manage.py usdcoptin <ADDRESS> <PRIVATE_KEY> ```.
+7. Go again to https://dispenser.testnet.aws.algodev.network/ and check "100 USDC" and paste your address there and click "Dispense".
+8. Go to django admin panel and add new Accounts/Account. Paste address, private key, set type on "Main account" and set user as superuser.
 
 ## V. Run test-net live tests:
 1. Copy backend/accounts/fixtures/example.main_account.json backend/accounts/fixtures/main_account.json .
