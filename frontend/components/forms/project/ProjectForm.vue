@@ -2,7 +2,7 @@
   <v-form ref="form">
     <v-layout column>
       <v-layout row ma-0>
-        <v-flex>
+        <v-flex xs12 sm12 md7 shrink>
           <TextInput
             label="Project title*"
             placeholder="Please enter project name..."
@@ -11,7 +11,8 @@
             required
           ></TextInput>
         </v-flex>
-        <v-flex mx-6>
+        <v-spacer></v-spacer>
+        <v-flex xs12 sm5 md2 shrink>
           <DateInput
             label="Start of project*"
             :text.sync="project.start"
@@ -19,7 +20,8 @@
             required
           ></DateInput>
         </v-flex>
-        <v-flex>
+        <v-spacer></v-spacer>
+        <v-flex xs12 sm5 md2 shrink>
           <DateInput
             label="End of project*"
             :text.sync="project.end"

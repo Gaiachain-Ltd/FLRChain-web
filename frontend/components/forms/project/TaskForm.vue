@@ -13,7 +13,7 @@
         ></DefaultIconButton>
       </v-layout>
       <v-layout row ma-0>
-        <v-flex grow>
+        <v-flex xs12 sm12 md9 shrink>
           <TextInput
             label="Action*"
             :text.sync="task.action"
@@ -22,7 +22,8 @@
             required
           ></TextInput>
         </v-flex>
-        <v-flex ml-6 shrink>
+        <v-spacer></v-spacer>
+        <v-flex xs12 sm12 md2 shrink>
           <TextInput
             label="Reward*"
             :text.sync="task.reward"

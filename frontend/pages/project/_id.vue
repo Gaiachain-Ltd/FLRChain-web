@@ -1,13 +1,13 @@
 <template>
   <v-layout column mt-2>
     <ToolBar title="Project details"> </ToolBar>
-    <v-layout row align-center ma-0 shrink mt-10 mb-5 >
+    <v-layout row align-center ma-0 shrink mt-10 mb-5 justify-center>
       <DefaultTitle class="mr-3">{{ project.title }}</DefaultTitle>
       <ProjectStatusLabel :status="projectStatus"></ProjectStatusLabel>
       <v-spacer></v-spacer>
       <ActionButton
         v-if="!isFinished && isFacililator"
-        class="white--text"
+        class="white--text mr-3"
         :label="edit ? 'Save project' : 'Edit project'"
         :color="edit ? 'primary' : 'septenary'"
         @clicked="handleEdit"
@@ -15,7 +15,7 @@
       ></ActionButton>
     </v-layout>
     <v-layout row ma-0 shrink>
-      <v-flex xs8 shrink>
+      <v-flex xs12 sm12 md6 lg6 xl6 shrink>
         <v-layout column mr-3>
           <DetailsProjectCard
             v-if="!edit"
@@ -39,8 +39,8 @@
           ></InputTasksCard>
         </v-layout>
       </v-flex>
-      <v-flex xs4 shrink>
-        <v-layout column ml-3 xs4>
+      <v-flex xs12 sm12 md6 lg6 xl6 shrink>
+        <v-layout column mr-3>
           <client-only v-if="project.investment" placeholder="Loading...">
             <DetailsInvestmentCard class="mb-6"></DetailsInvestmentCard>
           </client-only>
