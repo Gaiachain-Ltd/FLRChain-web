@@ -25,7 +25,7 @@
             :rules="firstNameRules"
             required
           ></TextInput>
-          <v-spacer></v-spacer>
+          <v-spacer class="hidden-sm-and-down"></v-spacer>
           <TextInput
             xs5
             label="Last name*"
@@ -37,6 +37,7 @@
         </v-layout>
         <v-flex shrink mx-0>
           <TextInput
+            xs5
             label="Email*"
             placeholder="Email..."
             :text.sync="user.email"
@@ -56,7 +57,7 @@
             type="password"
             required
           ></TextInput>
-          <v-spacer></v-spacer>
+          <v-spacer class="hidden-sm-and-down"></v-spacer>
           <TextInput
             xs5
             label="Re-password*"

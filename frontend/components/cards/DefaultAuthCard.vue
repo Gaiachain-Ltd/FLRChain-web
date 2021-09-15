@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-card min-width="500">
+    <v-card :width="width" class="auth-transition">
       <v-card-title class="px-6">
         <div class="auth-title">{{ title }}</div>
       </v-card-title>
@@ -40,6 +40,17 @@ export default {
       type: String,
     },
   },
+  computed: {
+    width() {
+      switch (this.$vuetify.breakpoint.name){
+        case 'xs': return 350
+        case 'sm': return 400
+        case 'md': return 500
+        case 'lg': return 550
+        case 'xl': return 600
+      }
+    },
+  },
   data() {
     return {
       errorPopupVisible: false,
@@ -72,4 +83,11 @@ export default {
   line-height: 42px !important;
   color: var(--v-primary-base);
 }
+.auth-transition {
+    -moz-transition: width 1s ease-in-out, left 1.5s ease-in-out;
+    -webkit-transition: width 1s ease-in-out, left 1.5s ease-in-out;
+    -o-transition: width 1s ease-in-out, left 1.5s ease-in-out;
+    transition: width 1s ease-in-out, left 1.5s ease-in-out;
+}
+
 </style>
