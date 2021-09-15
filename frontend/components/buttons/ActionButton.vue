@@ -3,6 +3,8 @@
     @click.prevent="$emit('clicked')"
     class="action-btn-style text-none elevation-0"
     height="50"
+    width="100%"
+    max-width="400"
     :color="color"
     :disabled="disabled"
     >{{ label }}</v-btn
@@ -33,6 +35,5 @@ export default {
   font-family: "open-sans" !important;
   font-size: 16px !important;
   font-weight: 600 !important;
-  min-width: 250px !important;
 }
 </style>

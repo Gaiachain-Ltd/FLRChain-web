@@ -2,20 +2,24 @@
   <v-card class="card-style">
     <v-card-text>
       <v-layout row ma-0 justify-center>
-        <v-flex shrink mr-3>
+        <v-spacer></v-spacer>
+        <v-spacer class="hidden-md-and-down"></v-spacer>
+        <v-spacer class="hidden-md-and-down"></v-spacer>
+        <v-flex xs4 shrink mr-3>
           <ActionButton
             label="Cancel"
             color="error"
             @clicked="$emit('cancel')"
           ></ActionButton>
         </v-flex>
-        <v-flex shrink ml-3>
+        <v-flex xs4 shrink ml-3>
           <ActionButton
             :disabled="disabled"
             label="Save"
             @clicked="$emit('save')"
           ></ActionButton>
         </v-flex>
+        <v-spacer></v-spacer>
       </v-layout>
     </v-card-text>
   </v-card>
@@ -32,7 +36,7 @@ export default {
   components: {
     ActionButton: () => import("@/components/buttons/ActionButton"),
   },
-};
+}
 </script>
 
 <style scoped>
@@ -42,7 +46,5 @@ export default {
   left: 0;
   right: 0;
   margin-bottom: -7px !important;
-  margin-left: 268px !important;
-  margin-right: 12px !important;
 }
 </style>

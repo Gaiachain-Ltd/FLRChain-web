@@ -1,5 +1,5 @@
 <template>
-  <v-card>
+  <v-card width="100%" height="100%">
     <v-layout column align-center pa-3>
       <DefaultText size="50" :color="$vuetify.theme.themes.light.quinary">{{
         value
