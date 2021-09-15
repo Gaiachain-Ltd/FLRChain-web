@@ -1,13 +1,12 @@
 <template>
-  <v-layout row shrink ma-0>
-    <v-flex xs9 shrink>
+  <v-layout row shrink ma-0 class="justify-space-around">
+    <v-flex xs12 sm5 md4 lg3 xl3 ma-3 shrink>
       <BalanceCard
         :value="received"
         label="Project rewards in USDC"
       ></BalanceCard>
     </v-flex>
-    <v-spacer></v-spacer>
-    <v-flex xs2 shrink>
+    <v-flex xs12 sm5 md4 lg3 xl3 ma-3 shrink>
       <ProjectCounter></ProjectCounter>
     </v-flex>
   </v-layout>

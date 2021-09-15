@@ -1,18 +1,15 @@
 <template>
-  <v-layout row shrink ma-0>
-    <v-flex xs2 shrink>
+  <v-layout row shrink ma-0 class="justify-space-around">
+    <v-flex xs12 sm5 md3 lg2 xl1 ma-3 shrink>
       <BalanceCard :value="total" label="All USDC"></BalanceCard>
     </v-flex>
-    <v-spacer></v-spacer>
-    <v-flex xs2 shrink>
+    <v-flex xs12 sm5 md3 lg2 xl1 ma-3 shrink>
       <BalanceCard :value="spent" label="Invested USDC"></BalanceCard>
     </v-flex>
-    <v-spacer></v-spacer>
-    <v-flex xs2 shrink>
+    <v-flex xs12 sm5 md3 lg2 xl1 ma-3 shrink>
       <BalanceCard :value="balance" label="Balance USDC"></BalanceCard>
     </v-flex>
-    <v-spacer></v-spacer>
-    <v-flex xs2 shrink>
+    <v-flex xs12 sm12 md12 lg2 xl1 ma-3 shrink>
       <ButtonCard
         :value="balance"
         @clicked="paymentPopupVisible = true"
