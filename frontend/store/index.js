@@ -1,5 +1,6 @@
 export const state = () => ({
-    regEmail: ''
+    regEmail: '',
+    drawerState: null,
 })
 
 export const getters = {
@@ -21,18 +22,26 @@ export const getters = {
 
     regEmail(state) {
         return state.regEmail;
-    }
+    },
+    getDrawerState(state) {
+      return state.drawerState
+    },
 }
 
 export const mutations = {
-
     setRegEmail(state, email) {
         state.regEmail = email;
-    }
+    },
+    setDrawerState(state,value) {
+      state.drawerState = value;
+    },
 }
 
 export const actions = {
     updateRegEmail({ commit }, email) {
         commit('setRegEmail', email);
-    }
+    },
+    updateDrawerState({ commit }, value) {
+        commit('setDrawerState', value);
+    },
 }
