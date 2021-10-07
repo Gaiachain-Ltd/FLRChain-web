@@ -78,6 +78,7 @@
           <BlockButton
             :disabled="!isValid || passwordsNotTheSame"
             @clicked="register"
+            type="submit"
             >Register</BlockButton
           >
         </v-flex>

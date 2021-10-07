@@ -37,7 +37,7 @@
           }}</DefaultText>
         </v-flex>
         <v-flex mb-8>
-          <BlockButton :loading="loading" @clicked="logIn">Log In</BlockButton>
+          <BlockButton :loading="loading" @clicked="logIn" type="submit">Log In</BlockButton>
         </v-flex>
       </v-form>
     </v-layout>
