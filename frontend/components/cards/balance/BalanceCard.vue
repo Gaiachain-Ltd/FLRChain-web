@@ -1,10 +1,10 @@
 <template>
   <v-card width="100%" height="100%">
     <v-layout column align-center pa-3>
-      <DefaultText size="50" :color="$vuetify.theme.themes.light.quinary">{{
+      <DefaultText class="text-no-wrap" size="50" :color="$vuetify.theme.themes.light.quinary">{{
         value
       }}</DefaultText>
-      <DefaultText size="18" :color="$vuetify.theme.themes.light.quinary">{{
+      <DefaultText class="text-no-wrap" size="18" :color="$vuetify.theme.themes.light.quinary">{{
         label
       }}</DefaultText>
     </v-layout>
