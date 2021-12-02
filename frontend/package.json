@@ -1,7 +1,7 @@
 {
   "name": "frontend",
-  "version": "1.0.0",
-  "description": "Nuxt.js project",
+  "version": "1.0.1",
+  "description": "FLRChain",
   "author": "Damian Cholewa <dcholewa@milosolutions.com>",
   "private": true,
   "scripts": {
