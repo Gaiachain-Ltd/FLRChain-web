@@ -28,6 +28,3 @@ services:
         read_only: true
     ports:
       - 80:80
-
-  algorand:
-    restart: unless-stopped
