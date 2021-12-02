@@ -1,4 +1,7 @@
 module.exports = {
+  // SSR IS DISABLED!
+  // Due to issue: https://github.com/nuxt-community/auth-module/issues/478
+  ssr: false,
   /*
   ** Headers of the page
   */
@@ -39,7 +42,7 @@ module.exports = {
   buildModules: [
     '@nuxtjs/vuetify',
     '@nuxtjs/axios',
-    '@nuxtjs/auth',
+    '@nuxtjs/auth-next',
     '@nuxtjs/moment',
   ],
   plugins: [
@@ -55,30 +58,30 @@ module.exports = {
     middleware: ['auth']
   },
   auth: {
+    cookie: false,
     strategies: {
       local: {
-        autoFetch: false,
+        token: {
+          property: 'token',
+          type: 'Token',
+          name: 'Authorization',
+          global: true
+        },
+        user: {
+          property: false
+        },
         endpoints: {
           login: {
             url: 'login/',
             method: 'post',
-            property_name: 'token'
           },
           logout: false,
           user: {
             url: 'info/',
             method: 'get',
-            propertyName: false,
           }
         },
-        tokenType: 'Token',
-        tokenName: 'Authorization',
-      },
-      redirect: {
-        login: '/login',
-        logout: '/login',
-        home: '/',
-      },
+      }
     }
   },
   vuetify: {
@@ -106,6 +109,6 @@ module.exports = {
         }
       }
     }
-  }
+  },
 }
 
