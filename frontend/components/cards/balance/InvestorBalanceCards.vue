@@ -16,12 +16,17 @@
         :disabled="!$auth.user.opted_in"
       ></ButtonCard>
     </v-layout>
-    <PaymentPopup
+    <PaymentTypePopup
+      :value.sync="paymentPopupVisible"
+      v-if="paymentPopupVisible"
+    >
+    </PaymentTypePopup>
+    <!-- <PaymentPopup
       :value.sync="paymentPopupVisible"
       v-if="paymentPopupVisible"
       @success="successPopupVisible = true"
       @error="errorPopupVisible = true"
-    ></PaymentPopup>
+    ></PaymentPopup> -->
     <SuccessPopup
       :value.sync="successPopupVisible"
       v-if="successPopupVisible"
@@ -58,7 +63,8 @@ export default {
   components: {
     BalanceCard: () => import("@/components/cards/balance/BalanceCard"),
     ButtonCard: () => import("@/components/cards/balance/ButtonCard"),
-    PaymentPopup: () => import("@/components/popups/PaymentPopup"),
+    PaymentTypePopup: () => import("@/components/popups/payments/PaymentTypePopup"),
+    PaymentPopup: () => import("@/components/popups/payments/PaymentPopup"),
     SuccessPopup: () => import("@/components/popups/SuccessPopup"),
     ErrorPopup: () => import("@/components/popups/ErrorPopup"),
     InfoPopup: () => import("@/components/popups/InfoPopup"),
