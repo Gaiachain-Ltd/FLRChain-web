@@ -103,7 +103,8 @@
       v-if="showWalletPopup"
       :value.sync="showWalletPopup"
       :connector="connector"
-      :account="account"
+      :sender="account"
+      :receiver="address"
       :kind="kind"
       @success="onSuccess"
       @error="onError"
@@ -128,6 +129,7 @@ const ALGORANDWALLET = 1;
 export default {
   props: {
     value: {},
+    address: {},
   },
   data() {
     return {

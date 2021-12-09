@@ -1,12 +1,12 @@
 <template>
   <v-layout row shrink ma-0 class="justify-space-around">
-    <v-layout xs12 sm5 md3 lg2 xl1 ma-3 shrink>
+    <v-layout xs12 sm5 md3 lg2 xl1 ma-3>
       <BalanceCard :value="total" label="All USDC"></BalanceCard>
     </v-layout>
-    <v-layout xs12 sm5 md3 lg2 xl1 ma-3 shrink>
+    <v-layout xs12 sm5 md3 lg2 xl1 ma-3>
       <BalanceCard :value="spent" label="Invested USDC"></BalanceCard>
     </v-layout>
-    <v-layout xs12 sm5 md3 lg2 xl1 ma-3 shrink>
+    <v-layout xs12 sm5 md3 lg2 xl1 ma-3>
       <BalanceCard :value="balance" label="Balance USDC"></BalanceCard>
     </v-layout>
     <v-layout xs12 sm12 md12 lg2 xl1 ma-3 shrink>
@@ -19,6 +19,7 @@
     <PaymentTypePopup
       :value.sync="paymentPopupVisible"
       v-if="paymentPopupVisible"
+      :address="address"
       @success="onSuccess"
       @error="onError"
     >
@@ -50,6 +51,7 @@ export default {
       total: 0,
       spent: 0,
       balance: 0,
+      address: "",
       paymentPopupVisible: false,
       successPopupVisible: false,
       errorPopupVisible: false,
@@ -94,6 +96,7 @@ export default {
     this.total = balanceInfo.total;
     this.spent = balanceInfo.spent;
     this.balance = balanceInfo.balance;
+    this.address = balanceInfo.address;
 
     if (!this.$auth.user.opted_in) {
       this.$auth.fetchUser().then(() => {

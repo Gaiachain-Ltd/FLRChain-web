@@ -70,7 +70,8 @@ class AccountView(CommonView):
                 'balance': top_ups + received - spent,
                 'spent': (spent - ret),
                 'received': received,
-                'total': top_ups
+                'total': top_ups,
+                'address': account.address
             },
             status=status.HTTP_200_OK)
 

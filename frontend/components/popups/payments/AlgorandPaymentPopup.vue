@@ -49,7 +49,8 @@ export default {
   props: {
     value: {},
     connector: {},
-    account: {},
+    sender: {},
+    receiver: {},
     kind: {},
   },
   data() {
@@ -84,7 +85,7 @@ export default {
       const txn = algosdk.makeAssetTransferTxnWithSuggestedParamsFromObject({
         suggestedParams: { ...this.params },
         from: this.address,
-        to: "SAWFVFKRTZLKORKN5J4D4H7MQ3QJBRMWXIVWC7QMB2EAHNYT5CTHEZ2ZNY",
+        to: this.receiver,
         amount: parseFloat(this.amount),
         assetIndex: USDC,
       });
@@ -137,9 +138,9 @@ export default {
   },
   async mounted() {
     if (this.kind == 0) {
-      this.address = this.account.address;
+      this.address = this.sender.address;
     } else {
-      this.address = this.account.accounts[0];
+      this.address = this.sender.accounts[0];
     }
     this.algodClient = new algosdk.Algodv2(
       "",
