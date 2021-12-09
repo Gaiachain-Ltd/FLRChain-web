@@ -19,24 +19,20 @@
     <PaymentTypePopup
       :value.sync="paymentPopupVisible"
       v-if="paymentPopupVisible"
+      @success="onSuccess"
+      @error="onError"
     >
     </PaymentTypePopup>
-    <!-- <PaymentPopup
-      :value.sync="paymentPopupVisible"
-      v-if="paymentPopupVisible"
-      @success="successPopupVisible = true"
-      @error="errorPopupVisible = true"
-    ></PaymentPopup> -->
     <SuccessPopup
-      :value.sync="successPopupVisible"
       v-if="successPopupVisible"
-      text="Your payment is processing."
+      :value.sync="successPopupVisible"
+      :text="successPopupText"
     >
     </SuccessPopup>
     <ErrorPopup
       :value.sync="errorPopupVisible"
       v-if="errorPopupVisible"
-      text="Unable to process your payment. Please try again later."
+      :text="errorPopupText"
     >
     </ErrorPopup>
     <InfoPopup
@@ -58,16 +54,38 @@ export default {
       successPopupVisible: false,
       errorPopupVisible: false,
       infoPopupVisible: false,
+      successPopupText: "",
+      errorPopupText: "",
     };
   },
   components: {
     BalanceCard: () => import("@/components/cards/balance/BalanceCard"),
     ButtonCard: () => import("@/components/cards/balance/ButtonCard"),
-    PaymentTypePopup: () => import("@/components/popups/payments/PaymentTypePopup"),
-    PaymentPopup: () => import("@/components/popups/payments/PaymentPopup"),
+    PaymentTypePopup: () =>
+      import("@/components/popups/payments/PaymentTypePopup"),
     SuccessPopup: () => import("@/components/popups/SuccessPopup"),
     ErrorPopup: () => import("@/components/popups/ErrorPopup"),
     InfoPopup: () => import("@/components/popups/InfoPopup"),
+  },
+  methods: {
+    onSuccess(msg) {
+      if (msg) {
+        this.successPopupText = msg;
+      } else {
+        this.successPopupText = "Your payment is processing.";
+      }
+      this.paymentPopupVisible = false;
+      this.successPopupVisible = true;
+    },
+    onError(msg) {
+      if (msg) {
+        this.errorPopupText = msg;
+      } else {
+        this.errorPopupText =
+          "Unable to process your payment. Please try again later.";
+      }
+      this.errorPopupVisible = true;
+    },
   },
   async fetch() {
     const balanceInfo = await this.$axios

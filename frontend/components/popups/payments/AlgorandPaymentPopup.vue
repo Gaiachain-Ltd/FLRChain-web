@@ -7,19 +7,27 @@
         required
       ></TextInput>
       <BlockButton
-        :loading="!params || !info"
+        :loading="!params || !info || loading"
         @clicked="
           () => {
+            this.loading = true;
+
             const txn = this.onConfirm();
 
             if (this.kind == 0) {
               this.connector
                 .signTransaction(txn.toByte())
-                .then((signedTxn) => this.onSend(signedTxn.blob));
+                .then((signedTxn) => this.onSend(signedTxn.blob))
+                .catch(() =>
+                  this.onError('Something went wrong. Please try again later.')
+                );
             } else {
               this.connector
                 .sendCustomRequest(txn)
-                .then((signedTxn) => this.onSend(signedTxn));
+                .then((signedTxn) => this.onSend(signedTxn))
+                .catch(() =>
+                  this.onError('Something went wrong. Please try again later.')
+                );
             }
           }
         "
@@ -34,6 +42,8 @@ import algosdk from "algosdk";
 import { formatJsonRpcRequest } from "@json-rpc-tools/utils";
 
 const USDC = 10458941;
+const MYALGOWALLET = 0;
+const ALGORANDWALLET = 1;
 
 export default {
   props: {
@@ -50,6 +60,7 @@ export default {
       amount: "0",
       maxAmount: "0",
       address: "",
+      loading: false,
     };
   },
   computed: {
@@ -70,7 +81,6 @@ export default {
   },
   methods: {
     onConfirm() {
-      console.log("HERE");
       const txn = algosdk.makeAssetTransferTxnWithSuggestedParamsFromObject({
         suggestedParams: { ...this.params },
         from: this.address,
@@ -78,37 +88,35 @@ export default {
         amount: parseFloat(this.amount),
         assetIndex: USDC,
       });
-      console.log("SSS", txn);
-      if (this.kind == 1) {
+
+      if (this.kind == ALGORANDWALLET) {
         const txnsToSign = [
           {
             txn: this.arrayBufferToBase64(
               algosdk.encodeUnsignedTransaction(txn)
             ),
-            message: "Description of transaction being signed",
-            // Note: if the transaction does not need to be signed (because it's part of an atomic group
-            // that will be signed by another party), specify an empty singers array like so:
-            // signers: [],
+            message: "Top up FLRChain USDC balance.",
           },
         ];
-        console.log("TXNS");
+
         const requestParams = [txnsToSign];
 
         const t = formatJsonRpcRequest("algo_signTxn", requestParams);
-        console.log("TXN", t);
         return t;
       }
       return txn;
-    },
-    onDebug(tt) {
-      console.log(tt);
-      console.log(this.base64ToArrayBuffer(tt));
     },
     onSend(signedTxn) {
       if (Array.isArray(signedTxn)) {
         signedTxn = this.convertToUint8Array(signedTxn);
       }
-      this.algodClient.sendRawTransaction(signedTxn).do();
+      this.algodClient
+        .sendRawTransaction(signedTxn)
+        .do()
+        .then(() => this.onSuccess("Transaction successful!"))
+        .catch(() =>
+          this.onError("Something went wrong. Please try again later.")
+        );
     },
     arrayBufferToBase64(buffer) {
       var binary = "";
@@ -120,9 +128,14 @@ export default {
       const bytes = new Uint8Array(...arr);
       return bytes;
     },
+    onSuccess(msg) {
+      this.$emit("success", msg);
+    },
+    onError(msg) {
+      this.$emit("error", msg);
+    },
   },
   async mounted() {
-    console.log("SHOWN!!!", this.account);
     if (this.kind == 0) {
       this.address = this.account.address;
     } else {
@@ -133,14 +146,25 @@ export default {
       "https://api.testnet.algoexplorer.io",
       ""
     );
-    this.params = await this.algodClient.getTransactionParams().do();
-    console.log("PARAMS", this.params);
-    this.info = await this.algodClient.accountInformation(this.address).do();
-    console.log("INFO", this.info);
-    if (!this.info) {
-      console.log("NO INFO");
-      return;
+
+    try {
+      this.params = await this.algodClient.getTransactionParams().do();
+    } finally {
+      if (!this.params) {
+        this.onError("Unable to fetch wallet info. Please try again later.");
+        return;
+      }
     }
+
+    try {
+      this.info = await this.algodClient.accountInformation(this.address).do();
+    } finally {
+      if (!this.info) {
+        this.onError("Unable to fetch wallet info. Please try again later.");
+        return;
+      }
+    }
+
     for (let index = 0; index < this.info.assets.length; index++) {
       const asset = this.info.assets[index];
       if (asset["asset-id"] == USDC) {
@@ -149,7 +173,9 @@ export default {
       }
     }
 
-    console.log("NOT FOUND!");
+    this.onError(
+      "Your wallet don't support USDC. Please add USDC asset to your wallet."
+    );
   },
 };
 </script>

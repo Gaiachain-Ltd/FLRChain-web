@@ -51,6 +51,7 @@ export default {
   },
   methods: {
     ok() {
+      this.$emit('ok');
       this.show = false;
     },
   },

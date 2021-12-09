@@ -1,8 +1,24 @@
 <template>
   <DefaultPopup :show.sync="show">
+    <v-layout slot="icon">
+      <DefaultSVGIcon
+        :icon="require('@/assets/balance/received.svg')"
+        :size="70"
+      ></DefaultSVGIcon>
+    </v-layout>
     <v-layout column slot="content">
-      <BlockButton>Credit Card</BlockButton>
+      <BlockButton class="mt-3" @clicked="onShowCardPopup">
+        <v-layout align-center shrink>
+          <DefaultSVGIcon
+            class="mr-1"
+            :icon="require('@/assets/payments/circle.svg')"
+            :size="19"
+          ></DefaultSVGIcon
+          ><span>Credit Card (Circle)</span>
+        </v-layout></BlockButton
+      >
       <BlockButton
+        class="mt-3"
         @clicked="
           () => {
             this.connector = this.MyAlgoWalletInit();
@@ -10,13 +26,27 @@
               .connect({ shouldSelectOneAccount: true })
               .then((accounts) => {
                 this.account = accounts[0];
-                this.onContinue();
-              });
+                this.onShowWalletPopup();
+              })
+              .catch(() =>
+                this.onError(
+                  'Unable to init MyAlgoWallet. Please try again later.'
+                )
+              );
           }
         "
-        >MyAlgoWallet</BlockButton
+      >
+        <v-layout align-center shrink>
+          <DefaultSVGIcon
+            class="mr-1"
+            :icon="require('@/assets/payments/myalgowallet.svg')"
+            :size="19"
+          ></DefaultSVGIcon
+          ><span>MyAlgoWallet</span>
+        </v-layout></BlockButton
       >
       <BlockButton
+        class="mt-3"
         @clicked="
           () => {
             this.connector = this.AlgorandWalletInit();
@@ -26,41 +56,64 @@
             // Subscribe to connection events
             this.connector.on('connect', (error, payload) => {
               if (error) {
-                throw error;
+                this.onError(
+                  'Unable to connect to Algorand Wallet. Please try again later.'
+                );
+                return;
               }
 
               // Get provided accounts
               this.account = payload.params[0];
-              this.onContinue();
+              this.onShowWalletPopup();
             });
 
             this.connector.on('session_update', (error, payload) => {
               if (error) {
-                throw error;
+                this.onError(
+                  'Unable to connect to Algorand Wallet. Please try again later.'
+                );
+                return;
               }
 
               // Get updated accounts
               this.account = payload.params[0];
-              this.onContinue();
+              this.onShowWalletPopup();
             });
 
             this.connector.on('disconnect', (error, payload) => {
               if (error) {
-                throw error;
+                this.onError('Something went wrong. Please try again later.');
+                return;
               }
             });
           }
         "
-        >Algorand Wallet</BlockButton
+      >
+        <v-layout align-center shrink>
+          <DefaultSVGIcon
+            class="mr-1"
+            :icon="require('@/assets/payments/algorand_wallet.svg')"
+            :size="19"
+          ></DefaultSVGIcon
+          ><span>Algorand Wallet</span>
+        </v-layout></BlockButton
       >
     </v-layout>
-    <MyAlgoWAlletPopup
-      :value.sync="showMyAlgoWalletPopup"
+    <AlgorandPaymentPopup
+      v-if="showWalletPopup"
+      :value.sync="showWalletPopup"
       :connector="connector"
       :account="account"
       :kind="kind"
-      v-if="showMyAlgoWalletPopup"
-    ></MyAlgoWAlletPopup>
+      @success="onSuccess"
+      @error="onError"
+    ></AlgorandPaymentPopup>
+    <CreditCardPaymentPopup
+      v-if="showCardPopup"
+      :value.sync="showCardPopup"
+      @success="onSuccess"
+      @error="onError"
+    ></CreditCardPaymentPopup>
   </DefaultPopup>
 </template>
 
@@ -78,10 +131,11 @@ export default {
   },
   data() {
     return {
-      showMyAlgoWalletPopup: false,
+      showWalletPopup: false,
+      showCardPopup: false,
       connector: null,
       account: null,
-      kind: MYALGOWALLET
+      kind: MYALGOWALLET,
     };
   },
   computed: {
@@ -95,15 +149,15 @@ export default {
     },
   },
   components: {
+    DefaultSVGIcon: () => import("@/components/icons/DefaultSVGIcon"),
     DefaultPopup: () => import("@/components/popups/DefaultPopup"),
     BlockButton: () => import("@/components/buttons/BlockButton"),
-    MyAlgoWAlletPopup: () =>
-      import("@/components/popups/payments/MyAlgoWalletPopup"),
+    CreditCardPaymentPopup: () =>
+      import("@/components/popups/payments/CreditCardPaymentPopup"),
+    AlgorandPaymentPopup: () =>
+      import("@/components/popups/payments/AlgorandPaymentPopup"),
   },
   methods: {
-    onMyAlgoWallet() {
-      this.showMyAlgoWalletPopup = true;
-    },
     MyAlgoWalletInit() {
       this.kind = MYALGOWALLET;
       return new MyAlgoConnect();
@@ -115,14 +169,36 @@ export default {
         qrcodeModal: QRCodeModal,
       });
     },
-    onContinue() {
-      this.showMyAlgoWalletPopup = true;
+    onShowWalletPopup() {
+      this.showWalletPopup = true;
+    },
+    onShowCardPopup() {
+      this.showCardPopup = true;
+    },
+    onSuccess(msg) {
+      this.$emit("success", msg);
+      this.onReset();
+    },
+    onError(msg) {
+      this.$emit("error", msg);
+      this.onReset();
+    },
+    onReset() {
+      this.showWalletPopup = false;
+      this.showCardPopup = false;
+
+      if (this.kind == ALGORANDWALLET) {
+        this.connector.killSession();
+      }
+
+      this.connector = null;
+      this.account = null;
     },
   },
   beforeDestroy() {
-    if (this.kind == ALGORANDWALLET) {
+    if (this.kind == ALGORANDWALLET && this.connector) {
       this.connector.killSession();
     }
-  }
+  },
 };
 </script>
