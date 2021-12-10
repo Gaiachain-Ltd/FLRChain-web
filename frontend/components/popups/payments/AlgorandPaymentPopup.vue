@@ -126,12 +126,14 @@ export default {
 
       if (this.kind == ALGORANDWALLET) {
         const requestParams = [
-          {
-            txn: this.arrayBufferToBase64(
-              algosdk.encodeUnsignedTransaction(txn)
-            ),
-            message: "Top up FLRChain USDC balance.",
-          },
+          [
+            {
+              txn: this.arrayBufferToBase64(
+                algosdk.encodeUnsignedTransaction(txn)
+              ),
+              message: "Top up FLRChain USDC balance.",
+            },
+          ],
         ];
         const awTxn = formatJsonRpcRequest("algo_signTxn", requestParams);
         return awTxn;
