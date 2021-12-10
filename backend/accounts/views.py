@@ -65,12 +65,13 @@ class AccountView(CommonView):
             ret = Decimal(ret)
 
         getcontext().prec = 6
+        balance = account.usdc_balance()
         return Response(
             {
-                'balance': top_ups + received - spent,
+                'balance': balance,
                 'spent': (spent - ret),
                 'received': received,
-                'total': top_ups,
+                'total': balance + (spent - ret),
                 'address': account.address
             },
             status=status.HTTP_200_OK)

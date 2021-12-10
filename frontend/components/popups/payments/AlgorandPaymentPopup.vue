@@ -1,12 +1,28 @@
 <template>
   <DefaultPopup :show.sync="show">
-    <v-layout column slot="content">
-      <TextInput
-        :label="`Amount (max ${this.maxAmount})*`"
-        :text.sync="amount"
-        required
-      ></TextInput>
+    <v-layout slot="icon">
+      <DefaultSVGIcon
+        :icon="require('@/assets/balance/received.svg')"
+        :size="70"
+      ></DefaultSVGIcon>
+    </v-layout>
+    <v-layout column slot="content" class="mt-3">
+      <v-form v-model="isValid">
+        <TextInput
+          :label="`Amount (max ${this.convertedMaxAmount})*`"
+          :text.sync="amount"
+          :rules="[
+            ...requiredRules,
+            ...decimalRules,
+            ...nonZeroDecimalRules,
+            lessThanMax,
+          ]"
+          :icon="icon"
+          required
+        ></TextInput>
+      </v-form>
       <BlockButton
+        :disabled="!isValid"
         :loading="!params || !info || loading"
         @clicked="
           () => {
@@ -40,12 +56,14 @@
 <script>
 import algosdk from "algosdk";
 import { formatJsonRpcRequest } from "@json-rpc-tools/utils";
+import ValidatorMixin from "@/validators";
 
 const USDC = 10458941;
 const MYALGOWALLET = 0;
 const ALGORANDWALLET = 1;
 
 export default {
+  mixins: [ValidatorMixin],
   props: {
     value: {},
     connector: {},
@@ -62,6 +80,8 @@ export default {
       maxAmount: "0",
       address: "",
       loading: false,
+      isValid: false,
+      icon: require("@/assets/icons/currency.svg"),
     };
   },
   computed: {
@@ -73,25 +93,39 @@ export default {
         this.$emit("update:value", value);
       },
     },
+    convertedAmount() {
+      console.log(parseFloat(this.amount));
+      return algosdk.algosToMicroalgos(parseFloat(this.amount));
+    },
+    convertedMaxAmount() {
+      return algosdk.microalgosToAlgos(parseInt(this.maxAmount));
+    },
   },
   components: {
+    DefaultSVGIcon: () => import("@/components/icons/DefaultSVGIcon"),
     DefaultText: () => import("@/components/texts/DefaultText"),
     TextInput: () => import("@/components/inputs/TextInput"),
     DefaultPopup: () => import("@/components/popups/DefaultPopup"),
     BlockButton: () => import("@/components/buttons/BlockButton"),
   },
   methods: {
+    lessThanMax(v) {
+      return (
+        this.convertedAmount <= parseInt(this.maxAmount) ||
+        "Value has to be less than max"
+      );
+    },
     onConfirm() {
       const txn = algosdk.makeAssetTransferTxnWithSuggestedParamsFromObject({
         suggestedParams: { ...this.params },
         from: this.address,
         to: this.receiver,
-        amount: parseFloat(this.amount),
+        amount: this.convertedAmount,
         assetIndex: USDC,
       });
 
       if (this.kind == ALGORANDWALLET) {
-        const txnsToSign = [
+        const requestParams = [
           {
             txn: this.arrayBufferToBase64(
               algosdk.encodeUnsignedTransaction(txn)
@@ -99,11 +133,8 @@ export default {
             message: "Top up FLRChain USDC balance.",
           },
         ];
-
-        const requestParams = [txnsToSign];
-
-        const t = formatJsonRpcRequest("algo_signTxn", requestParams);
-        return t;
+        const awTxn = formatJsonRpcRequest("algo_signTxn", requestParams);
+        return awTxn;
       }
       return txn;
     },

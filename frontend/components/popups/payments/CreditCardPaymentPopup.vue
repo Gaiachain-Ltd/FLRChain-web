@@ -1,6 +1,12 @@
 <template>
   <DefaultPopup :show.sync="show">
-    <v-layout column slot="content">
+    <v-layout slot="icon">
+      <DefaultSVGIcon
+        :icon="require('@/assets/balance/received.svg')"
+        :size="70"
+      ></DefaultSVGIcon>
+    </v-layout>
+    <v-layout column slot="content" class="mt-3">
       <CreditCardForm
         ref="cardform"
         v-if="page === 0"
@@ -14,7 +20,9 @@
     </v-layout>
     <v-layout slot="buttons" column ma-0 style="width: 100%">
       <v-flex mb-3>
-        <BlockButton @clicked="handleNext">{{ nextButtonText }}</BlockButton>
+        <BlockButton @clicked="handleNext" :loading="loading">{{
+          nextButtonText
+        }}</BlockButton>
       </v-flex>
       <v-flex>
         <BlockButton color="error" @clicked="handlePrev">{{
@@ -54,6 +62,7 @@ export default {
       },
       paymentId: null,
       idempotencyKey: uuidv4(),
+      loading: false,
     };
   },
   computed: {
@@ -81,6 +90,7 @@ export default {
     },
   },
   components: {
+    DefaultSVGIcon: () => import("@/components/icons/DefaultSVGIcon"),
     DefaultPopup: () => import("@/components/popups/DefaultPopup"),
     CreditCardForm: () => import("@/components/forms/payment/CreditCardForm"),
     BillingDetailsForm: () =>
@@ -110,6 +120,8 @@ export default {
       this.card.encryptedData = await this.encryptedData();
       delete this.card.number;
       delete this.card.cvv;
+
+      this.loading = true;
 
       await this.$axios
         .post("payments/circle/card/", {
