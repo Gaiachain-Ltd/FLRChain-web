@@ -2,8 +2,9 @@ import logging
 import uuid
 from celery import shared_task
 from payments.circle import CircleAPI
-from payments.models import CirclePayment, CircleTransfer
+from payments.models import CirclePayment, CircleTransfer, MTNPayout
 from django.db import models, transaction
+from django.db.models import Q
 from django.conf import settings
 from decimal import *
 from transactions.models import Transaction
@@ -13,7 +14,8 @@ logger = logging.getLogger(__name__)
 
 circle_client = CircleAPI(
     settings.CIRCLE_API_KEY,
-    settings.CIRCLE_API_ENVIROMENT_URL)
+    settings.CIRCLE_API_ENVIROMENT_URL
+)
 
 
 @shared_task()
@@ -78,3 +80,17 @@ def check_transfer_status():
                 transfer.transaction = txn
 
             transfer.save()
+
+
+@shared_task()
+def process_payouts():
+    for payout in MTNPayout.objects.filter(
+        ~Q(success=False) & ~Q(success=True, status=MTNPayout.COMPLETED)).order_by('modified')[:10]:
+        if payout.status == MTNPayout.PENDING:
+            payout.transfer()
+        elif payout.status == MTNPayout.TRANSFERED:
+            payout.confirm()
+        elif payout.status == MTNPayout.CONFIRMED:
+            payout.request()
+        elif payout.status == MTNPayout.REQUESTED:
+            payout.complete()

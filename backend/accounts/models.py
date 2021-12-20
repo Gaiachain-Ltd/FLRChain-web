@@ -57,7 +57,7 @@ class Account(models.Model):
             )
             logger.debug("Created account for user %s.", user)
 
-            # # ONLY FOR TEST PURPOSES!!
+            # ONLY FOR TEST PURPOSES!!
             if not main and user.type == CustomUser.INVESTOR and (settings.TESTING or settings.AUTO_INV_FUELING == '1'):
                 main_account = Account.get_main_account()
                 chained = [
@@ -84,7 +84,8 @@ class Account(models.Model):
         return Transaction.opt_in(
             self,
             main_account,
-            chain)
+            chain
+        )
 
     def usdc_balance(self):
         return utils.usdc_balance(self.address)

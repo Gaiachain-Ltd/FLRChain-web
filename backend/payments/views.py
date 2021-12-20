@@ -1,28 +1,36 @@
 import logging
-import uuid
 import hashlib
-from django.shortcuts import render
 from common.views import CommonView
 from rest_framework.permissions import IsAuthenticated
-from users.permissions import isInvestor
+from users.permissions import isInvestor, isBeneficiary
 from payments.circle import CircleAPI
 from django.conf import settings
 from rest_framework.response import Response
 from rest_framework import status
-from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from payments.serializers import *
 from decimal import *
-from payments.models import CirclePayment
+from payments.models import CirclePayment, MTNPayout
 from django.db import transaction
-from django.shortcuts import get_object_or_404
+from payments.mtn import MTNAPI
 
 
 logger = logging.getLogger(__name__)
 
+
 circle_client = CircleAPI(
     settings.CIRCLE_API_KEY,
-    settings.CIRCLE_API_ENVIROMENT_URL)
+    settings.CIRCLE_API_ENVIROMENT_URL
+)
+
+
+mtn_client = MTNAPI(
+    settings.MTN_SUBSCRIPTION_KEY,
+    settings.MTN_API_KEY,
+    settings.MTN_USER_ID,
+    settings.MTN_URL,
+    settings.MTN_CALLBACK_HOST
+)
 
 
 class CirclePaymentView(CommonView):
@@ -126,3 +134,25 @@ class CirclePaymentView(CommonView):
             )
 
         return Response(circle_reply, status=status.HTTP_200_OK)
+
+
+class MTNPayoutView(CommonView):
+    permission_classes = (IsAuthenticated, isBeneficiary)
+    serializer_class = MakePayoutSerializer
+
+    def payout(self, request):
+        serializer = MakePayoutSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        amount = serializer.validated_data['amount']
+        if request.user.account.usdc_balance() < Decimal(amount):
+            success = False
+        else:
+            MTNPayout.payout(
+                request.user,
+                amount,
+                serializer.validated_data['phone']
+            )
+            success = True
+
+        return Response({"success": success}, status=status.HTTP_200_OK)

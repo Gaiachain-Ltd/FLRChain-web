@@ -18,6 +18,8 @@ class Transaction(models.Model):
     FACILITATOR_FEE = 6
     RETURN_INVESTMENT = 7
     TOP_UP = 8
+    PAYOUT = 9
+
     ACTIONS = (
         (OPT_IN, "Opt-In action"),
         (FUELING, "Fueling action"),
@@ -27,7 +29,8 @@ class Transaction(models.Model):
         (REWARD, "Beneficiary reward"),
         (FACILITATOR_FEE, "Facilitator fee"),
         (RETURN_INVESTMENT, "Return investment"),
-        (TOP_UP, "Top up")
+        (TOP_UP, "Top up"),
+        (PAYOUT, "Payout")
     )
 
     ALGO = 0
@@ -209,7 +212,8 @@ class Transaction(models.Model):
             currency=currency,
             amount=amount,
             fee=fee,
-            project=project)
+            project=project
+        )
 
     @staticmethod
     def prepare_transfer(sender, receiver, amount,

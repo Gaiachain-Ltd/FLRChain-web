@@ -23,7 +23,8 @@ class AccountView(CommonView):
         spent = Transaction.objects.filter(
             from_account=request.user.account,
             currency=Transaction.USDC,
-            status__in=[Transaction.CONFIRMED, Transaction.PENDING]).aggregate(
+            status__in=[Transaction.CONFIRMED, Transaction.PENDING, 
+                        Transaction.PAYOUT]).aggregate(
                 total_spent=Sum('amount')).get('total_spent', 0)
         received = Transaction.objects.filter(
             Q(to_account=request.user.account,
