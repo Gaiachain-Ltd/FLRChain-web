@@ -1,5 +1,5 @@
 from django.contrib import admin
-from payments.models import CirclePayment, CircleTransfer
+from payments.models import CirclePayment, CircleTransfer, MTNPayout
 
 
 class CirclePaymentAdmin(admin.ModelAdmin):
@@ -14,3 +14,10 @@ class CircleTransferAdmin(admin.ModelAdmin):
                     'status', 'id')
 
 admin.site.register(CircleTransfer, CircleTransferAdmin)
+
+
+class MTNPayoutAdmin(admin.ModelAdmin):
+    list_display = ('user', 'transaction', 'amount', 
+                    'status', 'id')
+
+admin.site.register(MTNPayout, MTNPayoutAdmin)

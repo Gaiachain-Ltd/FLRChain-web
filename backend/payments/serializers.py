@@ -24,3 +24,6 @@ class MakePaymentSerializer(serializers.Serializer):
     cardId = serializers.CharField()
     encryptedData = serializers.CharField()
 
+class MakePayoutSerializer(serializers.Serializer):
+    amount = serializers.DecimalField(max_digits=26, decimal_places=6)
+    phone = serializers.CharField()

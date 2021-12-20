@@ -196,6 +196,10 @@ CELERY_BEAT_SCHEDULE = {
     "check_transfer_status": {
         "task": "payments.tasks.check_transfer_status",
         "schedule": crontab(minute="*/1")
+    },
+    "process_payouts": {
+        "task": "payments.tasks.process_payouts",
+        "schedule": crontab(minute="*/1")
     }
 }
 
@@ -269,3 +273,10 @@ CIRCLE_API_KEY = os.getenv('CIRCLE_API_KEY', '')
 CIRCLE_API_ENVIROMENT_URL = os.getenv(
     'CIRCLE_API_ENVIROMENT_URL', 'https://api-sandbox.circle.com')
 CIRCLE_ALGO_WALLET_ID = os.getenv('CIRCLE_ALGO_WALLET_ID')
+
+# MTN
+MTN_SUBSCRIPTION_KEY = os.getenv('MTN_SUBSCRIPTION_KEY', '')
+MTN_CALLBACK_HOST = os.getenv('MTN_CALLBACK_HOST', '')
+MTN_API_KEY = os.getenv('MTN_API_KEY', '')
+MTN_USER_ID = os.getenv('MTN_USER_ID', '')
+MTN_URL = os.getenv('MTN_URL', '')
