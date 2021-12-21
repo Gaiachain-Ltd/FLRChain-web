@@ -47,10 +47,11 @@ export default {
       for (let index = 0; index < transactions.length; index++) {
         const element = transactions[index];
         let addSeparatorWithDate = false;
+        
         if (!date) {
           date = element.created;
           addSeparatorWithDate = true;
-        } else if (this.$moment(date).diff(element.created, "days") < 0) {
+        } else if (this.$moment(date).diff(element.created, "days") != 0) {
           date = element.created;
           addSeparatorWithDate = true;
         }

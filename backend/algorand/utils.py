@@ -12,6 +12,10 @@ from decimal import *
 logger = logging.getLogger(__name__)
 
 CLIENT = algod.AlgodClient(settings.ALGO_API_TOKEN, settings.ALGO_API_URL)
+INDEXER = indexer.IndexerClient(
+    indexer_token=settings.ALGO_INDEXER_API_TOKEN,
+    indexer_address=settings.ALGO_INDEXER_API_URL
+)
 
 
 def generate_account():
@@ -156,3 +160,12 @@ def atomic_transfer(txns):
         
     CLIENT.send_transactions(sgtxns)
     return base64.b64encode(gtxn).decode('ascii')
+
+def get_transactions(address, asset=settings.ALGO_ASSET, limit=10, next_page_token=""):
+    return INDEXER.search_transactions(
+        limit=limit,
+        next_page=next_page_token,
+        address=address,
+        asset_id=asset,
+        min_amount=1,
+    )

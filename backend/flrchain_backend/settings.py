@@ -267,6 +267,8 @@ ALGO_API_TOKEN = os.getenv('ALGO_API_TOKEN')
 ALGO_API_URL = os.getenv('ALGO_API_URL', 'http://algorand:4161')
 ALGO_OPT_IN_AMOUNT = os.getenv('ALGO_OPT_IN_AMOUNT', 0.3)
 ALGO_ASSET = os.getenv('ALGO_ASSET', 10458941)  # Default: TESTnet USDC on ALGO
+ALGO_INDEXER_API_URL = os.getenv('ALGO_INDEXER_API_URL', '')
+ALGO_INDEXER_API_TOKEN = os.getenv('ALGO_INDEXER_API_TOKEN', '')
 
 # Circle
 CIRCLE_API_KEY = os.getenv('CIRCLE_API_KEY', '')

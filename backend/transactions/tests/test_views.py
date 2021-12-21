@@ -5,6 +5,7 @@ from accounts.models import Account
 
 
 class TransactionsViewTest(CommonTestCase):
+    fixtures = ['main_account.json', ]
 
     def setUp(self):
         self.beneficiary = CustomUser.objects.create(
@@ -25,20 +26,11 @@ class TransactionsViewTest(CommonTestCase):
             last_name="investor",
             type=CustomUser.INVESTOR)
 
-        self.beneficiary_account = Account.objects.create(
-            user=self.beneficiary,
-            address="test",
-            type=Account.NORMAL_ACCOUNT)
+        self.beneficiary_account = Account.generate(self.beneficiary)
 
-        self.facilitator_account = Account.objects.create(
-            user=self.facililator,
-            address="test",
-            type=Account.NORMAL_ACCOUNT)
+        self.facilitator_account = Account.generate(self.facililator)
 
-        self.investor_account = Account.objects.create(
-            user=self.investor,
-            address="test",
-            type=Account.NORMAL_ACCOUNT)
+        self.investor_account = Account.generate(self.investor)
 
     def test_list(self):
         self._list(
