@@ -22,7 +22,7 @@
           ></TextInput>
         </v-layout>
         <v-layout row align-center mx-0 mb-3>
-          <v-checkbox mb-0 label="Remember me"></v-checkbox>
+          <v-checkbox mb-0 label="Remember me" v-model="remember"></v-checkbox>
           <v-spacer></v-spacer>
           <DefaultText
             @clicked="$router.push('/forgot')"
@@ -63,6 +63,7 @@ export default {
     return {
       username: "",
       password: "",
+      remember: false,
       loading: false,
       externalError: "",
       wrongEmail: false,
@@ -88,7 +89,15 @@ export default {
             password: this.password,
           },
         })
-        .then(() => this.$router.push("/"))
+        .then(() => {
+          this.$nextTick(() => {
+            //Disable auto-logout:
+            if (this.remember) {
+              this.$auth.$storage.setUniversal('_token_expiration.local', false);
+            }
+            this.$router.push("/");
+          })
+        })
         .catch(({ response }) => {
           if (response && response.data.non_field_errors) {
             this.wrongPassword = true;
