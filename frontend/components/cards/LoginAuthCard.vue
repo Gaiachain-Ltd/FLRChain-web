@@ -42,7 +42,7 @@
       </v-form>
     </v-layout>
     <v-layout column align-center mb-2 slot="footer">
-      <DefaultText>You do not have account?</DefaultText>
+      <DefaultText>You do not have an account?</DefaultText>
       <DefaultText
         @clicked="$router.push('/register')"
         clickable

@@ -10,7 +10,6 @@
             <Nuxt />
           </v-layout>
         </v-layout>
-        <img class="background-decorator" :src="decorator" />
       </v-container>
     </v-main>
   </v-app>
@@ -19,7 +18,6 @@
 export default {
   data() {
     return {
-      decorator: require("@/assets/auth/auth_decorator.svg"),
       logo: require("@/assets/auth/auth_logo.svg"),
     };
   },
@@ -32,13 +30,5 @@ export default {
 }
 .main-component-style {
   z-index: 1;
-}
-.background-decorator {
-  z-index: 0;
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  left: 0;
-  width: 100%;
 }
 </style>

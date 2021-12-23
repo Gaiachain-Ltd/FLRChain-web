@@ -96,7 +96,7 @@ module.exports = {
       dark: false,
       themes: {
         light: {
-          primary: '#23BC3D',
+          primary: '#06BCC1',
           secondary: '#06BCC1',
           tertiary: '#F7F9FB',
           quaternary: "#778699",
