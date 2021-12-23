@@ -14,7 +14,14 @@
           <DefaultText :color="$vuetify.theme.themes.light.quinary">{{
             `${$auth.user.first_name} ${$auth.user.last_name}`
           }}</DefaultText>
-          <div class="account-type-text">{{ accountType }}</div>
+          <v-layout shrink>
+            <div
+              class="account-type-text"
+              :style="{ backgroundColor: accountTypeColor }"
+            >
+              {{ accountType }}
+            </div>
+          </v-layout>
         </v-layout>
         <v-flex class="logout-icon-style" shrink ml-4>
           <DefaultSVGIcon
@@ -43,7 +50,9 @@
         <BlockButton color="error" @clicked="logOut">Log out</BlockButton>
       </v-flex>
       <v-flex>
-        <BlockButton class="cancel-style" color="white"  @clicked="cancel">Cancel</BlockButton>
+        <BlockButton class="cancel-style" color="white" @clicked="cancel"
+          >Cancel</BlockButton
+        >
       </v-flex>
     </v-layout>
   </DefaultPopup>
@@ -69,6 +78,9 @@ export default {
     accountType() {
       return this.isFacililator ? "FACILILATOR" : "INVESTOR";
     },
+    accountTypeColor() {
+      return this.isFacililator ? "#0075DC" : "#00B854";
+    },
   },
   methods: {
     logOut() {
@@ -77,15 +89,20 @@ export default {
     },
     cancel() {
       this.showLogoutPopup = false;
-    }
+    },
   },
 };
 </script>
 
 <style scoped>
 .account-type-text {
-  font-size: 10px !important;
-  color: var(--v-quinary-base);
+  font-size: 9px !important;
+  color: white;
+  border-radius: 15px;
+  padding-top: 2px;
+  padding-bottom: 0px;
+  padding-left: 6px;
+  padding-right: 6px;
 }
 .logout-icon-style {
   min-width: 20px !important;

@@ -18,7 +18,7 @@
 export default {
   data() {
     return {
-      logo: require("@/assets/auth/auth_logo.svg"),
+      logo: require("@/assets/logo.svg"),
     };
   },
 };

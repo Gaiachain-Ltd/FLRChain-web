@@ -97,7 +97,7 @@ module.exports = {
       themes: {
         light: {
           primary: '#06BCC1',
-          secondary: '#06BCC1',
+          secondary: '#23BC3D',
           tertiary: '#F7F9FB',
           quaternary: "#778699",
           quinary: "#414D55",

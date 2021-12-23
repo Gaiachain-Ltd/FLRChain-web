@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-card :width="width" class="auth-transition elevation-16" >
+    <v-card :width="width" class="auth-transition elevation-16">
       <v-card-title class="px-6">
         <div class="auth-title">{{ title }}</div>
       </v-card-title>

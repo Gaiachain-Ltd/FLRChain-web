@@ -1,9 +1,15 @@
 <template>
   <v-app class="background-style">
-    <v-navigation-drawer app class="background-style" v-model="drawerState" absolute left >
+    <v-navigation-drawer
+      app
+      class="background-style elevation-16"
+      v-model="drawerState"
+      left
+      fixed
+    >
       <v-layout column align-center fill-height>
         <v-flex shrink mt-6>
-          <img :src="logo"/>
+          <img :src="logo" width="135px" />
         </v-flex>
         <v-layout shrink column ml-10 mt-6>
           <SideMenuItem
@@ -23,23 +29,23 @@
     </v-navigation-drawer>
     <v-main>
       <v-container fill-height>
-        <Nuxt/>
+        <Nuxt />
       </v-container>
     </v-main>
   </v-app>
 </template>
 
 <script>
-import {mapGetters,mapActions} from 'vuex';
+import { mapGetters, mapActions } from "vuex";
 
 export default {
   data() {
     return {
-      logo: require("@/assets/side/sidebar_logo.svg"),
+      logo: require("@/assets/logo.svg"),
     };
   },
   computed: {
-    ...mapGetters(['isFacililator','getDrawerState']),
+    ...mapGetters(["isFacililator", "getDrawerState"]),
     items() {
       let items = [];
       [
@@ -82,11 +88,11 @@ export default {
       set(value) {
         console.log(value, this.getDrawerState);
         this.updateDrawerState(value);
-      }
-    }
+      },
+    },
   },
-  methods:{
-    ...mapActions(['updateDrawerState']),
+  methods: {
+    ...mapActions(["updateDrawerState"]),
   },
   components: {
     SideMenuItem: () => import("@/components/sidemenu/SideMenuItem"),

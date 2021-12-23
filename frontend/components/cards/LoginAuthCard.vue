@@ -37,7 +37,9 @@
           }}</DefaultText>
         </v-flex>
         <v-flex mb-8>
-          <BlockButton :loading="loading" @clicked="logIn" type="submit">Log In</BlockButton>
+          <BlockButton :loading="loading" @clicked="logIn" type="submit"
+            >Log In</BlockButton
+          >
         </v-flex>
       </v-form>
     </v-layout>
@@ -93,10 +95,13 @@ export default {
           this.$nextTick(() => {
             //Disable auto-logout:
             if (this.remember) {
-              this.$auth.$storage.setUniversal('_token_expiration.local', false);
+              this.$auth.$storage.setUniversal(
+                "_token_expiration.local",
+                false
+              );
             }
             this.$router.push("/");
-          })
+          });
         })
         .catch(({ response }) => {
           if (response && response.data.non_field_errors) {
