@@ -14,7 +14,6 @@ export default {
   components: {
     DefaultCardWithTitle: () => import("@/components/cards/DefaultCardWithTitle"),
     ProjectForm: () => import("@/components/forms/project/ProjectForm"),
-    DefaultText: () => import("@/components/texts/DefaultText"),
   },
   methods: {
     validate() {

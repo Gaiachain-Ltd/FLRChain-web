@@ -11,7 +11,7 @@
         <v-flex shrink mt-6>
           <img :src="logo" width="135px" />
         </v-flex>
-        <v-layout shrink column ml-10 mt-6>
+        <v-layout shrink column mt-6>
           <SideMenuItem
             class="my-3"
             v-for="item in items"
@@ -48,7 +48,15 @@ export default {
     ...mapGetters(["isFacililator", "getDrawerState"]),
     items() {
       let items = [];
-      [
+      [ 
+        {
+          iconOn: require("@/assets/side/profile_on.svg"),
+          iconOff: require("@/assets/side/profile_off.svg"),
+          enabled: this.$route.name === "profile",
+          label: "Profile",
+          route: "/profile",
+          visible: true,
+        },
         {
           iconOn: require("@/assets/side/home_on.svg"),
           iconOff: require("@/assets/side/home_off.svg"),
@@ -69,7 +77,7 @@ export default {
           iconOn: require("@/assets/side/wallet_on.svg"),
           iconOff: require("@/assets/side/wallet_off.svg"),
           enabled: this.$route.name === "balance",
-          label: "Balance",
+          label: "Investments",
           route: "/balance",
           visible: true,
         },
