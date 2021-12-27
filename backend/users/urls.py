@@ -11,5 +11,6 @@ decorated_token_view = swagger_auto_schema(
 urlpatterns = [
     path('login/', decorated_token_view, name='login'),
     path('register/', user_register, name='register'),
-    path('info/', user_info, name='info')
+    path('info/', user_info, name='info'),
+    path('organization/', OrganizationView.as_view({'get': 'list', 'patch': 'patrial_update'})),
 ]

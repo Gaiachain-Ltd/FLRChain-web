@@ -1,6 +1,5 @@
 from rest_framework import serializers
-from users.models import CustomUser
-from transactions.models import Transaction
+from users.models import CustomUser, Organization
 
 
 class CustomUserSerializer(serializers.ModelSerializer):
@@ -35,3 +34,10 @@ class CustomUserSerializer(serializers.ModelSerializer):
 
     def get_opted_in(self, obj):
         return obj.opted_in
+
+
+class OrganizationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Organization
+        fields = ('name', 'organization_type', 'website',
+                  'statement', 'principal', 'email', 'phone')
