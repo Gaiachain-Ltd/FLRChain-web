@@ -12,12 +12,22 @@
           <img :src="logo" width="135px" />
         </v-flex>
         <v-layout shrink column mt-6>
-          <SideMenuItem
-            class="my-3"
-            v-for="item in items"
-            :key="item.label"
-            :item="item"
-          ></SideMenuItem>
+          <template v-for="item in items">
+            <v-layout column :key="item.label">
+              <SideMenuItem class="mt-6" :item="item"></SideMenuItem>
+              <v-expand-transition>
+                <v-layout column v-if="item.enabled">
+                  <SideMenuItem
+                    v-for="children in item.childrens"
+                    :key="children.label"
+                    :item="children"
+                    class="mt-2"
+                  >
+                  </SideMenuItem>
+                </v-layout>
+              </v-expand-transition>
+            </v-layout>
+          </template>
         </v-layout>
         <v-spacer></v-spacer>
         <v-flex shrink class="mb-6">
@@ -47,8 +57,7 @@ export default {
   computed: {
     ...mapGetters(["isFacililator", "getDrawerState"]),
     items() {
-      let items = [];
-      [ 
+      return [
         {
           iconOn: require("@/assets/side/profile_on.svg"),
           iconOff: require("@/assets/side/profile_off.svg"),
@@ -60,18 +69,53 @@ export default {
         {
           iconOn: require("@/assets/side/home_on.svg"),
           iconOff: require("@/assets/side/home_off.svg"),
-          enabled: this.$route.name === "index",
-          label: "Home",
+          enabled:
+            this.$route.name === "index" ||
+            this.$route.name.includes("project"),
+          label: "Projects",
           route: "/",
           visible: true,
-        },
-        {
-          iconOn: require("@/assets/side/plus_on.svg"),
-          iconOff: require("@/assets/side/plus_off.svg"),
-          enabled: this.$route.name === "project-create",
-          label: "Create project",
-          route: "/project/create",
-          visible: this.isFacililator,
+          childrens: [
+            {
+              enabled: this.$route.name === "index",
+              label: "All",
+              route: "/",
+              fontSize: 13,
+              visible: true,
+            },
+            {
+              enabled: this.$route.name === "project-fundraising",
+              label: "Fundraising",
+              route: "/project/fundraising",
+              fontSize: 13,
+              visible: true,
+            },
+            {
+              enabled: this.$route.name === "project-active",
+              label: "Active",
+              route: "/project/active",
+              fontSize: 13,
+              visible: true,
+            },
+            {
+              enabled: this.$route.name === "project-closed",
+              label: "Closed",
+              route: "/project/closed",
+              fontSize: 13,
+              visible: true,
+            },
+            {
+              iconOn: require("@/assets/side/plus_on.svg"),
+              iconOff: require("@/assets/side/plus_off.svg"),
+              enabled: this.$route.name === "project-create",
+              label: "Create project",
+              route: "/project/create",
+              fontSize: 13,
+              iconSize: 12,
+              spacing: 1,
+              visible: this.isFacililator,
+            },
+          ].filter((child) => child.visible),
         },
         {
           iconOn: require("@/assets/side/wallet_on.svg"),
@@ -81,13 +125,7 @@ export default {
           route: "/balance",
           visible: true,
         },
-      ].forEach((item) => {
-        if (item.visible) {
-          items.push(item);
-          console.log(this.$route.name);
-        }
-      });
-      return items;
+      ].filter((item) => item.visible);
     },
     drawerState: {
       get() {

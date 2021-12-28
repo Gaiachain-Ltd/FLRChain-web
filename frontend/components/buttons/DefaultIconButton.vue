@@ -5,16 +5,22 @@
     shrink
     class="pointer-cursor"
     @click.prevent="() => $emit('clicked')"
+    align-center
   >
     <DefaultSVGIcon
-      v-if="config.enabled"
-      :icon="config.iconOn"
+      v-if="config.iconOn || config.iconOff"
+      :icon="config.enabled ? config.iconOn : config.iconOff"
+      :size="config.iconSize || 20"
+      class="mb-1"
     ></DefaultSVGIcon>
-    <DefaultSVGIcon
-      v-if="!config.enabled"
-      :icon="config.iconOff"
-    ></DefaultSVGIcon>
-    <DefaultText class="ml-4" :color="color">{{ config.label }}</DefaultText>
+    <DefaultText
+      :class="[
+        (config.iconOn || config.iconOff) && `ml-${config.spacing || 4}`,
+      ]"
+      :color="color"
+      :size="config.fontSize || 16"
+      >{{ config.label }}</DefaultText
+    >
   </v-layout>
 </template>
 
