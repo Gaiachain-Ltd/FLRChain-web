@@ -4,8 +4,8 @@ export default {
     return {
       loading: false,
       message: "",
-      showSuccessPopup: false,
-      showErrorPopup: false,
+      snackBarVisible: false,
+      snackBarPositive: false,
     };
   },
   methods: {
@@ -16,14 +16,16 @@ export default {
       this.loading = false;
       if (message) {
         this.message = message;
-        this.showSuccessPopup = true;
+        this.snackBarPositive = true;
+        this.snackBarVisible = true;
       }
     },
     onError(message = "") {
       this.loading = false;
       if (message) {
         this.message = message;
-        this.showErrorPopup = true;
+        this.snackBarPositive = false;
+        this.snackBarVisible = true;
       }
     },
   },

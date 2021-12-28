@@ -10,8 +10,11 @@
       @cancel="$router.go(-1)"
       @save="handleEdit"
     ></ActionBarCard>
-    <SuccessPopup :value.sync="showSuccessPopup" :text="message"></SuccessPopup>
-    <ErrorPopup :value.sync="showErrorPopup" :text="message"></ErrorPopup>
+    <SnackBar
+      :visible.sync="snackBarVisible"
+      :message="message"
+      :positive="snackBarPositive"
+    ></SnackBar>
   </v-layout>
 </template>
 
@@ -33,6 +36,7 @@ export default {
     ActionBarCard: () => import("@/components/cards/ActionBarCard"),
     SuccessPopup: () => import("@/components/popups/SuccessPopup"),
     ErrorPopup: () => import("@/components/popups/ErrorPopup"),
+    SnackBar: () => import("@/components/popups/SnackBar"),
   },
   methods: {
     handleEdit() {
@@ -41,7 +45,7 @@ export default {
         .patch("organization/", this.organization)
         .then((reply) => {
           this.organization = reply.data;
-          this.onSuccess();
+          this.onSuccess("Changes saved successfully!");
         })
         .catch((error) => {
           this.onError("Something has gone wrong. Please try again later.");
@@ -53,7 +57,7 @@ export default {
       .get("organization/")
       .then((reply) => reply.data)
       .catch((error) => {
-        this.onError("Something has gone wrong. Please try again later.")
+        this.onError("Something has gone wrong. Please try again later.");
       });
   },
 };

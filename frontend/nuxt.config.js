@@ -106,9 +106,9 @@ module.exports = {
           octonary: "#253f50",
           nonary: "#72809D",
           accent: '#FAFAFD',
-          error: '#FE2121',
+          error: '#C50505',
           info: '#2196F3',
-          success: '#4CAF50',
+          success: '#25B81F',
           warning: '#FFC107',
         }
       }
