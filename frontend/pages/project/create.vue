@@ -52,7 +52,7 @@ export default {
     InputProjectCard: () =>
       import("@/components/cards/project/InputProjectCard"),
     InputTasksCard: () => import("@/components/cards/project/InputTasksCard"),
-    ActionBarCard: () => import("@/components/cards/project/ActionBarCard"),
+    ActionBarCard: () => import("@/components/cards/ActionBarCard"),
     DefaultTitle: () => import("@/components/texts/DefaultTitle"),
     ErrorPopup: () => import("@/components/popups/ErrorPopup"),
     InfoPopup: () => import("@/components/popups/InfoPopup"),

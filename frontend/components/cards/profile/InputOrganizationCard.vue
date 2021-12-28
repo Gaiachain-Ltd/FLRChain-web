@@ -1,5 +1,5 @@
 <template>
-  <DefaultCardWithTitle title="Investor public profile:">
+  <DefaultCardWithTitle title="Investor public profile">
     <v-flex>
       <OrganizationForm
         ref="organizationForm"
