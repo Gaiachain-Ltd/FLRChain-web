@@ -1,32 +1,53 @@
 <template>
-  <v-hover v-slot="{ hover }">
-    <v-card @click.prevent="details" ma-0>
-      <v-layout column ma-0 pa-6>
-        <v-layout row ma-0 align-center>
-          <DefaultSVGIcon
-            v-if="icon !== ''"
-            class="mb-1 mr-3"
-            :icon="icon"
-          ></DefaultSVGIcon>
-          <DefaultText
-            :size="18"
-            :color="hover ? hoverColor : $vuetify.theme.themes.light.quinary"
-            >{{ project.title }}</DefaultText
-          >
-          <v-spacer></v-spacer>
-          <DefaultSVGIcon
-            v-if="hover"
-            class="mb-1 mr-3"
-            :icon="arrowIcon"
-          ></DefaultSVGIcon>
-        </v-layout>
-        <slot></slot>
+  <v-card @click.prevent="details" ma-0>
+    <v-layout column ma-0 pa-6>
+      <v-layout align-center>
+        <DefaultText :size="18" :color="$vuetify.theme.themes.light.primary">{{
+          project.title
+        }}</DefaultText>
+        <v-spacer></v-spacer>
+        <DefaultText :size="12" :color="$vuetify.theme.themes.light.quinary"
+          >Active</DefaultText
+        >
+        <DefaultSVGIcon
+          v-if="icon !== ''"
+          class="mb-1 ml-1"
+          :icon="icon"
+          size="12"
+        ></DefaultSVGIcon>
       </v-layout>
-    </v-card>
-  </v-hover>
+      <v-layout align-center>
+        <DefaultSVGIcon
+          class="mb-1 mr-2"
+          :icon="require('@/assets/icons/date.svg')"
+          size="12"
+        ></DefaultSVGIcon>
+        <DefaultText :size="12">{{ timePeriod }}</DefaultText>
+      </v-layout>
+      <v-layout class="my-6">
+        <DefaultText :size="14">{{ project.description }}</DefaultText>
+      </v-layout>
+      <v-layout>
+        <v-spacer></v-spacer>
+        <ActionButton
+          label="My contribution"
+          color="white"
+          :border="`1px ${$vuetify.theme.themes.light.primary} solid !important`"
+          :textColor="`${$vuetify.theme.themes.light.primary} !important`"
+        ></ActionButton>
+        <ActionButton
+          class="ml-3"
+          label="Details"
+          color="primary"
+        ></ActionButton>
+      </v-layout>
+    </v-layout>
+  </v-card>
 </template>
 
 <script>
+import moment from "moment";
+
 export default {
   props: {
     project: {},
@@ -35,6 +56,7 @@ export default {
     DefaultText: () => import("@/components/texts/DefaultText"),
     DefaultSVGIcon: () => import("@/components/icons/DefaultSVGIcon"),
     LabeledTextWithIcon: () => import("@/components/texts/LabeledTextWithIcon"),
+    ActionButton: () => import("@/components/buttons/ActionButton"),
   },
   computed: {
     hoverColor() {
@@ -63,6 +85,11 @@ export default {
       } else {
         return require("@/assets/icons/arrow-project-green.svg");
       }
+    },
+    timePeriod() {
+      const start = moment(this.project.start).format("MMMM DD, YYYY");
+      const end = moment(this.project.end).format("MMMM DD, YYYY");
+      return `${start} - ${end}`;
     },
   },
   methods: {

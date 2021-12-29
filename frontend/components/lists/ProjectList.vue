@@ -1,26 +1,29 @@
 <template>
   <v-layout column fill-height>
-    <v-layout column fill-height>
-      <v-layout row ma-0 shrink>
-        <DefaultText :size="24" :color="color">{{ title }}</DefaultText>
-        <v-spacer></v-spacer>
-        <slot></slot>
-      </v-layout>
-      <v-layout column ma-0 mt-6 class="list-style">
-        <v-flex
-          class="ma-0 mb-6 ml-1 mr-3"
-          v-for="project in projects"
-          :key="project.id"
-          shrink
-        >
-          <slot name="delegate" v-bind:project="project">
-            <DefaultProjectDelegate :project="project"></DefaultProjectDelegate>
-          </slot>
-        </v-flex>
-        <v-flex>
-          <div class="placeholder"></div>
-        </v-flex>
-      </v-layout>
+    <v-layout row ma-0 shrink>
+      <DefaultText :size="24" :color="$vuetify.theme.themes.light.primary">{{
+        title
+      }}</DefaultText>
+      <v-spacer></v-spacer>
+      <slot></slot>
+    </v-layout>
+    <v-layout column ma-0>
+      <ProjectGroup
+        class="mt-6"
+        title="Fundraising projects"
+        :projects="projects"
+      ></ProjectGroup>
+      <ProjectGroup
+        class="mt-6"
+        title="Active projects"
+        :projects="projects"
+      ></ProjectGroup>
+      <ProjectGroup
+        class="mt-6"
+        title="Closed projects"
+        :projects="projects"
+      ></ProjectGroup>
+      <v-spacer></v-spacer>
     </v-layout>
   </v-layout>
 </template>
@@ -29,9 +32,6 @@
 export default {
   props: {
     title: {
-      type: String,
-    },
-    color: {
       type: String,
     },
     query: {
@@ -49,10 +49,16 @@ export default {
       projects: [],
     };
   },
+  computed: {
+    activeProjects() {
+      return [];
+    },
+  },
   components: {
     DefaultText: () => import("@/components/texts/DefaultText"),
     DefaultProjectDelegate: () =>
       import("@/components/delegates/DefaultProjectDelegate"),
+    ProjectGroup: () => import("@/components/lists/ProjectGroup"),
   },
   async fetch() {
     // TODO: Handle error!
