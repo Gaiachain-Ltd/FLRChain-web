@@ -3,6 +3,16 @@ from projects.managers import ProjectManager, ProjectQuerySet
 
 
 class Project(models.Model):
+    FUNDRAISING = 0
+    ACTIVE = 1
+    CLOSED = 2
+
+    STATES = (
+        (FUNDRAISING, "Fundraising"),
+        (ACTIVE, "Active"),
+        (CLOSED, "Closed")
+    )
+
     owner = models.ForeignKey(
         'users.CustomUser', on_delete=models.CASCADE)
     title = models.CharField(max_length=255)
@@ -13,9 +23,14 @@ class Project(models.Model):
     description = models.TextField(blank=True, null=True)
     beneficiaries = models.ManyToManyField(
         'users.CustomUser', through='Assignment', related_name='beneficiary_list')
-    tasks = models.ManyToManyField('projects.Task', related_name='tasks')
+    state = models.PositiveSmallIntegerField(choices=STATES, default=CLOSED)
 
     objects = ProjectManager.from_queryset(ProjectQuerySet)()
+
+
+class Milestone(models.Model):
+    name = models.CharField(max_length=255)
+    tasks = models.ManyToManyField('projects.Task', related_name='tasks')
 
 
 class Task(models.Model):
