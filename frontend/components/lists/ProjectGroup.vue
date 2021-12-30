@@ -1,8 +1,10 @@
 <template>
   <v-layout column>
-    <DefaultText size="20" :color="$vuetify.theme.themes.light.primary">{{
+    <v-layout>
+    <DefaultText class="mb-3" size="20" :color="$vuetify.theme.themes.light.primary">{{
       title
     }}</DefaultText>
+    </v-layout>
     <v-row>
       <v-col xs6 v-for="project in projects" :key="project.id">
         <DefaultProjectDelegate :project="project"></DefaultProjectDelegate>
@@ -19,12 +21,13 @@ export default {
       default: "Active projects",
     },
     projects: {
-      type: String,
+      type: Array,
       default: () => [],
     },
   },
   components: {
     DefaultText: () => import("@/components/texts/DefaultText"),
+    DefaultIconButton: () => import("@/components/buttons/DefaultIconButton"),
     DefaultProjectDelegate: () =>
       import("@/components/delegates/DefaultProjectDelegate"),
   },

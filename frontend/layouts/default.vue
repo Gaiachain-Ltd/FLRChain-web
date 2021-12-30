@@ -67,8 +67,8 @@ export default {
           visible: true,
         },
         {
-          iconOn: require("@/assets/side/home_on.svg"),
-          iconOff: require("@/assets/side/home_off.svg"),
+          iconOn: require("@/assets/side/projects_on.svg"),
+          iconOff: require("@/assets/side/projects_off.svg"),
           enabled:
             this.$route.name === "index" ||
             this.$route.name.includes("project"),
@@ -118,8 +118,8 @@ export default {
           ].filter((child) => child.visible),
         },
         {
-          iconOn: require("@/assets/side/wallet_on.svg"),
-          iconOff: require("@/assets/side/wallet_off.svg"),
+          iconOn: require("@/assets/side/investment_on.svg"),
+          iconOff: require("@/assets/side/investment_off.svg"),
           enabled: this.$route.name === "balance",
           label: "Investments",
           route: "/balance",

@@ -9,12 +9,7 @@
         <DefaultText :size="12" :color="$vuetify.theme.themes.light.quinary"
           >Active</DefaultText
         >
-        <DefaultSVGIcon
-          v-if="icon !== ''"
-          class="mb-1 ml-1"
-          :icon="icon"
-          size="12"
-        ></DefaultSVGIcon>
+        <StatusIndicator class="ml-1" :color="indicatorColor"></StatusIndicator>
       </v-layout>
       <v-layout align-center>
         <DefaultSVGIcon
@@ -23,6 +18,13 @@
           size="12"
         ></DefaultSVGIcon>
         <DefaultText :size="12">{{ timePeriod }}</DefaultText>
+      </v-layout>
+      <v-layout>
+        <v-img
+          :src="require('@/assets/images/placeholder.png')"
+          class="mt-6"
+          contain
+        ></v-img>
       </v-layout>
       <v-layout class="my-6">
         <DefaultText :size="14">{{ project.description }}</DefaultText>
@@ -47,34 +49,28 @@
 
 <script>
 import moment from "moment";
+import { STATUS } from "@/constants/project";
 
 export default {
   props: {
     project: {},
   },
   components: {
+    StatusIndicator: () => import("@/components/widgets/projects/StatusIndicator"),
     DefaultText: () => import("@/components/texts/DefaultText"),
     DefaultSVGIcon: () => import("@/components/icons/DefaultSVGIcon"),
     LabeledTextWithIcon: () => import("@/components/texts/LabeledTextWithIcon"),
     ActionButton: () => import("@/components/buttons/ActionButton"),
   },
   computed: {
-    hoverColor() {
-      if (!this.project.investment) {
-        return this.$vuetify.theme.themes.light.secondary;
-      } else if (this.project.investment.status === 0) {
-        return this.$vuetify.theme.themes.light.error;
-      } else {
-        return this.$vuetify.theme.themes.light.primary;
-      }
-    },
-    icon() {
-      if (!this.project.investment) {
-        return "";
-      } else if (this.project.investment.status === 0) {
-        return require("@/assets/icons/inactive.svg");
-      } else {
-        return require("@/assets/icons/active.svg");
+    indicatorColor() {
+      switch(this.project.status) {
+        case STATUS.FUNDRAISING:
+          return this.$vuetify.theme.themes.light.primary;
+        case STATUS.ACTIVE:
+          return this.$vuetify.theme.themes.light.success;
+        case STATUS.CLOSED:
+          return this.$vuetify.theme.themes.light.error;
       }
     },
     arrowIcon() {

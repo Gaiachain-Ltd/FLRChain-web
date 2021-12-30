@@ -11,17 +11,17 @@
       <ProjectGroup
         class="mt-6"
         title="Fundraising projects"
-        :projects="projects"
+        :projects="fundraisingProjects"
       ></ProjectGroup>
       <ProjectGroup
         class="mt-6"
         title="Active projects"
-        :projects="projects"
+        :projects="activeProjects"
       ></ProjectGroup>
       <ProjectGroup
         class="mt-6"
         title="Closed projects"
-        :projects="projects"
+        :projects="closedProjects"
       ></ProjectGroup>
       <v-spacer></v-spacer>
     </v-layout>
@@ -29,6 +29,12 @@
 </template>
 
 <script>
+import _ from "lodash";
+
+const FUNDRAISING = 0;
+const ACTIVE = 1;
+const CLOSED = 2;
+
 export default {
   props: {
     title: {
@@ -50,9 +56,15 @@ export default {
     };
   },
   computed: {
-    activeProjects() {
-      return [];
+    fundraisingProjects() {
+      return _.filter(this.projects, ['status', FUNDRAISING])
     },
+    activeProjects() {
+      return _.filter(this.projects, ['status', ACTIVE]);
+    },
+    closedProjects() {
+      return _.filter(this.projects, ['status', CLOSED]);
+    }
   },
   components: {
     DefaultText: () => import("@/components/texts/DefaultText"),
@@ -68,14 +80,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-.list-style {
-  max-height: calc(100% - 138px) !important;
-  overflow: auto;
-}
-.placeholder {
-  width: 100%;
-  height: 12px;
-}
-</style>

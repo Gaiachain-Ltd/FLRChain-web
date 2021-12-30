@@ -7,7 +7,7 @@ class Project(models.Model):
     ACTIVE = 1
     CLOSED = 2
 
-    STATES = (
+    STATUSES = (
         (FUNDRAISING, "Fundraising"),
         (ACTIVE, "Active"),
         (CLOSED, "Closed")
@@ -23,12 +23,13 @@ class Project(models.Model):
     description = models.TextField(blank=True, null=True)
     beneficiaries = models.ManyToManyField(
         'users.CustomUser', through='Assignment', related_name='beneficiary_list')
-    state = models.PositiveSmallIntegerField(choices=STATES, default=CLOSED)
+    status = models.PositiveSmallIntegerField(choices=STATUSES, default=CLOSED)
 
     objects = ProjectManager.from_queryset(ProjectQuerySet)()
 
 
 class Milestone(models.Model):
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     tasks = models.ManyToManyField('projects.Task', related_name='tasks')
 

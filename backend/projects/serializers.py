@@ -29,19 +29,19 @@ class TaskSerializer(serializers.ModelSerializer):
 class ProjectSerializer(serializers.ModelSerializer):
     start = serializers.DateField()
     end = serializers.DateField()
-    tasks = TaskSerializer(many=True)
     investment = InvestmentSerializer(required=False, read_only=True)
     assignment_status = serializers.IntegerField(required=False)
     facililator = serializers.SerializerMethodField(required=False, read_only=True)
     spent = serializers.DecimalField(max_digits=26, decimal_places=6, required=False, read_only=True)
+    status = serializers.IntegerField()
 
     class Meta:
         model = Project
         fields = ('id', 'title', 'description', 'start', 'end',
-                  'tasks', 'assignment_status', 'investment',
-                  'facililator', 'spent')
+                  'assignment_status', 'investment',
+                  'facililator', 'spent', 'status')
         read_only_fields = ('assignment_status', 'investment',
-                            'facililator', 'spent')
+                            'facililator', 'spent', 'status')
 
     def get_facililator(self, obj):
         return f"{obj.owner.first_name} {obj.owner.last_name}"
