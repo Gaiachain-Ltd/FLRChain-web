@@ -14,6 +14,7 @@ from users.permissions import *
 class ProjectView(CommonView):
     serializer_class = ProjectSerializer
     filterset_fields = ('status',)
+    search_fields = ('title',)
 
     def get_permissions(self):
         """

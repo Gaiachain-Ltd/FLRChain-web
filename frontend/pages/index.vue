@@ -1,39 +1,55 @@
 <template>
-  <v-layout column ma-3>
-    <ToolBar title="Projects"></ToolBar>
-    <v-layout ma-0 align-center shrink>
-      <DefaultText :size="24" :color="$vuetify.theme.themes.light.primary"
-        >Your impact</DefaultText
-      >
+  <v-layout column ma-0>
+    <ToolBar title="Projects"> </ToolBar>
+    <v-card class="search-wrapper mb-2" style="background-color: #fafafd">
+      <v-layout justify-center>
+        <v-text-field
+          v-model="search"
+          solo
+          flat
+          class="search"
+          background-color="transparent"
+          placeholder="Click to search projects..."
+          hide-details
+          clearable
+        ></v-text-field>
+      </v-layout>
+    </v-card>
+    <v-layout column ma-3>
+      <v-layout ma-0 align-center shrink>
+        <DefaultText :size="24" :color="$vuetify.theme.themes.light.primary"
+          >Your impact</DefaultText
+        >
+        <v-spacer></v-spacer>
+        <ProjectsCounter
+          :fundraising="fundraisingVisible ? fundraisingProjects.length : -1"
+          :active="activeVisible ? activeProjects.length : -1"
+          :closed="closedVisible ? closedProjects.length : -1"
+        ></ProjectsCounter>
+      </v-layout>
+      <v-layout column ma-0 shrink>
+        <ProjectGroup
+          v-if="fundraisingVisible"
+          class="mt-6"
+          title="Fundraising projects"
+          :projects="fundraisingProjects"
+        ></ProjectGroup>
+        <ProjectGroup
+          v-if="activeVisible"
+          class="mt-6"
+          title="Active projects"
+          :projects="activeProjects"
+        ></ProjectGroup>
+        <ProjectGroup
+          v-if="closedVisible"
+          class="mt-6"
+          title="Closed projects"
+          :projects="closedProjects"
+        ></ProjectGroup>
+        <v-spacer></v-spacer>
+      </v-layout>
       <v-spacer></v-spacer>
-      <ProjectsCounter
-        :fundraising="fundraisingVisible ? fundraisingProjects.length : -1"
-        :active="activeVisible ? activeProjects.length : -1"
-        :closed="closedVisible ? closedProjects.length : -1"
-      ></ProjectsCounter>
     </v-layout>
-    <v-layout column ma-0 shrink>
-      <ProjectGroup
-        v-if="fundraisingVisible"
-        class="mt-6"
-        title="Fundraising projects"
-        :projects="fundraisingProjects"
-      ></ProjectGroup>
-      <ProjectGroup
-        v-if="activeVisible"
-        class="mt-6"
-        title="Active projects"
-        :projects="activeProjects"
-      ></ProjectGroup>
-      <ProjectGroup
-        v-if="closedVisible"
-        class="mt-6"
-        title="Closed projects"
-        :projects="closedProjects"
-      ></ProjectGroup>
-      <v-spacer></v-spacer>
-    </v-layout>
-    <v-spacer></v-spacer>
   </v-layout>
 </template>
 
@@ -51,7 +67,13 @@ export default {
   data() {
     return {
       projects: [],
+      search: null,
     };
+  },
+  watch: {
+    search() {
+      this.$fetch();
+    }
   },
   computed: {
     fundraisingProjects() {
@@ -67,7 +89,7 @@ export default {
       return this.status === -1 || this.status == STATUS.FUNDRAISING;
     },
     activeVisible() {
-      console.log("ACTIVE", this.status === -1 || this.status == STATUS.ACTIVE)
+      console.log("ACTIVE", this.status === -1 || this.status == STATUS.ACTIVE);
       return this.status === -1 || this.status == STATUS.ACTIVE;
     },
     closedVisible() {
@@ -85,11 +107,26 @@ export default {
   },
   async fetch() {
     this.projects = await this.$axios
-      .get(
-        "projects/",
-        this.status !== -1 && { params: { status: this.status } }
-      )
+      .get("projects/", {
+        params: { 
+          status: this.status !== -1 ? this.status : undefined,
+          search: !!this.search ? this.search : undefined
+        },
+      })
       .then((reply) => reply.data.results);
   },
 };
 </script>
+
+<style scoped>
+.search-wrapper {
+  border-radius: 0px !important;
+  background-color: var(--v-accent-base) !important;
+}
+.search {
+  max-width: 300px;
+}
+.search ::v-deep input {
+  text-align: center !important;
+}
+</style>

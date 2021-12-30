@@ -38,7 +38,7 @@
       </v-layout>
     </v-navigation-drawer>
     <v-main>
-      <v-container fill-height>
+      <v-container fill-height pa-0>
         <Nuxt />
       </v-container>
     </v-main>
