@@ -11,6 +11,7 @@
         <v-flex shrink mt-6>
           <img :src="logo" width="135px" />
         </v-flex>
+        {{$route.name}}
         <v-layout shrink column mt-6>
           <template v-for="item in items">
             <v-layout column :key="item.label">

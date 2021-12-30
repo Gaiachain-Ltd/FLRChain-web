@@ -13,9 +13,7 @@ from users.permissions import *
 
 class ProjectView(CommonView):
     serializer_class = ProjectSerializer
-    filterset_fields = {
-        'status': ['isnull',],
-    }
+    filterset_fields = ('status',)
 
     def get_permissions(self):
         """

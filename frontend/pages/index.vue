@@ -39,17 +39,9 @@ import { STATUS } from "@/constants/project";
 
 export default {
   props: {
-    title: {
-      type: String,
-    },
-    query: {
-      type: Object,
-      default: undefined,
-    },
-  },
-  watch: {
-    query() {
-      this.$fetch();
+    status: {
+      type: Number,
+      default: -1,
     },
   },
   data() {
@@ -78,10 +70,12 @@ export default {
       import("@/components/widgets/projects/ProjectsCounter"),
   },
   async fetch() {
-    // TODO: Handle error!
     this.projects = await this.$axios
-      .get("projects/")
+      .get(
+        "projects/",
+        this.status !== -1 && { params: { status: this.status } }
+      )
       .then((reply) => reply.data.results);
-  },
+  }
 };
 </script>
