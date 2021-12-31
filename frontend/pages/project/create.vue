@@ -1,13 +1,11 @@
 <template>
-  <v-layout column fill-height mt-2 style="width: 100%">
+  <v-layout column fill-height ma-6>
     <ToolBar title="Create project"></ToolBar>
-    <DefaultTitle class="mt-10 mb-5">New project</DefaultTitle>
     <InputProjectCard
       ref="inputProject"
       class="mb-5"
       :project.sync="project"
     ></InputProjectCard>
-    <InputTasksCard ref="inputTasks" :project.sync="project"></InputTasksCard>
     <v-spacer></v-spacer>
     <div class="placeholder"></div>
     <ActionBarCard
@@ -38,10 +36,15 @@ export default {
         description: "",
         start: this.$moment().format("YYYY-MM-DD"),
         end: this.$moment().format("YYYY-MM-DD"),
-        tasks: [
+        milestones: [
           {
-            action: "",
-            reward: "0",
+            name: "",
+            tasks: [
+              {
+                action: "",
+                reward: "0",
+              },
+            ],
           },
         ],
       },
@@ -56,6 +59,7 @@ export default {
     DefaultTitle: () => import("@/components/texts/DefaultTitle"),
     ErrorPopup: () => import("@/components/popups/ErrorPopup"),
     InfoPopup: () => import("@/components/popups/InfoPopup"),
+    ProjectForm: () => import("@/components/forms/project/ProjectForm"),
   },
   computed: {
     blocked() {

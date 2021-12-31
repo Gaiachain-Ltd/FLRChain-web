@@ -5,7 +5,7 @@
     class="action-btn-style text-none elevation-0"
     :style="{ border: border, color: textColor }"
     height="41"
-    >{{ label }}</v-btn
+    ><slot>{{ label }}</slot></v-btn
   >
 </template>
 

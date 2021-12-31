@@ -1,7 +1,7 @@
 <template>
   <v-layout column ma-0>
     <ToolBar title="Projects"> </ToolBar>
-    <v-card class="search-wrapper mb-2" style="background-color: #fafafd">
+    <v-card class="search-wrapper" style="background-color: #fafafd">
       <v-layout justify-center align-center fill-height>
         <v-text-field
           v-model="search"
@@ -22,7 +22,7 @@
         </v-text-field>
       </v-layout>
     </v-card>
-    <v-layout column ma-3>
+    <v-layout column ma-6>
       <v-layout ma-0 align-center shrink>
         <DefaultText :size="24" :color="$vuetify.theme.themes.light.primary"
           >Your impact</DefaultText

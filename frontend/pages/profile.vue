@@ -1,5 +1,5 @@
 <template>
-  <v-layout column fill-height ma-3 style="width: 100%">
+  <v-layout column fill-height ma-6>
     <ToolBar title="Profile"></ToolBar>
     <InputOrganizationCard
       :organization.sync="organization"

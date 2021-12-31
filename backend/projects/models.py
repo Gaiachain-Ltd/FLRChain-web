@@ -24,6 +24,7 @@ class Project(models.Model):
     beneficiaries = models.ManyToManyField(
         'users.CustomUser', through='Assignment', related_name='beneficiary_list')
     status = models.PositiveSmallIntegerField(choices=STATUSES, default=CLOSED)
+    milestones = models.ManyToManyField('projects.Milestone', related_name='milestones')
 
     objects = ProjectManager.from_queryset(ProjectQuerySet)()
 

@@ -25,6 +25,12 @@ class TaskSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({"reward": "reward must be greater than zero"})
         return data
 
+class MilestoneSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(required=False)
+    tasks = TaskSerializer(many=True)
+    class Meta:
+        model = Milestone,
+        fields = ('id', 'name', 'tasks')   
 
 class ProjectSerializer(serializers.ModelSerializer):
     start = serializers.DateField()
@@ -34,12 +40,13 @@ class ProjectSerializer(serializers.ModelSerializer):
     facililator = serializers.SerializerMethodField(required=False, read_only=True)
     spent = serializers.DecimalField(max_digits=26, decimal_places=6, required=False, read_only=True)
     status = serializers.IntegerField()
+    milestones = MilestoneSerializer(many=True)
 
     class Meta:
         model = Project
         fields = ('id', 'title', 'description', 'start', 'end',
                   'assignment_status', 'investment',
-                  'facililator', 'spent', 'status')
+                  'facililator', 'spent', 'status', 'milestones')
         read_only_fields = ('assignment_status', 'investment',
                             'facililator', 'spent', 'status')
 
