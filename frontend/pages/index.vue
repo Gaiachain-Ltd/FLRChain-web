@@ -2,7 +2,7 @@
   <v-layout column ma-0>
     <ToolBar title="Projects"> </ToolBar>
     <v-card class="search-wrapper mb-2" style="background-color: #fafafd">
-      <v-layout justify-center>
+      <v-layout justify-center align-center fill-height>
         <v-text-field
           v-model="search"
           solo
@@ -122,6 +122,7 @@ export default {
 .search-wrapper {
   border-radius: 0px !important;
   background-color: var(--v-accent-base) !important;
+  min-height: 70px;
 }
 .search {
   max-width: 300px;
