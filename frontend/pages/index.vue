@@ -12,7 +12,14 @@
           placeholder="Click to search projects..."
           hide-details
           clearable
-        ></v-text-field>
+        >
+          <DefaultSVGIcon
+            slot="append"
+            :size="16"
+            :icon="require('@/assets/icons/search.svg')"
+          >
+          </DefaultSVGIcon>
+        </v-text-field>
       </v-layout>
     </v-card>
     <v-layout column ma-3>
@@ -73,7 +80,7 @@ export default {
   watch: {
     search() {
       this.$fetch();
-    }
+    },
   },
   computed: {
     fundraisingProjects() {
@@ -104,13 +111,14 @@ export default {
     ProjectGroup: () => import("@/components/lists/ProjectGroup"),
     ProjectsCounter: () =>
       import("@/components/widgets/projects/ProjectsCounter"),
+    DefaultSVGIcon: () => import("@/components/icons/DefaultSVGIcon"),
   },
   async fetch() {
     this.projects = await this.$axios
       .get("projects/", {
-        params: { 
+        params: {
           status: this.status !== -1 ? this.status : undefined,
-          search: !!this.search ? this.search : undefined
+          search: !!this.search ? this.search : undefined,
         },
       })
       .then((reply) => reply.data.results);
@@ -125,7 +133,7 @@ export default {
   min-height: 70px;
 }
 .search {
-  max-width: 300px;
+  max-width: 235px;
 }
 .search ::v-deep input {
   text-align: center !important;
