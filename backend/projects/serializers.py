@@ -29,7 +29,7 @@ class MilestoneSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(required=False)
     tasks = TaskSerializer(many=True)
     class Meta:
-        model = Milestone,
+        model = Milestone
         fields = ('id', 'name', 'tasks')   
 
 class ProjectSerializer(serializers.ModelSerializer):

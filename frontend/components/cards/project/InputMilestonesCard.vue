@@ -17,12 +17,14 @@
         ></DefaultIconButton>
       </v-layout>
       <v-layout column>
-        <MilestoneForm></MilestoneForm>
+        <MilestoneForm
+          v-model="project.milestones[milestoneIndex]"
+        ></MilestoneForm>
         <v-layout column class="ml-4">
           <TaskForm
             v-for="(task, taskIndex) in milestone.tasks"
+            v-model="milestone.tasks[taskIndex]"
             :key="taskIndex"
-            :task.sync="milestone.tasks[taskIndex]"
             :index="taskIndex"
             :milestoneIndex="milestoneIndex + 1"
             :showDeleteBtn="milestone.tasks.length > 1"

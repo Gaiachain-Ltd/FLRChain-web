@@ -69,8 +69,7 @@ export default {
   methods: {
     handleCreate() {
       if (
-        this.$refs.inputProject.validate() &&
-        this.$refs.inputTasks.validate()
+        this.$refs.inputProject.validate()
       ) {
         this.$axios
           .post("projects/", this.project)

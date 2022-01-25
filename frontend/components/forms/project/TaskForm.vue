@@ -43,7 +43,7 @@ import ValidatorMixin from "@/validators";
 export default {
   mixins: [ValidatorMixin],
   props: {
-    task: {},
+    value: {},
     index: {
       type: Number,
       default: 1,
@@ -64,10 +64,20 @@ export default {
         label: "Delete",
         enabled: true,
         colorEnabled: this.$vuetify.theme.themes.light.error,
-        spacing: 2
+        spacing: 2,
       },
       icon: require("@/assets/icons/currency.svg"),
     };
+  },
+  computed: {
+    task: {
+      get() {
+        return this.value;
+      },
+      set(value) {
+        this.$emit("input", value);
+      },
+    },
   },
   components: {
     DefaultText: () => import("@/components/texts/DefaultText"),

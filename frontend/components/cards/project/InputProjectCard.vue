@@ -2,7 +2,7 @@
   <DefaultCardWithTitle title="New project:">
     <v-layout column>
       <ProjectForm ref="projectForm" :project.sync="project"></ProjectForm>
-      <DefaultText>Milestones & Tasks</DefaultText>
+      <DefaultText>{{ `Milestones & Tasks` }}</DefaultText>
       <InputMilestonesCard :project.sync="project"></InputMilestonesCard>
     </v-layout>
   </DefaultCardWithTitle>
