@@ -1,18 +1,18 @@
 <template>
   <v-form ref="form">
     <v-layout column ma-0>
-      <v-layout row ma-0 mb-3>
+      <v-layout ma-0 mb-3>
         <DefaultText :color="$vuetify.theme.themes.light.primary">{{
-          `Task #${index + 1}`
+          `Task ${milestoneIndex}.${index + 1}`
         }}</DefaultText>
         <v-spacer></v-spacer>
         <DefaultIconButton
           v-if="showDeleteBtn"
           :config="deleteBtnConf"
-          @clicked="$emit('delete', index)"
+          @clicked="$emit('delete')"
         ></DefaultIconButton>
       </v-layout>
-      <v-layout row ma-0>
+      <v-layout ma-0>
         <v-flex xs12 sm12 md9 shrink>
           <TextInput
             label="Action*"
@@ -48,6 +48,10 @@ export default {
       type: Number,
       default: 1,
     },
+    milestoneIndex: {
+      type: Number,
+      default: 1,
+    },
     showDeleteBtn: {
       type: Boolean,
       default: false,
@@ -60,6 +64,7 @@ export default {
         label: "Delete",
         enabled: true,
         colorEnabled: this.$vuetify.theme.themes.light.error,
+        spacing: 2
       },
       icon: require("@/assets/icons/currency.svg"),
     };

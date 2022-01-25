@@ -1,6 +1,5 @@
 <template>
   <v-layout
-    row
     ma-0
     shrink
     class="pointer-cursor"
