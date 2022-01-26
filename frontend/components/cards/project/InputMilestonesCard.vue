@@ -31,7 +31,7 @@
             @delete="() => onDeleteTask(milestone, taskIndex)"
           ></TaskForm>
         </v-layout>
-        <v-layout justify-center>
+        <v-layout justify-center class="my-3">
           <DefaultIconButton
             :config="addTaskBtnConfig"
             @clicked="() => onAddTask(milestone)"
@@ -39,7 +39,7 @@
         </v-layout>
       </v-layout>
     </v-layout>
-    <v-layout justify-center>
+    <v-layout justify-center class="my-3">
       <DefaultIconButton
         :config="addMilestoneBtnConfig"
         @clicked="onAddMilestone"
@@ -62,16 +62,21 @@ export default {
         label: "Delete",
         enabled: true,
         colorEnabled: this.$vuetify.theme.themes.light.error,
+        spacing: 2,
       },
       addTaskBtnConfig: {
+        iconOn: require("@/assets/icons/add_task.svg"),
         label: "Add task",
         enabled: true,
         colorEnabled: this.$vuetify.theme.themes.light.primary,
+        spacing: 2,
       },
       addMilestoneBtnConfig: {
+        iconOn: require("@/assets/icons/add_milestone.svg"),
         label: "Add milestone",
         enabled: true,
         colorEnabled: this.$vuetify.theme.themes.light.primary,
+        spacing: 2,
       },
     };
   },
