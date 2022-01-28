@@ -4,6 +4,7 @@ from django.db import transaction
 from users.serializers import CustomUserSerializer
 from investments.serializers import InvestmentSerializer
 from decimal import *
+import datetime
 
 
 class TaskListSerializer(serializers.ListSerializer):
@@ -14,6 +15,7 @@ class TaskListSerializer(serializers.ListSerializer):
 
 class TaskSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(required=False)
+
     class Meta:
         list_serializer_class = TaskListSerializer
         model = Task
@@ -22,23 +24,29 @@ class TaskSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         if Decimal(data['reward']) < 0:
-            raise serializers.ValidationError({"reward": "reward must be greater than zero"})
+            raise serializers.ValidationError(
+                {"reward": "reward must be greater than zero"})
         return data
+
 
 class MilestoneSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(required=False)
     tasks = TaskSerializer(many=True)
+
     class Meta:
         model = Milestone
-        fields = ('id', 'name', 'tasks')   
+        fields = ('id', 'name', 'tasks')
+
 
 class ProjectSerializer(serializers.ModelSerializer):
     start = serializers.DateField()
     end = serializers.DateField()
     investment = InvestmentSerializer(required=False, read_only=True)
     assignment_status = serializers.IntegerField(required=False)
-    facililator = serializers.SerializerMethodField(required=False, read_only=True)
-    spent = serializers.DecimalField(max_digits=26, decimal_places=6, required=False, read_only=True)
+    facililator = serializers.SerializerMethodField(
+        required=False, read_only=True)
+    spent = serializers.DecimalField(
+        max_digits=26, decimal_places=6, required=False, read_only=True)
     status = serializers.IntegerField()
     milestones = MilestoneSerializer(many=True)
 
@@ -46,7 +54,8 @@ class ProjectSerializer(serializers.ModelSerializer):
         model = Project
         fields = ('id', 'title', 'description', 'start', 'end',
                   'assignment_status', 'investment',
-                  'facililator', 'spent', 'status', 'milestones')
+                  'facililator', 'spent', 'status', 'milestones',
+                  'fundraising_duration')
         read_only_fields = ('assignment_status', 'investment',
                             'facililator', 'spent', 'status')
 
@@ -58,25 +67,88 @@ class ProjectSerializer(serializers.ModelSerializer):
         Check that the start is before the end.
         """
         if data['start'] > data['end']:
-            raise serializers.ValidationError({"end": "end must occur after start"})
+            raise serializers.ValidationError(
+                {"end": "end must occur after start"})
         return data
 
     def create(self, validated_data):
+        now = datetime.datetime.now()
+        start_dt = datetime.datetime.combine(
+            validated_data['start'], now.time())
+        fundraising_start_dt = start_dt - \
+            datetime.timedelta(days=validated_data['fundraising_duration'])
+
+        if now.date() < fundraising_start_dt.date():
+            raise serializers.ValidationError(
+                {
+                    "start": "incorrect start date",
+                    "fundraising_duration": "incorrect fundraising duration"
+                })
+
         with transaction.atomic():
+            total = validated_data['total']
+            milestone_rewards = validated_data['milestones_rewards']
+            milestones_batch = validated_data['milestones_batch']
+            fac_adm_funds = validated_data['fac_adm_funds']
+
+            if total != (milestone_rewards + milestones_batch + fac_adm_funds):
+                raise serializers.ValidationError({
+                    "total": "incorrect amount",
+                })
+
             project = Project.objects.create(
                 owner=self.context['owner'],
                 title=validated_data['title'],
                 description=validated_data['description'],
                 start=validated_data['start'],
-                end=validated_data['end'])
+                end=validated_data['end'],
+                fundraising_duration=validated_data['fundraising_duration'],
+                total=total,
+                milestones_rewards=milestone_rewards,
+                milestones_batch=milestones_batch,
+                fac_adm_funds=fac_adm_funds
+            )
 
-            for task in validated_data['tasks']:
-                task_obj = Task.objects.create(
+            for milestone in validated_data['milestones']:
+                tasks_total = milestone['tasks_total']
+                tasks_rewards = milestone['tasks_rewards']
+                tasks_batch = milestone['task_batch']
+
+                if tasks_total != (tasks_rewards + tasks_batch):
+                    raise serializers.ValidationError({
+                        "tasks_total": "incorrect amount"
+                    })
+
+                milestone_obj = Milestone.objects.create(
                     project=project,
-                    action=task['action'],
-                    reward=task['reward'])
+                    name=milestone['name'],
+                    tasks_total=tasks_total,
+                    tasks_rewards=tasks_rewards,
+                    tasks_batch=tasks_batch
+                )
+                project.milestones.add(milestone_obj)
 
-                project.tasks.add(task_obj)
+                for task in milestone['tasks']:
+                    total = task['total']
+                    reward = task['reward']
+                    batch = task['batch']
+                    count = task['count']
+
+                    if total != (reward * count) + batch:
+                        raise serializers.ValidationError({
+                            "total": "incorrect amount"
+                        })
+
+                    task_obj = Task.objects.create(
+                        project=project,
+                        milestone=milestone_obj,
+                        action=task['action'],
+                        reward=reward,
+                        batch=batch,
+                        count=count,
+                        total=total
+                    )
+                    milestone.tasks.add(task_obj)
 
             project.save()
             return project
@@ -88,7 +160,8 @@ class ProjectSerializer(serializers.ModelSerializer):
             instance.start = validated_data['start']
             instance.end = validated_data['end']
 
-            tasks_dict = {task.id: task for task in instance.tasks.filter(deleted=False)}
+            tasks_dict = {
+                task.id: task for task in instance.tasks.filter(deleted=False)}
             for task in validated_data['tasks']:
                 if task.get('id', None):
                     task_obj = Task.objects.get(
