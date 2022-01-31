@@ -19,7 +19,8 @@ class TaskSerializer(serializers.ModelSerializer):
     class Meta:
         list_serializer_class = TaskListSerializer
         model = Task
-        fields = ('id', 'action', 'reward', 'deleted')
+        fields = ('id', 'reward', 'deleted', 'batch', 'count',
+                  'name')
         read_only_fields = ('id',)
 
     def validate(self, data):
@@ -47,7 +48,7 @@ class ProjectSerializer(serializers.ModelSerializer):
         required=False, read_only=True)
     spent = serializers.DecimalField(
         max_digits=26, decimal_places=6, required=False, read_only=True)
-    status = serializers.IntegerField()
+    status = serializers.IntegerField(required=False)
     milestones = MilestoneSerializer(many=True)
 
     class Meta:
@@ -55,7 +56,7 @@ class ProjectSerializer(serializers.ModelSerializer):
         fields = ('id', 'title', 'description', 'start', 'end',
                   'assignment_status', 'investment',
                   'facililator', 'spent', 'status', 'milestones',
-                  'fundraising_duration')
+                  'fundraising_duration', 'fac_adm_funds')
         read_only_fields = ('assignment_status', 'investment',
                             'facililator', 'spent', 'status')
 
@@ -86,72 +87,35 @@ class ProjectSerializer(serializers.ModelSerializer):
                 })
 
         with transaction.atomic():
-            total = validated_data['total']
-            milestone_rewards = validated_data['milestones_rewards']
-            milestones_batch = validated_data['milestones_batch']
-            fac_adm_funds = validated_data['fac_adm_funds']
-
-            if total != (milestone_rewards + milestones_batch + fac_adm_funds):
-                raise serializers.ValidationError({
-                    "total": "incorrect amount",
-                })
-
-            project = Project.objects.create(
+            project_obj = Project.objects.create(
                 owner=self.context['owner'],
                 title=validated_data['title'],
                 description=validated_data['description'],
                 start=validated_data['start'],
                 end=validated_data['end'],
                 fundraising_duration=validated_data['fundraising_duration'],
-                total=total,
-                milestones_rewards=milestone_rewards,
-                milestones_batch=milestones_batch,
-                fac_adm_funds=fac_adm_funds
+                fac_adm_funds=validated_data['fac_adm_funds']
             )
 
             for milestone in validated_data['milestones']:
-                tasks_total = milestone['tasks_total']
-                tasks_rewards = milestone['tasks_rewards']
-                tasks_batch = milestone['task_batch']
-
-                if tasks_total != (tasks_rewards + tasks_batch):
-                    raise serializers.ValidationError({
-                        "tasks_total": "incorrect amount"
-                    })
-
                 milestone_obj = Milestone.objects.create(
-                    project=project,
+                    project=project_obj,
                     name=milestone['name'],
-                    tasks_total=tasks_total,
-                    tasks_rewards=tasks_rewards,
-                    tasks_batch=tasks_batch
                 )
-                project.milestones.add(milestone_obj)
-
+                project_obj.milestones.add(milestone_obj)
+                
                 for task in milestone['tasks']:
-                    total = task['total']
-                    reward = task['reward']
-                    batch = task['batch']
-                    count = task['count']
-
-                    if total != (reward * count) + batch:
-                        raise serializers.ValidationError({
-                            "total": "incorrect amount"
-                        })
-
                     task_obj = Task.objects.create(
-                        project=project,
+                        project=project_obj,
                         milestone=milestone_obj,
-                        action=task['action'],
-                        reward=reward,
-                        batch=batch,
-                        count=count,
-                        total=total
+                        reward=task['reward'],
+                        batch=task['batch'],
+                        count=task['count']
                     )
-                    milestone.tasks.add(task_obj)
+                    milestone_obj.tasks.add(task_obj)
 
-            project.save()
-            return project
+            project_obj.save()
+            return project_obj
 
     def update(self, instance, validated_data):
         with transaction.atomic():

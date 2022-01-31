@@ -19,9 +19,7 @@
 <script>
 export default {
   props: {
-    value: {
-      type: String,
-    },
+    value: {},
     label: {
       type: String,
       default: "",

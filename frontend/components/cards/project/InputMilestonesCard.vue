@@ -20,7 +20,7 @@
         <MilestoneForm
           v-model="project.milestones[milestoneIndex]"
         ></MilestoneForm>
-        <v-layout column class="ml-4">
+        <v-layout column class="ml-6">
           <TaskForm
             v-for="(task, taskIndex) in milestone.tasks"
             v-model="milestone.tasks[taskIndex]"
@@ -100,8 +100,11 @@ export default {
       this.$set(milestone, "tasks", [
         ...(milestone.tasks || []),
         {
-          action: "",
+          name: "",
+          instructions: "",
+          batch: "0",
           reward: "0",
+          count: 1,
         },
       ]);
     },

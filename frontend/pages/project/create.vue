@@ -41,8 +41,11 @@ export default {
             name: "",
             tasks: [
               {
-                action: "",
+                name: "",
+                instructions: "",
+                batch: "0",
                 reward: "0",
+                count: 1
               },
             ],
           },

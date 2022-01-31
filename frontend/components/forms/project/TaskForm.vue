@@ -25,6 +25,13 @@
           v-model="task.instructions"
         ></TextAreaInput>
         <TextInput
+          label="Batch"
+          v-model="task.batch"
+          :rules="requiredRules"
+          :icon="icon"
+          required
+        ></TextInput>
+        <TextInput
           label="How much will a steward receive upon confirmation of the task?"
           v-model="task.reward"
           :rules="[...requiredRules, ...decimalRules, ...nonZeroDecimalRules]"

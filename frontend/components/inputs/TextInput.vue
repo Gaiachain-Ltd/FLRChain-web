@@ -37,9 +37,7 @@ export default {
       type: String,
       default: "",
     },
-    value: {
-      type: String,
-    },
+    value: {},
     rules: {
       type: Array,
       default: () => [],

@@ -42,16 +42,18 @@ export default {
       this.$set(this.project, "tasks", [
         ...this.project.tasks,
         {
-          action: "",
+          name: "",
+          instructions: "",
+          batch: "0",
           reward: "0",
+          count: 1,
         },
       ]);
     },
     deleteTask(index) {
       this.project.tasks.splice(index, 1);
-      this.$emit('update:project', this.project);
+      this.$emit("update:project", this.project);
       // this.$set(this.project, "tasks", this.project.tasks);
-
     },
     validate() {
       for (let index = 0; index < this.$refs.taskForms.length; index++) {

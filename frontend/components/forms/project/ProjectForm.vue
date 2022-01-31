@@ -30,12 +30,28 @@
           ></DateInput>
         </v-flex>
       </v-layout>
-      <v-layout row ma-0>
+      <v-layout>
+        <TextInput
+          label="Fundraising duration"
+          v-model="project.fundraising_duration"
+          :rules="requiredRules"
+          required
+        ></TextInput>
+      </v-layout>
+      <v-layout>
         <TextAreaInput
           label="Description"
           placeholder="Please enter project description..."
           v-model="project.description"
         ></TextAreaInput>
+      </v-layout>
+      <v-layout>
+        <TextInput
+          label="Facilitator administration funds"
+          v-model="project.fac_adm_funds"
+          :rules="requiredRules"
+          required
+        ></TextInput>
       </v-layout>
     </v-layout>
   </v-form>
@@ -57,7 +73,7 @@ export default {
   methods: {
     validate() {
       return this.$refs.form.validate();
-    }
+    },
   },
 };
 </script>

@@ -23,21 +23,11 @@ class Project(models.Model):
     description = models.TextField(blank=True, null=True)
     beneficiaries = models.ManyToManyField(
         'users.CustomUser', through='Assignment', related_name='beneficiary_list')
-    status = models.PositiveSmallIntegerField(choices=STATUSES, default=CLOSED)
+    status = models.PositiveSmallIntegerField(choices=STATUSES, default=FUNDRAISING)
     milestones = models.ManyToManyField('projects.Milestone', related_name='milestones')
     fundraising_duration = models.PositiveSmallIntegerField(default=30)
     
-    total = models.DecimalField(
-        max_digits=26, decimal_places=6, default=0)
-    milestones_rewards = models.DecimalField(
-        max_digits=26, decimal_places=6, default=0)
-    milestones_batch = models.DecimalField(
-        max_digits=26, decimal_places=6, default=0)
-    milestones_total = models.DecimalField(
-        max_digits=26, decimal_places=6, default=0)
     fac_adm_funds = models.DecimalField(
-        max_digits=26, decimal_places=6, default=0)
-    raised_total = models.DecimalField(
         max_digits=26, decimal_places=6, default=0)
 
     objects = ProjectManager.from_queryset(ProjectQuerySet)()
@@ -48,19 +38,11 @@ class Milestone(models.Model):
     name = models.CharField(max_length=255)
     tasks = models.ManyToManyField('projects.Task', related_name='tasks')
 
-    tasks_total = models.DecimalField(
-        max_digits=26, decimal_places=6, default=0)
-    tasks_rewards = models.DecimalField(
-        max_digits=26, decimal_places=6, default=0)
-    tasks_batch = models.DecimalField(
-        max_digits=26, decimal_places=6, default=0)
-
 
 class Task(models.Model):
     name = models.CharField(max_length=255)
     milestone = models.ForeignKey(Milestone, on_delete=models.CASCADE, null=True)
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
-    action = models.CharField(max_length=255)
     deleted = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
@@ -69,10 +51,7 @@ class Task(models.Model):
         max_digits=26, decimal_places=6, default=0)
     batch = models.DecimalField(
         max_digits=26, decimal_places=6, default=0)
-    count = models.DecimalField(
-        max_digits=26, decimal_places=6, default=0)
-    total = models.DecimalField(
-        max_digits=26, decimal_places=6, default=0)
+    count = models.PositiveIntegerField(default=0)
 
 
 class Assignment(models.Model):
