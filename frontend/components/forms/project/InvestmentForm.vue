@@ -22,7 +22,7 @@
       <v-flex>
         <TextInput
           label="Coins for investment*"
-          :text.sync="investment.amount"
+          v-model="investment.amount"
           :rules="[...requiredRules, ...decimalRules, ...nonZeroDecimalRules]"
           :icon="icon"
           required

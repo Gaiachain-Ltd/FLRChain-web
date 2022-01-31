@@ -4,7 +4,7 @@
       <TextInput
         label="Organization name"
         placeholder="Please enter organization name..."
-        :text.sync="organization.name"
+        v-model="organization.name"
       ></TextInput>
       <Combobox
         label="Organization type"
@@ -15,27 +15,27 @@
       <TextInput
         label="Website"
         placeholder="Please enter website..."
-        :text.sync="organization.website"
+        v-model="organization.website"
       ></TextInput>
       <TextAreaInput
         label="Mission statement"
         placeholder="Please enter mission statement..."
-        :text.sync="organization.statement"
+        v-model="organization.statement"
       ></TextAreaInput>
       <TextInput
         label="Name of principal contact"
         placeholder="Please enter name of principal contact..."
-        :text.sync="organization.principal"
+        v-model="organization.principal"
       ></TextInput>
       <TextInput
         label="Email"
         placeholder="Please enter your email address..."
-        :text.sync="organization.email"
+        v-model="organization.email"
       ></TextInput>
       <TextInput
         label="Phone"
         placeholder="Please enter your phone number..."
-        :text.sync="organization.phone"
+        v-model="organization.phone"
       ></TextInput>
     </v-layout>
   </v-form>

@@ -37,7 +37,7 @@ export default {
       type: String,
       default: "",
     },
-    text: {
+    value: {
       type: String,
     },
     rules: {
@@ -80,10 +80,10 @@ export default {
   computed: {
     internalText: {
       get() {
-        return this.text;
+        return this.value;
       },
       set(value) {
-        this.$emit("update:text", value);
+        this.$emit("input", value);
       },
     },
     internalError: {

@@ -19,6 +19,9 @@
 <script>
 export default {
   props: {
+    value: {
+      type: String,
+    },
     label: {
       type: String,
       default: "",
@@ -26,9 +29,6 @@ export default {
     placeholder: {
       type: String,
       default: "",
-    },
-    text: {
-      type: String,
     },
     password: {
       type: Boolean,
@@ -38,10 +38,10 @@ export default {
   computed: {
     internalText: {
       get() {
-        return this.text;
+        return this.value;
       },
       set(value) {
-        this.$emit("update:text", value);
+        this.$emit("input", value);
       },
     },
   },

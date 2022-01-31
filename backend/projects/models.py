@@ -57,6 +57,7 @@ class Milestone(models.Model):
 
 
 class Task(models.Model):
+    name = models.CharField(max_length=255)
     milestone = models.ForeignKey(Milestone, on_delete=models.CASCADE, null=True)
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     action = models.CharField(max_length=255)

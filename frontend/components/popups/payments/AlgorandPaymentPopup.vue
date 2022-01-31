@@ -10,7 +10,7 @@
       <v-form v-model="isValid">
         <TextInput
           :label="`Amount (max ${this.convertedMaxAmount})*`"
-          :text.sync="amount"
+          v-model="amount"
           :rules="[
             ...requiredRules,
             ...decimalRules,

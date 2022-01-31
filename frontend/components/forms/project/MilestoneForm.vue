@@ -1,7 +1,7 @@
 <template>
   <v-form>
     <v-layout column>
-      <TextInput label="Milestone name" :text.sync="milestone.name"></TextInput>
+      <TextInput label="Milestone name" v-model="milestone.name"></TextInput>
     </v-layout>
   </v-form>
 </template>

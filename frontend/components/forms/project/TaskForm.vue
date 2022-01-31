@@ -12,26 +12,31 @@
           @clicked="$emit('delete')"
         ></DefaultIconButton>
       </v-layout>
-      <v-layout ma-0>
-        <v-flex xs12 sm12 md9 shrink>
-          <TextInput
-            label="Action*"
-            :text.sync="task.action"
-            placeholder="Please enter action..."
-            :rules="requiredRules"
-            required
-          ></TextInput>
-        </v-flex>
-        <v-spacer></v-spacer>
-        <v-flex xs12 sm12 md2 shrink>
-          <TextInput
-            label="Reward*"
-            :text.sync="task.reward"
-            :rules="[...requiredRules, ...decimalRules, ...nonZeroDecimalRules]"
-            :icon="icon"
-            required
-          ></TextInput>
-        </v-flex>
+      <v-layout column>
+        <TextInput
+          label="Task name*"
+          v-model="task.name"
+          placeholder="Please enter task name..."
+          :rules="requiredRules"
+          required
+        ></TextInput>
+        <TextAreaInput
+          label="Instructions for steward"
+          v-model="task.instructions"
+        ></TextAreaInput>
+        <TextInput
+          label="How much will a steward receive upon confirmation of the task?"
+          v-model="task.reward"
+          :rules="[...requiredRules, ...decimalRules, ...nonZeroDecimalRules]"
+          :icon="icon"
+          required
+        ></TextInput>
+        <TextInput
+          label="How many times can this task be performed?"
+          v-model="task.count"
+          :rules="requiredRules"
+          required
+        ></TextInput>
       </v-layout>
     </v-layout>
   </v-form>
@@ -82,6 +87,7 @@ export default {
   components: {
     DefaultText: () => import("@/components/texts/DefaultText"),
     TextInput: () => import("@/components/inputs/TextInput"),
+    TextAreaInput: () => import("@/components/inputs/TextAreaInput"),
     DefaultIconButton: () => import("@/components/buttons/DefaultIconButton"),
   },
   methods: {

@@ -6,7 +6,7 @@
           <TextInput
             label="Project title*"
             placeholder="Please enter project name..."
-            :text.sync="project.title"
+            v-model="project.title"
             :rules="requiredRules"
             required
           ></TextInput>
@@ -34,7 +34,7 @@
         <TextAreaInput
           label="Description"
           placeholder="Please enter project description..."
-          :text.sync="project.description"
+          v-model="project.description"
         ></TextAreaInput>
       </v-layout>
     </v-layout>

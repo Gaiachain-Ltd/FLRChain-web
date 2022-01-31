@@ -5,7 +5,7 @@
         <v-layout column mt-8>
           <TextInput
             label="Email*"
-            :text.sync="username"
+            v-model="username"
             :rules="emailRules"
             :error.sync="wrongEmail"
             placeholder="Please enter your email..."
@@ -13,7 +13,7 @@
           ></TextInput>
           <TextInput
             label="Password*"
-            :text.sync="password"
+            v-model="password"
             :rules="passwordRules"
             :error.sync="wrongPassword"
             placeholder="Please enter your password..."

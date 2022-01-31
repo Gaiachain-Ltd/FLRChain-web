@@ -21,7 +21,7 @@
             xs5
             label="First name*"
             placeholder="First name..."
-            :text.sync="user.first_name"
+            v-model="user.first_name"
             :rules="firstNameRules"
             required
           ></TextInput>
@@ -30,7 +30,7 @@
             xs5
             label="Last name*"
             placeholder="Last name..."
-            :text.sync="user.last_name"
+            v-model="user.last_name"
             :rules="lastNameRules"
             required
           ></TextInput>
@@ -40,7 +40,7 @@
             xs5
             label="Email*"
             placeholder="Email..."
-            :text.sync="user.email"
+            v-model="user.email"
             :rules="emailRules"
             :error.sync="usedEmail"
             required
@@ -51,7 +51,7 @@
             xs5
             label="Password*"
             placeholder="Password..."
-            :text.sync="user.password"
+            v-model="user.password"
             :rules="passwordRules"
             :error.sync="passwordsNotTheSame"
             type="password"
@@ -62,7 +62,7 @@
             xs5
             label="Re-password*"
             placeholder="Repeat password..."
-            :text.sync="repassword"
+            v-model="repassword"
             :rules="passwordRules"
             :error.sync="passwordsNotTheSame"
             type="password"
