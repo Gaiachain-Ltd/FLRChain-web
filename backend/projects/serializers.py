@@ -40,27 +40,53 @@ class MilestoneSerializer(serializers.ModelSerializer):
 
 
 class ProjectSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(read_only=True)
+
+    action = serializers.CharField(required=False, allow_blank=True)
+    description = serializers.CharField(required=False, allow_blank=True)
+
+    image = serializers.FileField(required=False)
+    document = serializers.FileField(required=False)
+    budget = serializers.FileField(required=False)
+
+    status = serializers.IntegerField(read_only=True)
+
+    fundraising_duration = serializers.IntegerField()
     start = serializers.DateField()
     end = serializers.DateField()
-    investment = InvestmentSerializer(required=False, read_only=True)
-    assignment_status = serializers.IntegerField(required=False)
-    facililator = serializers.SerializerMethodField(
-        required=False, read_only=True)
-    spent = serializers.DecimalField(
-        max_digits=26, decimal_places=6, required=False, read_only=True)
-    status = serializers.IntegerField(required=False)
+    
     milestones = MilestoneSerializer(many=True)
+
+    fac_adm_funds = models.DecimalField(
+        max_digits=26, decimal_places=6, default=0
+    )
+
+    created = serializers.DateTimeField(read_only=True)
+
+    facilitator = serializers.SerializerMethodField(
+        required=False, read_only=True)
 
     class Meta:
         model = Project
-        fields = ('id', 'title', 'description', 'start', 'end',
-                  'assignment_status', 'investment',
-                  'facililator', 'spent', 'status', 'milestones',
-                  'fundraising_duration', 'fac_adm_funds')
-        read_only_fields = ('assignment_status', 'investment',
-                            'facililator', 'spent', 'status')
+        fields = (
+            'id', 
+            'title', 
+            'description',
+            'action',
+            'image',
+            'document',
+            'budget',
+            'status',
+            'fundraising_duration',
+            'start',
+            'end',
+            'milestones',
+            'fac_adm_funds',
+            'facilitator',
+            'created'
+        )
 
-    def get_facililator(self, obj):
+    def get_facilitator(self, obj):
         return f"{obj.owner.first_name} {obj.owner.last_name}"
 
     def validate(self, data):
