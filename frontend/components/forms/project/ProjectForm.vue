@@ -18,25 +18,24 @@
               :rules="requiredRules"
               required
             ></TextInput>
-            <TextInput
-              label="Fundraising duration"
-              v-model="project.fundraising_duration"
-              :rules="requiredRules"
-              required
-            ></TextInput>
             <v-layout>
-              <DateInput
-                label="Start of project*"
-                :text.sync="project.start"
-                :rules="[...requiredRules, ...dateRules]"
-                required
-              ></DateInput>
-              <DateInput
-                label="End of project*"
-                :text.sync="project.end"
-                :rules="[...requiredRules, ...dateRules]"
-                required
-              ></DateInput>
+              <v-flex mr-3>
+                <DateInput
+                  label="Start of project*"
+                  :text.sync="project.start"
+                  :rules="[...requiredRules, ...dateRules]"
+                  required
+                ></DateInput>
+              </v-flex>
+              <v-flex ml-3>
+                <DateInput
+                  label="End of project*"
+                  class="ml-3"
+                  :text.sync="project.end"
+                  :rules="[...requiredRules, ...dateRules]"
+                  required
+                ></DateInput>
+              </v-flex>
             </v-layout>
           </v-layout>
         </v-flex>
@@ -57,11 +56,42 @@
 
 <script>
 import ValidatorMixin from "@/validators";
+import _ from "lodash";
 
 export default {
   mixins: [ValidatorMixin],
   props: {
     project: {},
+  },
+  data() {
+    return {
+      fundraisingPeriods: [
+        { text: "1 month", value: 30 },
+        { text: "2 months", value: 60 },
+        { text: "3 months", value: 90 },
+        { text: "4 months", value: 120 },
+        { text: "5 months", value: 150 },
+        { text: "6 months", value: 180 },
+      ],
+    };
+  },
+  computed: {
+    fundraisingDuration: {
+      get() {
+        const index = _.findIndex(this.fundraisingPeriods, [
+          "value",
+          this.project.fundraising_duration,
+        ]);
+        if (index !== -1) {
+          return this.fundraisingPeriods[index];
+        } else {
+          return null;
+        }
+      },
+      set(value) {
+        this.$set(this.project, "fundraising_duration", value.value);
+      },
+    },
   },
   components: {
     DefaultText: () => import("@/components/texts/DefaultText"),
@@ -69,6 +99,7 @@ export default {
     TextAreaInput: () => import("@/components/inputs/TextAreaInput"),
     DateInput: () => import("@/components/inputs/DateInput"),
     UploadButton: () => import("@/components/buttons/UploadButton"),
+    Combobox: () => import("@/components/inputs/Combobox"),
   },
   methods: {
     validate() {

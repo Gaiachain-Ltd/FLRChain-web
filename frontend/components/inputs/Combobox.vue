@@ -42,7 +42,7 @@ export default {
         return this.value;
       },
       set(value) {
-        this.$emit("update:value", value);
+        this.$emit("input", value);
       },
     },
   },

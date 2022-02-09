@@ -9,7 +9,7 @@
       <Combobox
         label="Organization type"
         placeholder="Please select organization type..."
-        :value.sync="organizationType"
+        v-model="organizationType"
         :items="organizationTypes"
       ></Combobox>
       <TextInput
