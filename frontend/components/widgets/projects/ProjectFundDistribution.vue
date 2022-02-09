@@ -70,7 +70,7 @@ export default {
     },
     facAdmFunds() {
       return this.project.fac_adm_funds
-        ? parseFloat(this.project.fac_adm_funds).toFixed(2)
+        ? parseFloat(this.project.fac_adm_funds)
         : 0;
     },
     sum() {
@@ -80,19 +80,19 @@ export default {
       if (!this.rewards) {
         return 0;
       }
-      return (this.rewards * 100) / this.sum;
+      return ((this.rewards * 100) / this.sum).toFixed(2);
     },
     batchesShare() {
       if (!this.batches) {
         return 0;
       }
-      return (this.batches * 100) / this.sum;
+      return ((this.batches * 100) / this.sum).toFixed(2);
     },
     facAdmFundsShare() {
       if (!this.facAdmFunds) {
         return 0;
       }
-      return (this.facAdmFunds * 100) / this.sum;
+      return ((this.facAdmFunds * 100) / this.sum).toFixed(2);
     },
   },
   components: {

@@ -15,6 +15,10 @@
         </v-flex>
         <v-layout column>
           <InputMilestonesCard :project.sync="project"></InputMilestonesCard>
+          <InputBudgetCard
+            :project.sync="project"
+            class="mt-6"
+          ></InputBudgetCard>
         </v-layout>
       </v-layout>
     </v-layout>
@@ -37,6 +41,7 @@ export default {
       import("@/components/widgets/projects/ProjectStructure"),
     ProjectFundDistribution: () =>
       import("@/components/widgets/projects/ProjectFundDistribution"),
+    InputBudgetCard: () => import("@/components/cards/project/InputBudgetCard"),
   },
   methods: {
     validate() {
