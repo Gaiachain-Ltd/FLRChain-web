@@ -1,5 +1,5 @@
 <template>
-  <v-layout column class="wrapper pa-3">
+  <v-layout column class="border-wrapper pa-3">
     <ProjectFundDistributionDelegate
       name="Tasks"
       :color="$vuetify.theme.themes.light.success"
@@ -102,13 +102,7 @@ export default {
 };
 </script>
 
-<style scoped lang="scss">
-.wrapper {
-  border-color: #dce0e7;
-  border-style: solid;
-  border-width: 1px;
-  border-radius: 10px;
-}
+<style scoped>
 .share {
   height: 18px;
 }

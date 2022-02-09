@@ -4,6 +4,7 @@
       column
       v-for="(milestone, milestoneIndex) in project.milestones"
       :key="milestoneIndex"
+      class="border-wrapper pa-3"
     >
       <v-layout ma-0 mb-3 justify-center>
         <DefaultText :color="$vuetify.theme.themes.light.primary">{{
@@ -20,30 +21,35 @@
         <MilestoneForm
           v-model="project.milestones[milestoneIndex]"
         ></MilestoneForm>
-        <v-layout column class="ml-6">
-          <TaskForm
+        <v-layout column class="border-wrapper pa-3">
+          <v-layout
+            column
             v-for="(task, taskIndex) in milestone.tasks"
-            v-model="milestone.tasks[taskIndex]"
             :key="taskIndex"
-            :index="taskIndex"
-            :milestoneIndex="milestoneIndex + 1"
-            :showDeleteBtn="milestone.tasks.length > 1"
-            @delete="() => onDeleteTask(milestone, taskIndex)"
-          ></TaskForm>
-        </v-layout>
-        <v-layout justify-center class="my-3">
-          <DefaultIconButton
-            :config="addTaskBtnConfig"
-            @clicked="() => onAddTask(milestone)"
-          ></DefaultIconButton>
+          >
+            <TaskForm
+              v-model="milestone.tasks[taskIndex]"
+              :index="taskIndex"
+              :milestoneIndex="milestoneIndex + 1"
+              :showDeleteBtn="milestone.tasks.length > 1"
+              @delete="() => onDeleteTask(milestone, taskIndex)"
+            ></TaskForm>
+            <v-divider class="mb-4"></v-divider>
+          </v-layout>
+          <v-layout justify-center class="my-3">
+            <DefaultIconButton
+              :config="addTaskBtnConfig"
+              @clicked="() => onAddTask(milestone)"
+            ></DefaultIconButton>
+          </v-layout>
         </v-layout>
       </v-layout>
-    </v-layout>
-    <v-layout justify-center class="my-3">
-      <DefaultIconButton
-        :config="addMilestoneBtnConfig"
-        @clicked="onAddMilestone"
-      ></DefaultIconButton>
+      <v-layout justify-center class="mb-3 mt-6">
+        <DefaultIconButton
+          :config="addMilestoneBtnConfig"
+          @clicked="onAddMilestone"
+        ></DefaultIconButton>
+      </v-layout>
     </v-layout>
   </v-layout>
 </template>
@@ -117,3 +123,6 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+</style>

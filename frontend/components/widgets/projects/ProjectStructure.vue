@@ -1,5 +1,5 @@
 <template>
-  <v-layout column shrink class="wrapper px-3 pt-3">
+  <v-layout column shrink class="border-wrapper px-3 pt-3">
     <v-layout
       column
       shrink
@@ -40,12 +40,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-.wrapper {
-  border-color: #DCE0E7;
-  border-style: solid;
-  border-width: 1px;
-  border-radius: 10px;
-}
-</style>
