@@ -2,11 +2,16 @@
   <DefaultCardWithTitle title="New project:">
     <v-layout column>
       <ProjectForm ref="projectForm" :project.sync="project"></ProjectForm>
-
       <DefaultText>{{ `Milestones & Tasks` }}</DefaultText>
       <v-layout>
         <v-flex xs2>
-          <ProjectStructure :project="project" class="mr-6"></ProjectStructure>
+          <v-layout column class="mr-6">
+            <ProjectStructure :project="project"></ProjectStructure>
+            <ProjectFundDistribution
+              class="mt-3"
+              :project="project"
+            ></ProjectFundDistribution>
+          </v-layout>
         </v-flex>
         <v-layout column>
           <InputMilestonesCard :project.sync="project"></InputMilestonesCard>
@@ -30,6 +35,8 @@ export default {
       import("@/components/cards/project/InputMilestonesCard"),
     ProjectStructure: () =>
       import("@/components/widgets/projects/ProjectStructure"),
+    ProjectFundDistribution: () =>
+      import("@/components/widgets/projects/ProjectFundDistribution"),
   },
   methods: {
     validate() {
