@@ -3,7 +3,8 @@ from algosdk.v2client import *
 from algosdk.future import *
 from algosdk.logic import *
 from pyteal import *
-from algorand.utils import CLIENT, wait_for_confirmation, prepare_transfer_algos
+from algorand.utils import (CLIENT, wait_for_confirmation, prepare_transfer_algos,
+                            prepare_transfer_assets, sign_send_atomic_trasfer)
 from django.conf import settings
 
 
@@ -14,50 +15,51 @@ def approval_program():
     G_START_KEY = Bytes("start")
     G_END_KEY = Bytes("end")
     G_ADM_KEY = Bytes("adm")
-    
+
     L_TOTAL_KEY = Bytes("total")
     L_ROLE_KEY = Bytes("role")
     L_JOIN_KEY = Bytes("join")
     L_COUNT_KEY = Bytes("count")
     L_BALANCE_KEY = Bytes("balance")
-    
+
     INITIAL_STATUS = Int(0)
     INITIALIZED_STATUS = Int(1)
     STARTED_STATUS = Int(2)
     FINISHED_STATUS = Int(3)
-    
+
     FACILILTATOR_ROLE = Int(1)
     INVESTOR_ROLE = Int(2)
     BENEFICIARY_ROLE = Int(3)
-    
+
     ACCEPTED_JOIN = Int(1)
     REJECTED_JOIN = Int(2)
-    
+
     ACCEPTED_VERIFY = Int(1)
     REJECTED_VERIFY = Int(2)
-    
+
     is_initialized = App.globalGet(G_STATUS_KEY) == INITIALIZED_STATUS
-    
+
     is_started = App.globalGet(G_STATUS_KEY) == STARTED_STATUS
-    
+
     is_facilitator = Global.creator_address() == Txn.sender()
-    
+
     is_opted_in = App.localGet(Txn.sender(), L_ROLE_KEY) != Int(0)
-    
+
     is_beneficiary = App.localGet(Txn.sender(), L_ROLE_KEY) == BENEFICIARY_ROLE
-    
+
     is_investor = App.localGet(Txn.sender(), L_ROLE_KEY) == INVESTOR_ROLE
-    
+
     @Subroutine(TealType.uint64)
     def is_accepted(account):
         return App.localGet(account, L_JOIN_KEY) == ACCEPTED_JOIN
-    
+
     @Subroutine(TealType.none)
     def set_project_properties():
         return Seq([
             Assert(
                 And(
-                    Btoi(Txn.application_args[1]) < Btoi(Txn.application_args[2]),
+                    Btoi(Txn.application_args[1]) < Btoi(
+                        Txn.application_args[2]),
                     Btoi(Txn.application_args[2]) > Global.latest_timestamp()
                 )
             ),
@@ -65,54 +67,54 @@ def approval_program():
             App.globalPut(G_END_KEY, Btoi(Txn.application_args[2])),
             App.globalPut(G_ADM_KEY, Btoi(Txn.application_args[3])),
         ])
-    
+
     @Subroutine(TealType.uint64)
     def facilitator_adm_fee_withdraw():
         return Minus(
-           App.globalGet(G_ADM_KEY),
-           App.localGet(Txn.sender(), L_TOTAL_KEY)
+            App.globalGet(G_ADM_KEY),
+            App.localGet(Txn.sender(), L_TOTAL_KEY)
         )
-    
+
     @Subroutine(TealType.uint64)
     def investor_withdraw(project_balance):
         return Mul(
-           Div(
-               App.localGet(Txn.sender(), L_TOTAL_KEY),
-               Minus(
-                   App.globalGet(G_TOTAL_KEY),
-                   App.globalGet(G_ADM_KEY)
-               )
-           ),
-           project_balance
-       )
-    
+            Div(
+                App.localGet(Txn.sender(), L_TOTAL_KEY),
+                Minus(
+                    App.globalGet(G_TOTAL_KEY),
+                    App.globalGet(G_ADM_KEY)
+                )
+            ),
+            project_balance
+        )
+
     on_init = Seq([
         Assert(Not(is_initialized)),
         InnerTxnBuilder.Begin(),
         InnerTxnBuilder.SetFields({
-           TxnField.type_enum: TxnType.AssetTransfer,
-           TxnField.xfer_asset: Txn.assets[0],
-           TxnField.asset_receiver: Global.current_application_address(),
-           TxnField.asset_amount: Int(0),
-       }),
-       InnerTxnBuilder.Submit(),
-       App.globalPut(G_STATUS_KEY, INITIALIZED_STATUS),
-       Approve()
+            TxnField.type_enum: TxnType.AssetTransfer,
+            TxnField.xfer_asset: Txn.assets[0],
+            TxnField.asset_receiver: Global.current_application_address(),
+            TxnField.asset_amount: Int(0),
+        }),
+        InnerTxnBuilder.Submit(),
+        App.globalPut(G_STATUS_KEY, INITIALIZED_STATUS),
+        Approve()
     ])
-    
+
     on_invest = Seq([
         Assert(Or(is_initialized, is_started)),
         Assert(is_investor),
         Assert(
             And(
-                Global.group_size() == Int(2),
-                Gtxn[1].type_enum() == TxnType.AssetTransfer,
-                Gtxn[1].xfer_asset() == Txn.assets[0],
-                Gtxn[1].asset_receiver() == Global.current_application_address()
+                Global.group_size() == Int(3),
+                Gtxn[2].type_enum() == TxnType.AssetTransfer,
+                Gtxn[2].xfer_asset() == Txn.assets[0],
+                Gtxn[2].asset_receiver() == Global.current_application_address()
             )
         ),
         If(App.localGet(Txn.sender(), L_TOTAL_KEY) == Int(0)).
-        Then(        
+        Then(
             App.globalPut(
                 G_COUNT_KEY,
                 Add(
@@ -122,23 +124,23 @@ def approval_program():
             )
         ),
         App.localPut(
-            Txn.sender(), 
-            L_TOTAL_KEY, 
+            Txn.sender(),
+            L_TOTAL_KEY,
             Add(
                 App.localGet(Txn.sender(), L_TOTAL_KEY),
-                Gtxn[1].asset_amount()
+                Gtxn[2].asset_amount()
             )
         ),
         App.globalPut(
             G_TOTAL_KEY,
             Add(
                 App.globalGet(G_TOTAL_KEY),
-                Gtxn[1].asset_amount()
+                Gtxn[2].asset_amount()
             )
         ),
         Approve()
     ])
-    
+
     on_join = Seq([
         Assert(Or(is_initialized, is_started)),
         Assert(is_facilitator),
@@ -148,25 +150,26 @@ def approval_program():
                 Btoi(Txn.application_args[1]) == REJECTED_JOIN
             )
         ),
-        App.localPut(Txn.accounts[1], L_JOIN_KEY, Btoi(Txn.application_args[1])),
+        App.localPut(Txn.accounts[1], L_JOIN_KEY,
+                     Btoi(Txn.application_args[1])),
         Approve()
     ])
-    
+
     on_work = Seq([
         Assert(Or(is_initialized, is_started)),
         Assert(is_beneficiary),
         Assert(is_accepted(Txn.sender())),
         App.localPut(
-            Txn.sender(), 
-            L_TOTAL_KEY, 
+            Txn.sender(),
+            L_TOTAL_KEY,
             Add(
                 App.localGet(Txn.sender(), L_TOTAL_KEY),
                 Btoi(Txn.application_args[1])
             )
         ),
         App.localPut(
-            Txn.sender(), 
-            L_COUNT_KEY, 
+            Txn.sender(),
+            L_COUNT_KEY,
             Add(
                 App.localGet(Txn.sender(), L_COUNT_KEY),
                 Int(1)
@@ -174,7 +177,7 @@ def approval_program():
         ),
         Approve()
     ])
-    
+
     # TODO: Checks
     on_verify = Seq([
         Assert(Or(is_initialized, is_started)),
@@ -214,22 +217,22 @@ def approval_program():
                 ),
                 InnerTxnBuilder.Begin(),
                 InnerTxnBuilder.SetFields({
-                   TxnField.type_enum: TxnType.AssetTransfer,
-                   TxnField.xfer_asset: Txn.assets[0],
-                   TxnField.asset_receiver: Txn.accounts[1],
-                   TxnField.asset_amount: Btoi(Txn.application_args[2]),
-               }),
-               InnerTxnBuilder.Submit(),
+                    TxnField.type_enum: TxnType.AssetTransfer,
+                    TxnField.xfer_asset: Txn.assets[0],
+                    TxnField.asset_receiver: Txn.accounts[1],
+                    TxnField.asset_amount: Btoi(Txn.application_args[2]),
+                }),
+                InnerTxnBuilder.Submit(),
             ])
         ),
         Approve()
     ])
-    
+
     app_balance = AssetHolding.balance(
-       Global.current_application_address(),
-       Txn.assets[0]
-   )
-    
+        Global.current_application_address(),
+        Txn.assets[0]
+    )
+
     on_withdraw = Seq([
         Assert(
             Or(
@@ -244,16 +247,16 @@ def approval_program():
                 Assert(facilitator_adm_fee_withdraw() > Int(0)),
                 InnerTxnBuilder.Begin(),
                 InnerTxnBuilder.SetFields({
-                   TxnField.type_enum: TxnType.AssetTransfer,
-                   TxnField.xfer_asset: Txn.assets[0],
-                   TxnField.asset_receiver: Txn.sender(),
-                   TxnField.asset_amount: facilitator_adm_fee_withdraw()
-               }),
-               InnerTxnBuilder.Submit(),
-               App.localPut(Txn.sender(), L_TOTAL_KEY, Add(
-                   App.localGet(Txn.sender(), L_TOTAL_KEY),
-                   facilitator_adm_fee_withdraw()
-               ))
+                    TxnField.type_enum: TxnType.AssetTransfer,
+                    TxnField.xfer_asset: Txn.assets[0],
+                    TxnField.asset_receiver: Txn.sender(),
+                    TxnField.asset_amount: facilitator_adm_fee_withdraw()
+                }),
+                InnerTxnBuilder.Submit(),
+                App.localPut(Txn.sender(), L_TOTAL_KEY, Add(
+                    App.localGet(Txn.sender(), L_TOTAL_KEY),
+                    facilitator_adm_fee_withdraw()
+                ))
             ])
         ).
         ElseIf(is_investor).
@@ -263,19 +266,19 @@ def approval_program():
                 Assert(investor_withdraw(app_balance.value()) > Int(0)),
                 InnerTxnBuilder.Begin(),
                 InnerTxnBuilder.SetFields({
-                   TxnField.type_enum: TxnType.AssetTransfer,
-                   TxnField.xfer_asset: Txn.assets[0],
-                   TxnField.asset_receiver: Txn.sender(),
-                   TxnField.asset_amount: investor_withdraw(app_balance.value()),
-               }),
-               InnerTxnBuilder.Submit(),
-               App.localPut(Txn.sender(), L_COUNT_KEY, Int(1))
+                    TxnField.type_enum: TxnType.AssetTransfer,
+                    TxnField.xfer_asset: Txn.assets[0],
+                    TxnField.asset_receiver: Txn.sender(),
+                    TxnField.asset_amount: investor_withdraw(app_balance.value()),
+                }),
+                InnerTxnBuilder.Submit(),
+                App.localPut(Txn.sender(), L_COUNT_KEY, Int(1))
             ])
         ).
         Else(Reject()),
         Approve()
     ])
-    
+
     on_start = Seq([
         Assert(is_initialized),
         Assert(is_facilitator),
@@ -283,7 +286,7 @@ def approval_program():
         set_project_properties(),
         Approve()
     ])
-    
+
     on_update = Seq([
         Assert(is_started),
         Assert(is_facilitator),
@@ -291,22 +294,22 @@ def approval_program():
         App.globalPut(G_STATUS_KEY, Txn.application_args[4]),
         Approve()
     ])
-    
+
     on_batch = Seq([
         Assert(is_started),
         Assert(is_facilitator),
         Assert(App.localGet(Txn.accounts[1], L_ROLE_KEY) == BENEFICIARY_ROLE),
         InnerTxnBuilder.Begin(),
         InnerTxnBuilder.SetFields({
-           TxnField.type_enum: TxnType.AssetTransfer,
-           TxnField.xfer_asset: Txn.assets[0],
-           TxnField.asset_receiver: Txn.accounts[1],
-           TxnField.asset_amount: Btoi(Txn.application_args[2]),
-       }),
-       InnerTxnBuilder.Submit(),
-       Approve()
+            TxnField.type_enum: TxnType.AssetTransfer,
+            TxnField.xfer_asset: Txn.assets[0],
+            TxnField.asset_receiver: Txn.accounts[1],
+            TxnField.asset_amount: Btoi(Txn.application_args[2]),
+        }),
+        InnerTxnBuilder.Submit(),
+        Approve()
     ])
-    
+
     handle_noop = Cond(
         [Txn.application_args[0] == Bytes("INIT"), on_init],
         [Txn.application_args[0] == Bytes("INVEST"), on_invest],
@@ -318,17 +321,17 @@ def approval_program():
         [Txn.application_args[0] == Bytes("UPDATE"), on_update],
         [Txn.application_args[0] == Bytes("BATCH"), on_batch],
     )
-    
+
     handle_delete = Seq([
         Assert(is_facilitator),
         Approve()
     ])
-    
+
     handle_update = Seq([
         Assert(is_facilitator),
         Approve()
     ])
-    
+
     handle_optin = Seq([
         Assert(Or(is_initialized, is_started)),
         Assert(Not(is_opted_in)),
@@ -337,18 +340,20 @@ def approval_program():
     ])
 
     program = Cond(
-       [Txn.application_id() == Int(0), Approve()],
-       [Txn.on_completion() == OnComplete.OptIn, handle_optin],
-       [Txn.on_completion() == OnComplete.CloseOut, Reject()],
-       [Txn.on_completion() == OnComplete.UpdateApplication, handle_delete],
-       [Txn.on_completion() == OnComplete.DeleteApplication, handle_update],
-       [Txn.on_completion() == OnComplete.NoOp, handle_noop]
+        [Txn.application_id() == Int(0), Approve()],
+        [Txn.on_completion() == OnComplete.OptIn, handle_optin],
+        [Txn.on_completion() == OnComplete.CloseOut, Reject()],
+        [Txn.on_completion() == OnComplete.UpdateApplication, handle_delete],
+        [Txn.on_completion() == OnComplete.DeleteApplication, handle_update],
+        [Txn.on_completion() == OnComplete.NoOp, handle_noop]
     )
     return compileTeal(program, Mode.Application, version=5)
+
 
 def clear_program():
     program = Return(Int(1))
     return compileTeal(program, Mode.Application, version=5)
+
 
 def create(creator_address, creator_pk):
     approval_compiled = CLIENT.compile(approval_program())
@@ -359,7 +364,7 @@ def create(creator_address, creator_pk):
 
     local_ints = 5
     local_bytes = 0
-    global_ints = 6 
+    global_ints = 6
     global_bytes = 0
     global_schema = transaction.StateSchema(global_ints, global_bytes)
     local_schema = transaction.StateSchema(local_ints, local_bytes)
@@ -369,9 +374,9 @@ def create(creator_address, creator_pk):
     params = CLIENT.suggested_params()
 
     txn = transaction.ApplicationCreateTxn(
-        creator_address, 
-        params, 
-        on_complete, 
+        creator_address,
+        params,
+        on_complete,
         approval_compiled_decoded,
         clear_compiled_decoded,
         global_schema,
@@ -384,7 +389,8 @@ def create(creator_address, creator_pk):
     app_id = wait_for_confirmation(txn_id)['application-index']
     return app_id
 
-def initialize(creator_address, creator_pk, app_id):
+
+def initialize(creator_address, creator_priv_key, app_id):
     params = CLIENT.suggested_params()
     app_address = get_application_address(app_id)
 
@@ -394,18 +400,41 @@ def initialize(creator_address, creator_pk, app_id):
         settings.ALGO_OPT_IN_AMOUNT
     )
     txn2 = transaction.ApplicationNoOpTxn(
-        creator_address, 
-        params, 
-        app_id, 
-        ["INIT"], 
+        creator_address,
+        params,
+        app_id,
+        ["INIT"],
         foreign_assets=[settings.ALGO_ASSET]
     )
 
-    txn1, txn2 = transaction.assign_group_id([txn1, txn2])
-
-    txn1_signed = txn1.sign(creator_pk)
-    txn2_signed = txn2.sign(creator_pk)
-
-    txn_id = CLIENT.send_transactions([txn1_signed, txn2_signed])
+    txn_id = sign_send_atomic_trasfer(creator_priv_key, [txn1, txn2])
     wait_for_confirmation(txn_id)
 
+
+def opt_in(address, app_id, role):
+    params = CLIENT.suggested_params()
+    txn = transaction.ApplicationOptInTxn(address, params, app_id, [role])
+    return txn
+
+
+def invest(address, priv_key, app_id, amount, asset=settings.ALGO_ASSET):
+    params = CLIENT.suggested_params()
+    app_address = get_application_address(app_id)
+
+    txn1 = opt_in(address, app_id, 2)
+    txn2 = transaction.ApplicationNoOpTxn(
+        address,
+        params,
+        app_id,
+        ["INVEST"],
+        foreign_assets=[asset]
+    )
+    txn3, _ = prepare_transfer_assets(
+        address,
+        app_address,
+        amount,
+        asset=asset
+    )
+    
+    txn_id = sign_send_atomic_trasfer(priv_key, [txn1, txn2, txn3])
+    wait_for_confirmation(txn_id)

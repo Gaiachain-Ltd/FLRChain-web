@@ -179,11 +179,11 @@ CELERY_BROKER_URL = "redis://redis:6379"
 CELERY_RESULT_BACKEND = "redis://redis:6379"
 CELERY_BEAT_SCHEDULE = {
     "create_project_smart_contract": {
-        "task": "projects.tasks.create_project_smart_contract",
+        "task": "projects.tasks.create_project",
         "schedule": crontab(minute="*/1")
     },
     "initialize_project_smart_contract": {
-        "task": "projects.tasks.initialize_project_smart_contract",
+        "task": "projects.tasks.initialize_project",
         "schedule": crontab(minute="*/1")
     }
     # "transfer_back_funds": {

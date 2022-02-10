@@ -7,10 +7,10 @@ from transactions.models import Transaction
 
 # source: https://tech.serhatteker.com/post/2020-01/email-as-username-django/
 class CustomUser(AbstractUser):
-    BENEFICIARY = 0
+    ADMINISTRATOR = 0
     FACILITATOR = 1
     INVESTOR = 2
-    ADMINISTRATOR = 3
+    BENEFICIARY = 3
 
     USER_TYPES = (
         (BENEFICIARY, "Beneficiary"),

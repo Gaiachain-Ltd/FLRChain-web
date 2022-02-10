@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 
 @shared_task()
-def create_project_smart_contract():
+def create_project():
     projects = Project.objects.filter(
         state=Project.INITIAL, 
         status=Project.FUNDRAISING
@@ -33,7 +33,7 @@ def create_project_smart_contract():
 
 
 @shared_task()
-def initialize_project_smart_contract():
+def initialize_project():
     projects = Project.objects.filter(
         state=Project.CREATED, 
         status=Project.FUNDRAISING
@@ -48,3 +48,10 @@ def initialize_project_smart_contract():
         project.state = Project.INITIALIZED
         project.save()
         
+@shared_task()
+def start_project():
+    projects = Project.objects.filter(
+        state=Project.INITIALIZED, 
+        status=Project.FUNDRAISING
+    )
+    

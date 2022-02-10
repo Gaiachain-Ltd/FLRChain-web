@@ -11,6 +11,7 @@ from django.db import transaction
 from smart_contracts.models import SmartContract
 from users.permissions import isInvestor, isOptedIn
 from rest_framework.permissions import IsAuthenticated
+from algorand.smartcontract import invest
 
 
 class InvestmentView(CommonView):
@@ -22,31 +23,46 @@ class InvestmentView(CommonView):
         request_body=InvestmentSerializer,
         tags=['investor'])
     def create(self, request, pk=None):
-        with transaction.atomic():
-            serializer = self.serializer_class(data=request.data)
-            serializer.is_valid(raise_exception=True)
+        project = get_object_or_404(
+            Project, 
+            pk=pk,
+            status=Project.FUNDRAISING,
+            state__in=(Project.INITIALIZED, Project.POSTPONED)
+        )
+        account = request.user.account
+        invest(
+            account.address, 
+            account.private_key, 
+            project.app_id, 
+            int(request.data.get('amount'))
+        )
 
-            start = serializer.validated_data['start']
-            end = serializer.validated_data['end']
+        
+        # with transaction.atomic():
+        #     serializer = self.serializer_class(data=request.data)
+        #     serializer.is_valid(raise_exception=True)
 
-            project = get_object_or_404(
-                Project, 
-                pk=pk, 
-                investment=None,
-                start__lte=start,
-                end__gte=end)
+        #     start = serializer.validated_data['start']
+        #     end = serializer.validated_data['end']
 
-            investment = Investment.objects.create(
-                project=project,
-                investor=request.user,
-                amount=serializer.validated_data['amount'],
-                start=start,
-                end=end)
+        #     project = get_object_or_404(
+        #         Project, 
+        #         pk=pk, 
+        #         investment=None,
+        #         start__lte=start,
+        #         end__gte=end)
 
-            SmartContract.generate(investment)
+        #     investment = Investment.objects.create(
+        #         project=project,
+        #         investor=request.user,
+        #         amount=serializer.validated_data['amount'],
+        #         start=start,
+        #         end=end)
 
-            serializer = self.serializer_class(investment)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        #     SmartContract.generate(investment)
+
+        #     serializer = self.serializer_class(investment)
+        return Response(status=status.HTTP_201_CREATED)
         
     @swagger_auto_schema(
         operation_summary="Investment details",

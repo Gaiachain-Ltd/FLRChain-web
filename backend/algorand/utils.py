@@ -174,6 +174,13 @@ def prepare_transfer_assets(
     fee = (_params.min_fee if _params.fee == 0 else _params.fee) / 1000000
     return atxn, fee
 
+def sign_send_atomic_trasfer(private_key, txns):
+    grouped_txns = assign_group_id(txns)
+    signed_txns = list()
+    for gt in grouped_txns:
+        signed_txns.append(gt.sign(private_key))
+
+    return CLIENT.send_transactions(signed_txns)
 
 def atomic_transfer(txns):
     gtxn = calculate_group_id([txn[0] for txn in txns])
