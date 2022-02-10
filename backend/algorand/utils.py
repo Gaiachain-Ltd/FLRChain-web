@@ -5,7 +5,7 @@ import accounts
 from django.conf import settings
 from algosdk.v2client import *
 from algosdk import account
-from algosdk.future.transaction import PaymentTxn, AssetTransferTxn, calculate_group_id
+from algosdk.future.transaction import * 
 from decimal import *
 
 
@@ -91,7 +91,7 @@ def wait_for_confirmation(transaction_id, timeout=1000):
         except Exception:
             return False
         if pending_txn.get("confirmed-round", 0) > 0:
-            return True
+            return pending_txn
         elif pending_txn["pool-error"]:  
             return False
         CLIENT.status_after_block(current_round)                   
@@ -103,10 +103,7 @@ def transfer_algos(sender, receiver, amount, close_remainder_to=None):
     _params = params()
     txn = PaymentTxn(sender.address, _params, receiver.address, int(amount * 1000000),
                      close_remainder_to=close_remainder_to.address if close_remainder_to else None)
-    if sender.type == accounts.models.Account.SMART_CONTRACT_ACCOUNT:
-        signed_txn = sender.smart_contract.sign(txn)
-    else:
-        signed_txn = txn.sign(sender.private_key)
+    signed_txn = txn.sign(sender.private_key)
     fee = (_params.min_fee if _params.fee == 0 else _params.fee) / 1000000
     return CLIENT.send_transaction(signed_txn), fee
 
@@ -116,28 +113,64 @@ def transfer_assets(sender, receiver, amount,
     _params = params()
     atxn = AssetTransferTxn(sender.address, _params, receiver.address, int(amount * 1000000), asset, 
                             close_assets_to=close_assets_to.address if close_assets_to else None)
-    if sender.type == accounts.models.Account.SMART_CONTRACT_ACCOUNT:
-        signed_atxn = sender.smart_contract.sign(atxn)
-    else:
-        signed_atxn = atxn.sign(sender.private_key)
+    signed_atxn = atxn.sign(sender.private_key)
     fee = (_params.min_fee if _params.fee == 0 else _params.fee) / 1000000
     return CLIENT.send_transaction(signed_atxn), fee
 
 
-def prepare_transfer_algos(sender, receiver, amount, 
-                          close_remainder_to=None):
+def prepare_transfer_algos(
+    sender, 
+    receiver, 
+    amount, 
+    close_remainder_to=None
+):
+    if isinstance(sender, str):
+        snd = sender
+    else:
+        snd = sender.address
+
+    if isinstance(receiver, str):
+        rec = receiver
+    else:
+        rec = receiver.address
+
     _params = params()
-    txn = PaymentTxn(sender.address, _params, receiver.address, int(amount * 1000000),
-                     close_remainder_to=close_remainder_to.address if close_remainder_to else None)
+    txn = PaymentTxn(
+        snd, 
+        _params, 
+        rec, 
+        int(amount * 1000000),
+        close_remainder_to=close_remainder_to.address if close_remainder_to else None
+    )
     fee = (_params.min_fee if _params.fee == 0 else _params.fee) / 1000000
     return txn, fee
 
 
-def prepare_transfer_assets(sender, receiver, amount, 
-                    asset=settings.ALGO_ASSET, close_assets_to=None):
+def prepare_transfer_assets(
+    sender, 
+    receiver, 
+    amount, 
+    asset=settings.ALGO_ASSET, close_assets_to=None
+):
+    if isinstance(sender, str):
+        snd = sender
+    else:
+        snd = sender.address
+
+    if isinstance(receiver, str):
+        rec = receiver
+    else:
+        rec = receiver.address
+
     _params = params()
-    atxn = AssetTransferTxn(sender.address, _params, receiver.address, int(amount * 1000000), asset, 
-                            close_assets_to=close_assets_to.address if close_assets_to else None)
+    atxn = AssetTransferTxn(
+        snd, 
+        _params, 
+        rec, 
+        int(amount * 1000000), 
+        asset, 
+        close_assets_to=close_assets_to.address if close_assets_to else None
+    )
     fee = (_params.min_fee if _params.fee == 0 else _params.fee) / 1000000
     return atxn, fee
 
@@ -149,12 +182,8 @@ def atomic_transfer(txns):
     for txn in txns:
         txn[0].group = gtxn
         
-        if txn[1].from_account.type == accounts.models.Account.SMART_CONTRACT_ACCOUNT:
-            signed = txn[1].from_account.smart_contract.sign(txn[0])
-            sgtxns.append(signed)
-        else:
-            signed = txn[0].sign(txn[1].from_account.private_key)
-            sgtxns.append(signed)
+        signed = txn[0].sign(txn[1].from_account.private_key)
+        sgtxns.append(signed)
 
         txn[1].txid = signed.get_txid()
         

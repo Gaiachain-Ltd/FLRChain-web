@@ -145,14 +145,14 @@ class Transaction(models.Model):
                 return t.txid
 
     @staticmethod
-    def opt_in(to_account, from_account, chain=[]):
+    def opt_in(to_account, from_account, chain=[], initial_amount=settings.ALGO_OPT_IN_AMOUNT):
         txns = list()
 
         # Opt-In Algos
         txns.append(Transaction.prepare_transfer(
             from_account,
             to_account,
-            settings.ALGO_OPT_IN_AMOUNT,
+            initial_amount,
             action=Transaction.OPT_IN))
 
         # Opt-In USDC

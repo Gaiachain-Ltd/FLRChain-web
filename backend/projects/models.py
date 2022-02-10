@@ -19,6 +19,24 @@ class Project(models.Model):
         (CLOSED, "Closed")
     )
 
+    INITIAL = 0
+    CREATED = 1
+    INITIALIZED = 2
+    POSTPONED = 3
+    STARTED = 4
+    FINISHED = 5
+    DELETED = 6
+
+    STATES = (
+        (INITIAL, "Initial"),
+        (CREATED, "Created"),
+        (INITIALIZED, "Initialized"),
+        (POSTPONED, "Postponed"),
+        (STARTED, "Started"),
+        (FINISHED, "Finished"),
+        (DELETED, "Deleted")
+    )
+
     owner = models.ForeignKey(
         'users.CustomUser', on_delete=models.CASCADE)
 
@@ -31,8 +49,8 @@ class Project(models.Model):
     budget = models.FileField(upload_to=upload_project_document, null=True)
 
     status = models.PositiveSmallIntegerField(choices=STATUSES, default=FUNDRAISING)
+    state = models.PositiveSmallIntegerField(choices=STATES, default=INITIAL)
 
-    fundraising_duration = models.PositiveSmallIntegerField(default=30)
     start = models.DateField()
     end = models.DateField()
 
@@ -46,6 +64,8 @@ class Project(models.Model):
     
     fac_adm_funds = models.DecimalField(
         max_digits=26, decimal_places=6, default=0)
+
+    app_id = models.IntegerField(null=True)
 
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)

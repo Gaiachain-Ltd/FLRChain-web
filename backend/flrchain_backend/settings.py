@@ -178,30 +178,38 @@ REST_FRAMEWORK = {
 CELERY_BROKER_URL = "redis://redis:6379"
 CELERY_RESULT_BACKEND = "redis://redis:6379"
 CELERY_BEAT_SCHEDULE = {
-    "transfer_back_funds": {
-        "task": "accounts.tasks.transfer_back_funds",
+    "create_project_smart_contract": {
+        "task": "projects.tasks.create_project_smart_contract",
         "schedule": crontab(minute="*/1")
     },
-    "finish_investment": {
-        "task": "investments.tasks.finish_investment",
-        "schedule": crontab(minute="*/1")
-    },
-    "verify_transactions": {
-        "task": "transactions.tasks.verify_transactions",
-        "schedule": crontab(minute="*/1")
-    },
-    "check_payment_status": {
-        "task": "payments.tasks.check_payment_status",
-        "schedule": crontab(minute="*/1")
-    },
-    "check_transfer_status": {
-        "task": "payments.tasks.check_transfer_status",
-        "schedule": crontab(minute="*/1")
-    },
-    "process_payouts": {
-        "task": "payments.tasks.process_payouts",
+    "initialize_project_smart_contract": {
+        "task": "projects.tasks.initialize_project_smart_contract",
         "schedule": crontab(minute="*/1")
     }
+    # "transfer_back_funds": {
+    #     "task": "accounts.tasks.transfer_back_funds",
+    #     "schedule": crontab(minute="*/1")
+    # },
+    # "finish_investment": {
+    #     "task": "investments.tasks.finish_investment",
+    #     "schedule": crontab(minute="*/1")
+    # },
+    # "verify_transactions": {
+    #     "task": "transactions.tasks.verify_transactions",
+    #     "schedule": crontab(minute="*/1")
+    # },
+    # "check_payment_status": {
+    #     "task": "payments.tasks.check_payment_status",
+    #     "schedule": crontab(minute="*/1")
+    # },
+    # "check_transfer_status": {
+    #     "task": "payments.tasks.check_transfer_status",
+    #     "schedule": crontab(minute="*/1")
+    # },
+    # "process_payouts": {
+    #     "task": "payments.tasks.process_payouts",
+    #     "schedule": crontab(minute="*/1")
+    # }
 }
 
 # Logging
@@ -267,6 +275,7 @@ AUTO_INV_FUELING = os.getenv('AUTO_INV_FUELING', 0)
 ALGO_API_TOKEN = os.getenv('ALGO_API_TOKEN')
 ALGO_API_URL = os.getenv('ALGO_API_URL', 'http://algorand:4161')
 ALGO_OPT_IN_AMOUNT = os.getenv('ALGO_OPT_IN_AMOUNT', 0.3)
+ALGO_APP_CREATE_AMOUNT = os.getenv('ALGO_APP_CREATE_AMOUNT', 0.8)
 ALGO_ASSET = os.getenv('ALGO_ASSET', 10458941)  # Default: TESTnet USDC on ALGO
 ALGO_INDEXER_API_URL = os.getenv('ALGO_INDEXER_API_URL', '')
 ALGO_INDEXER_API_TOKEN = os.getenv('ALGO_INDEXER_API_TOKEN', '')

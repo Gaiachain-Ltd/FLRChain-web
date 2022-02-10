@@ -51,7 +51,6 @@ class ProjectSerializer(serializers.ModelSerializer):
 
     status = serializers.IntegerField(read_only=True)
 
-    fundraising_duration = serializers.IntegerField()
     start = serializers.DateField()
     end = serializers.DateField()
     
@@ -77,7 +76,6 @@ class ProjectSerializer(serializers.ModelSerializer):
             'document',
             'budget',
             'status',
-            'fundraising_duration',
             'start',
             'end',
             'milestones',
@@ -100,18 +98,6 @@ class ProjectSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         now = datetime.datetime.now()
-        start_dt = datetime.datetime.combine(
-            validated_data['start'], now.time())
-        fundraising_start_dt = start_dt - \
-            datetime.timedelta(days=validated_data['fundraising_duration'])
-
-        if now.date() < fundraising_start_dt.date():
-            raise serializers.ValidationError(
-                {
-                    "start": "incorrect start date",
-                    "fundraising_duration": "incorrect fundraising duration"
-                })
-
         with transaction.atomic():
             project_obj = Project.objects.create(
                 owner=self.context['owner'],
@@ -119,7 +105,6 @@ class ProjectSerializer(serializers.ModelSerializer):
                 description=validated_data['description'],
                 start=validated_data['start'],
                 end=validated_data['end'],
-                fundraising_duration=validated_data['fundraising_duration'],
                 fac_adm_funds=validated_data['fac_adm_funds']
             )
 
