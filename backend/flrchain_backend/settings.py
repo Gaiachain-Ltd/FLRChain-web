@@ -185,6 +185,10 @@ CELERY_BEAT_SCHEDULE = {
     "initialize_project_smart_contract": {
         "task": "projects.tasks.initialize_project",
         "schedule": crontab(minute="*/1")
+    },
+    "start_project_smart_contract": {
+        "task": "projects.tasks.start_project",
+        "schedule": crontab(minute="*/1")
     }
     # "transfer_back_funds": {
     #     "task": "accounts.tasks.transfer_back_funds",
@@ -274,8 +278,8 @@ AUTO_INV_FUELING = os.getenv('AUTO_INV_FUELING', 0)
 # Algorand
 ALGO_API_TOKEN = os.getenv('ALGO_API_TOKEN')
 ALGO_API_URL = os.getenv('ALGO_API_URL', 'http://algorand:4161')
-ALGO_OPT_IN_AMOUNT = os.getenv('ALGO_OPT_IN_AMOUNT', 0.3)
-ALGO_APP_CREATE_AMOUNT = os.getenv('ALGO_APP_CREATE_AMOUNT', 0.8)
+ALGO_OPT_IN_AMOUNT = os.getenv('ALGO_OPT_IN_AMOUNT', 0.6)
+ALGO_APP_CREATE_AMOUNT = os.getenv('ALGO_APP_CREATE_AMOUNT', 1)
 ALGO_ASSET = os.getenv('ALGO_ASSET', 10458941)  # Default: TESTnet USDC on ALGO
 ALGO_INDEXER_API_URL = os.getenv('ALGO_INDEXER_API_URL', '')
 ALGO_INDEXER_API_TOKEN = os.getenv('ALGO_INDEXER_API_TOKEN', '')

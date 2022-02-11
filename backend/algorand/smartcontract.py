@@ -342,7 +342,7 @@ def approval_program():
     program = Cond(
         [Txn.application_id() == Int(0), Approve()],
         [Txn.on_completion() == OnComplete.OptIn, handle_optin],
-        [Txn.on_completion() == OnComplete.CloseOut, Reject()],
+        [Txn.on_completion() == OnComplete.CloseOut, Approve()],
         [Txn.on_completion() == OnComplete.UpdateApplication, handle_delete],
         [Txn.on_completion() == OnComplete.DeleteApplication, handle_update],
         [Txn.on_completion() == OnComplete.NoOp, handle_noop]
@@ -390,10 +390,16 @@ def create(creator_address, creator_pk):
     return app_id
 
 
-def initialize(creator_address, creator_priv_key, app_id):
+def initialize(
+    creator_address, 
+    creator_priv_key, 
+    facilitator_address, 
+    facilitator_priv_key, 
+    app_id
+):
     params = CLIENT.suggested_params()
     app_address = get_application_address(app_id)
-
+    
     txn1, _ = prepare_transfer_algos(
         creator_address,
         app_address,
@@ -406,14 +412,24 @@ def initialize(creator_address, creator_priv_key, app_id):
         ["INIT"],
         foreign_assets=[settings.ALGO_ASSET]
     )
+    txn3 = opt_in(facilitator_address, app_id, 1)
 
-    txn_id = sign_send_atomic_trasfer(creator_priv_key, [txn1, txn2])
+    txn_id = sign_send_atomic_trasfer(
+        [creator_priv_key, creator_priv_key, facilitator_priv_key], 
+        [txn1, txn2, txn3]
+    )
     wait_for_confirmation(txn_id)
 
 
 def opt_in(address, app_id, role):
     params = CLIENT.suggested_params()
     txn = transaction.ApplicationOptInTxn(address, params, app_id, [role])
+    return txn
+
+
+def opt_out(address, app_id):
+    params = CLIENT.suggested_params()
+    txn = transaction.ApplicationCloseOutTxn(address, params, app_id)
     return txn
 
 
@@ -438,3 +454,28 @@ def invest(address, priv_key, app_id, amount, asset=settings.ALGO_ASSET):
     
     txn_id = sign_send_atomic_trasfer(priv_key, [txn1, txn2, txn3])
     wait_for_confirmation(txn_id)
+
+def start(address, priv_key, app_id, start, end, fac_adm_funds):
+    params = CLIENT.suggested_params()
+    txn = transaction.ApplicationNoOpTxn(
+        address,
+        params,
+        app_id,
+        ["START", start, end, int(fac_adm_funds * 1000000)],
+    )
+
+    txn_signed = txn.sign(priv_key)
+    txn_id = CLIENT.send_transactions([txn_signed])
+    wait_for_confirmation(txn_id)
+
+def withdraw(address, app_id):
+    params = CLIENT.suggested_params()
+    txn = transaction.ApplicationNoOpTxn(
+        address,
+        params,
+        app_id,
+        ["WITHDRAW"],
+        foreign_assets=[settings.ALGO_ASSET]
+    )
+    return txn
+

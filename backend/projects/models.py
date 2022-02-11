@@ -44,9 +44,9 @@ class Project(models.Model):
     description = models.TextField(blank=True, null=True)
     action = models.CharField(max_length=255, blank=True, null=True)
 
-    image = models.FileField(upload_to=upload_project_image, null=True)
-    document = models.FileField(upload_to=upload_project_document, null=True)
-    budget = models.FileField(upload_to=upload_project_document, null=True)
+    image = models.FileField(upload_to=upload_project_image, null=True, blank=True)
+    document = models.FileField(upload_to=upload_project_document, null=True, blank=True)
+    budget = models.FileField(upload_to=upload_project_document, null=True, blank=True)
 
     status = models.PositiveSmallIntegerField(choices=STATUSES, default=FUNDRAISING)
     state = models.PositiveSmallIntegerField(choices=STATES, default=INITIAL)

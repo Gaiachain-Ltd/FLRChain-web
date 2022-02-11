@@ -6,6 +6,7 @@ from django.conf import settings
 from algosdk.v2client import *
 from algosdk import account
 from algosdk.future.transaction import * 
+from algosdk.logic import get_application_address
 from decimal import *
 
 
@@ -28,6 +29,10 @@ def check_balance_info(address):
 
 def status():
     return CLIENT.status()
+
+
+def application_address(app_id):
+    return get_application_address(app_id)
 
 
 def usdc_balance(address):
@@ -174,11 +179,16 @@ def prepare_transfer_assets(
     fee = (_params.min_fee if _params.fee == 0 else _params.fee) / 1000000
     return atxn, fee
 
-def sign_send_atomic_trasfer(private_key, txns):
+def sign_send_atomic_trasfer(private_keys, txns):
+    is_str = isinstance(private_keys, str)
     grouped_txns = assign_group_id(txns)
     signed_txns = list()
-    for gt in grouped_txns:
-        signed_txns.append(gt.sign(private_key))
+    for index, gt in enumerate(grouped_txns):
+        signed_txns.append(
+            gt.sign(
+                private_keys if is_str else private_keys[index]
+            )
+        )
 
     return CLIENT.send_transactions(signed_txns)
 
