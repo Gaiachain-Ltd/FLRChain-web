@@ -139,13 +139,18 @@ def prepare_transfer_algos(
     else:
         rec = receiver.address
 
+    if isinstance(close_remainder_to, str):
+        close_remainder_to = close_remainder_to
+    elif close_remainder_to is not None:
+        close_remainder_to = close_remainder_to.address
+
     _params = params()
     txn = PaymentTxn(
         snd, 
         _params, 
         rec, 
         int(amount * 1000000),
-        close_remainder_to=close_remainder_to.address if close_remainder_to else None
+        close_remainder_to=close_remainder_to
     )
     fee = (_params.min_fee if _params.fee == 0 else _params.fee) / 1000000
     return txn, fee
@@ -155,7 +160,8 @@ def prepare_transfer_assets(
     sender, 
     receiver, 
     amount, 
-    asset=settings.ALGO_ASSET, close_assets_to=None
+    asset=settings.ALGO_ASSET, 
+    close_assets_to=None
 ):
     if isinstance(sender, str):
         snd = sender
@@ -167,6 +173,11 @@ def prepare_transfer_assets(
     else:
         rec = receiver.address
 
+    if isinstance(close_assets_to, str):
+        close_assets_to = close_assets_to
+    elif close_assets_to is not None:
+        close_assets_to = close_assets_to.address
+
     _params = params()
     atxn = AssetTransferTxn(
         snd, 
@@ -174,7 +185,7 @@ def prepare_transfer_assets(
         rec, 
         int(amount * 1000000), 
         asset, 
-        close_assets_to=close_assets_to.address if close_assets_to else None
+        close_assets_to=close_assets_to
     )
     fee = (_params.min_fee if _params.fee == 0 else _params.fee) / 1000000
     return atxn, fee

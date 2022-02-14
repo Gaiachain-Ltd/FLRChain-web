@@ -40,8 +40,10 @@ def approval_program():
     is_initialized = App.globalGet(G_STATUS_KEY) == INITIALIZED_STATUS
 
     is_started = App.globalGet(G_STATUS_KEY) == STARTED_STATUS
+    
+    is_creator = Global.creator_address() == Txn.sender()
 
-    is_facilitator = Global.creator_address() == Txn.sender()
+    is_facilitator = App.localGet(Txn.sender(), L_ROLE_KEY) == FACILILTATOR_ROLE
 
     is_opted_in = App.localGet(Txn.sender(), L_ROLE_KEY) != Int(0)
 
@@ -244,19 +246,20 @@ def approval_program():
         If(is_facilitator).
         Then(
             Seq([
-                Assert(facilitator_adm_fee_withdraw() > Int(0)),
-                InnerTxnBuilder.Begin(),
-                InnerTxnBuilder.SetFields({
-                    TxnField.type_enum: TxnType.AssetTransfer,
-                    TxnField.xfer_asset: Txn.assets[0],
-                    TxnField.asset_receiver: Txn.sender(),
-                    TxnField.asset_amount: facilitator_adm_fee_withdraw()
-                }),
-                InnerTxnBuilder.Submit(),
-                App.localPut(Txn.sender(), L_TOTAL_KEY, Add(
-                    App.localGet(Txn.sender(), L_TOTAL_KEY),
-                    facilitator_adm_fee_withdraw()
-                ))
+                Approve(),
+                # Assert(facilitator_adm_fee_withdraw() > Int(0)),
+                # InnerTxnBuilder.Begin(),
+                # InnerTxnBuilder.SetFields({
+                #     TxnField.type_enum: TxnType.AssetTransfer,
+                #     TxnField.xfer_asset: Txn.assets[0],
+                #     TxnField.asset_receiver: Txn.sender(),
+                #     TxnField.asset_amount: facilitator_adm_fee_withdraw()
+                # }),
+                # InnerTxnBuilder.Submit(),
+                # App.localPut(Txn.sender(), L_TOTAL_KEY, Add(
+                #     App.localGet(Txn.sender(), L_TOTAL_KEY),
+                #     facilitator_adm_fee_withdraw()
+                # ))
             ])
         ).
         ElseIf(is_investor).
@@ -323,12 +326,29 @@ def approval_program():
     )
 
     handle_delete = Seq([
-        Assert(is_facilitator),
+        Assert(is_creator),
+        InnerTxnBuilder.Begin(),
+        InnerTxnBuilder.SetFields({
+            TxnField.type_enum: TxnType.AssetTransfer,
+            TxnField.xfer_asset: Txn.assets[0],
+            TxnField.asset_amount: Int(0),
+            TxnField.asset_receiver: Txn.sender(),
+            TxnField.asset_close_to: Txn.sender(),
+        }),
+        InnerTxnBuilder.Submit(),
+        InnerTxnBuilder.Begin(),
+        InnerTxnBuilder.SetFields({
+            TxnField.type_enum: TxnType.Payment,
+            TxnField.amount: Int(0),
+            TxnField.receiver: Txn.sender(),
+            TxnField.close_remainder_to: Txn.sender(),
+        }),
+        InnerTxnBuilder.Submit(),
         Approve()
     ])
 
     handle_update = Seq([
-        Assert(is_facilitator),
+        Assert(is_creator),
         Approve()
     ])
 
@@ -343,12 +363,11 @@ def approval_program():
         [Txn.application_id() == Int(0), Approve()],
         [Txn.on_completion() == OnComplete.OptIn, handle_optin],
         [Txn.on_completion() == OnComplete.CloseOut, Approve()],
-        [Txn.on_completion() == OnComplete.UpdateApplication, handle_delete],
-        [Txn.on_completion() == OnComplete.DeleteApplication, handle_update],
+        [Txn.on_completion() == OnComplete.UpdateApplication, handle_update],
+        [Txn.on_completion() == OnComplete.DeleteApplication, handle_delete],
         [Txn.on_completion() == OnComplete.NoOp, handle_noop]
     )
     return compileTeal(program, Mode.Application, version=5)
-
 
 def clear_program():
     program = Return(Int(1))
@@ -455,6 +474,7 @@ def invest(address, priv_key, app_id, amount, asset=settings.ALGO_ASSET):
     txn_id = sign_send_atomic_trasfer(priv_key, [txn1, txn2, txn3])
     wait_for_confirmation(txn_id)
 
+
 def start(address, priv_key, app_id, start, end, fac_adm_funds):
     params = CLIENT.suggested_params()
     txn = transaction.ApplicationNoOpTxn(
@@ -468,6 +488,7 @@ def start(address, priv_key, app_id, start, end, fac_adm_funds):
     txn_id = CLIENT.send_transactions([txn_signed])
     wait_for_confirmation(txn_id)
 
+
 def withdraw(address, app_id):
     params = CLIENT.suggested_params()
     txn = transaction.ApplicationNoOpTxn(
@@ -479,3 +500,12 @@ def withdraw(address, app_id):
     )
     return txn
 
+def delete(address, app_id):
+    params = CLIENT.suggested_params()
+    txn = transaction.ApplicationDeleteTxn(
+        address,
+        params,
+        app_id,
+        foreign_assets=[settings.ALGO_ASSET]
+    )
+    return txn

@@ -6,7 +6,7 @@ from accounts.models import Account
 from users.models import CustomUser
 from celery import shared_task
 from algorand import smartcontract
-from algorand.utils import usdc_balance, application_address, INDEXER, sign_send_atomic_trasfer, wait_for_confirmation
+from algorand.utils import *
 from django.conf import settings
 from django.db.models import F, Sum
 
@@ -54,7 +54,8 @@ def initialize_project():
         )
         project.state = Project.INITIALIZED
         project.save()
-        
+
+
 @shared_task()
 def start_project():
     projects = Project.objects.filter(
@@ -73,8 +74,8 @@ def start_project():
             project.save()
         else:
             smartcontract.start(
-                project.account.address,
-                project.account.private_key,
+                project.owner.account.address,
+                project.owner.account.private_key,
                 project.app_id,
                 int(
                     datetime.datetime.combine(
@@ -112,7 +113,7 @@ def finish_project():
                 if app_local_state['id'] == project.app_id:
                         for key_value in app_local_state['key-value']:
                             if base64.b64decode(key_value['key']).decode() == "role":
-                                if key_value['value']['uint'] in [CustomUser.INVESTOR]:
+                                if key_value['value']['uint'] in [CustomUser.INVESTOR, CustomUser.FACILITATOR]:
                                     investor_address_list.append(investor_data['address'])
         keys = list()
         txns = list()
@@ -138,3 +139,39 @@ def finish_project():
         project.state = Project.FINISHED
         project.status = Project.CLOSED
         project.save()
+
+
+@shared_task()
+def close_project():
+    projects = Project.objects.filter(
+        state=Project.FINISHED, 
+        status=Project.CLOSED
+    )
+
+    for project in projects:
+        main = Account.get_main_account()
+        account = project.account
+        
+        txn1 = smartcontract.delete(account.address, project.app_id)
+        txn2, _ = prepare_transfer_assets(
+            account.address,
+            main.address,
+            0,
+            close_assets_to=main.address
+        )
+        txn3, _ = prepare_transfer_algos(
+            account.address,
+            main.address,
+            0,
+            close_remainder_to=main.address
+        )
+
+        txn = sign_send_atomic_trasfer(
+            account.private_key, [txn1, txn2, txn3]
+        )
+        wait_for_confirmation(txn)
+
+        project.state = Project.DELETED
+        project.save()
+
+        
