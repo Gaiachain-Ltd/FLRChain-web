@@ -14,7 +14,7 @@
             <TextInput
               label="FLR Action"
               placeholder="Please enter project name..."
-              v-model="project.title"
+              v-model="project.action"
               :rules="requiredRules"
               required
             ></TextInput>

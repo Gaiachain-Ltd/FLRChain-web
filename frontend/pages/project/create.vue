@@ -3,16 +3,15 @@
     <ToolBar title="Create project"></ToolBar>
     <InputProjectCard
       ref="inputProject"
-      class="mb-5"
+      class="pb-0"
       :project.sync="project"
     ></InputProjectCard>
-    <v-spacer></v-spacer>
-    <div class="placeholder"></div>
     <ActionBarCard
       :disabled="!$auth.user.opted_in"
       @save="handleCreate"
       @cancel="handleCancel"
     ></ActionBarCard>
+    <v-spacer></v-spacer>
     <ErrorPopup
       v-if="errorPopupVisible"
       :value.sync="errorPopupVisible"
@@ -45,7 +44,7 @@ export default {
                 instructions: "",
                 batch: "0",
                 reward: "0",
-                count: 1
+                count: 1,
               },
             ],
           },
@@ -71,9 +70,7 @@ export default {
   },
   methods: {
     handleCreate() {
-      if (
-        this.$refs.inputProject.validate()
-      ) {
+      if (this.$refs.inputProject.validate()) {
         this.$axios
           .post("projects/", this.project)
           .then(() => this.$router.push("/"))

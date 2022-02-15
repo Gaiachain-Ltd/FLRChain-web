@@ -4,52 +4,53 @@
       column
       v-for="(milestone, milestoneIndex) in project.milestones"
       :key="milestoneIndex"
-      class="border-wrapper pa-3"
     >
-      <v-layout ma-0 mb-3 justify-center>
-        <DefaultText :color="$vuetify.theme.themes.light.primary">{{
-          `Milesone ${milestoneIndex + 1}`
-        }}</DefaultText>
-        <v-spacer></v-spacer>
-        <DefaultIconButton
-          v-if="project.milestones.length > 1"
-          :config="deleteBtnConf"
-          @clicked="() => onDeleteMilestone(milestoneIndex)"
-        ></DefaultIconButton>
-      </v-layout>
-      <v-layout column>
-        <MilestoneForm
-          v-model="project.milestones[milestoneIndex]"
-        ></MilestoneForm>
-        <v-layout column class="border-wrapper pa-3">
-          <v-layout
-            column
-            v-for="(task, taskIndex) in milestone.tasks"
-            :key="taskIndex"
-          >
-            <TaskForm
-              v-model="milestone.tasks[taskIndex]"
-              :index="taskIndex"
-              :milestoneIndex="milestoneIndex + 1"
-              :showDeleteBtn="milestone.tasks.length > 1"
-              @delete="() => onDeleteTask(milestone, taskIndex)"
-            ></TaskForm>
-            <v-divider class="mb-4"></v-divider>
-          </v-layout>
-          <v-layout justify-center class="my-3">
-            <DefaultIconButton
-              :config="addTaskBtnConfig"
-              @clicked="() => onAddTask(milestone)"
-            ></DefaultIconButton>
+      <v-layout column mb-6 class="border-wrapper pa-6">
+        <v-layout ma-0 mb-3 justify-center>
+          <DefaultText :color="$vuetify.theme.themes.light.primary">{{
+            `Milesone ${milestoneIndex + 1}`
+          }}</DefaultText>
+          <v-spacer></v-spacer>
+          <DefaultIconButton
+            v-if="project.milestones.length > 1"
+            :config="deleteBtnConf"
+            @clicked="() => onDeleteMilestone(milestoneIndex)"
+          ></DefaultIconButton>
+        </v-layout>
+        <v-layout column>
+          <MilestoneForm
+            v-model="project.milestones[milestoneIndex]"
+          ></MilestoneForm>
+          <v-layout column class="border-wrapper pa-6">
+            <v-layout
+              column
+              v-for="(task, taskIndex) in milestone.tasks"
+              :key="taskIndex"
+            >
+              <TaskForm
+                v-model="milestone.tasks[taskIndex]"
+                :index="taskIndex"
+                :milestoneIndex="milestoneIndex + 1"
+                :showDeleteBtn="milestone.tasks.length > 1"
+                @delete="() => onDeleteTask(milestone, taskIndex)"
+              ></TaskForm>
+              <v-divider class="mb-4"></v-divider>
+            </v-layout>
+            <v-layout justify-center class="mt-2">
+              <DefaultIconButton
+                :config="addTaskBtnConfig"
+                @clicked="() => onAddTask(milestone)"
+              ></DefaultIconButton>
+            </v-layout>
           </v-layout>
         </v-layout>
       </v-layout>
-      <v-layout justify-center class="mb-3 mt-6">
-        <DefaultIconButton
-          :config="addMilestoneBtnConfig"
-          @clicked="onAddMilestone"
-        ></DefaultIconButton>
-      </v-layout>
+    </v-layout>
+    <v-layout justify-center class="mb-2 mt-2">
+      <DefaultIconButton
+        :config="addMilestoneBtnConfig"
+        @clicked="onAddMilestone"
+      ></DefaultIconButton>
     </v-layout>
   </v-layout>
 </template>
@@ -94,24 +95,31 @@ export default {
     DefaultIconButton: () => import("@/components/buttons/DefaultIconButton"),
   },
   methods: {
+    defaultMilesone() {
+      return {
+        name: "",
+        tasks: [this.defaultTask()],
+      };
+    },
+    defaultTask() {
+      return {
+        name: "",
+        instructions: "",
+        batch: "0",
+        reward: "0",
+        count: 1,
+      };
+    },
     onAddMilestone() {
       this.$set(this.project, "milestones", [
         ...(this.project.milestones || []),
-        {
-          name: "",
-        },
+        this.defaultMilesone(),
       ]);
     },
     onAddTask(milestone) {
       this.$set(milestone, "tasks", [
         ...(milestone.tasks || []),
-        {
-          name: "",
-          instructions: "",
-          batch: "0",
-          reward: "0",
-          count: 1,
-        },
+        this.defaultTask(),
       ]);
     },
     onDeleteTask(milestone, index) {
