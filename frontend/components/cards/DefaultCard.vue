@@ -1,8 +1,12 @@
 <template>
   <v-layout column>
-    <DefaultText v-if="title" class="mb-2" :color="$vuetify.theme.themes.light.primary" size="20">{{
-      title
-    }}</DefaultText>
+    <DefaultText
+      v-if="title"
+      class="mb-2"
+      :color="$vuetify.theme.themes.light.primary"
+      size="20"
+      >{{ title }}</DefaultText
+    >
     <v-card ma-0>
       <v-layout column ma-0 pa-6>
         <slot></slot>

@@ -1,5 +1,5 @@
 <template>
-  <DefaultCardWithTitle title="History">
+  <DefaultCard title="History">
     <v-layout column ma-0>
       <template v-for="transaction in transactions">
         <v-layout column :key="transaction.id" ma-0>
@@ -23,7 +23,7 @@
         </v-layout>
       </template>
     </v-layout>
-  </DefaultCardWithTitle>
+  </DefaultCard>
 </template>
 
 <script>
@@ -35,8 +35,8 @@ export default {
   },
   components: {
     DefaultText: () => import("@/components/texts/DefaultText"),
-    DefaultCardWithTitle: () =>
-      import("@/components/cards/DefaultCardWithTitle"),
+    DefaultCard: () =>
+      import("@/components/cards/DefaultCard"),
     TransactionDelegate: () =>
       import("@/components/delegates/TransactionDelegate"),
   },

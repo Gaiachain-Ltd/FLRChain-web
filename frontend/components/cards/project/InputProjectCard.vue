@@ -1,5 +1,5 @@
 <template>
-  <DefaultCardWithTitle title="New project:">
+  <DefaultCard title="New project:">
     <v-layout column>
       <ProjectForm ref="projectForm" :project.sync="project"></ProjectForm>
       <DefaultText>{{ `Milestones & Tasks` }}</DefaultText>
@@ -22,7 +22,7 @@
         </v-layout>
       </v-layout>
     </v-layout>
-  </DefaultCardWithTitle>
+  </DefaultCard>
 </template>
 
 <script>
@@ -32,8 +32,8 @@ export default {
   },
   components: {
     DefaultText: () => import("@/components/texts/DefaultText"),
-    DefaultCardWithTitle: () =>
-      import("@/components/cards/DefaultCardWithTitle"),
+    DefaultCard: () =>
+      import("@/components/cards/DefaultCard"),
     ProjectForm: () => import("@/components/forms/project/ProjectForm"),
     InputMilestonesCard: () =>
       import("@/components/cards/project/InputMilestonesCard"),

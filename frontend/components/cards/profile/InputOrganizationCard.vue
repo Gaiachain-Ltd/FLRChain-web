@@ -1,12 +1,12 @@
 <template>
-  <DefaultCardWithTitle title="Investor public profile">
+  <DefaultCard title="Investor public profile">
     <v-flex>
       <OrganizationForm
         ref="organizationForm"
         :organization.sync="organization"
       ></OrganizationForm>
     </v-flex>
-  </DefaultCardWithTitle>
+  </DefaultCard>
 </template>
 
 <script>
@@ -15,8 +15,8 @@ export default {
     organization: {},
   },
   components: {
-    DefaultCardWithTitle: () =>
-      import("@/components/cards/DefaultCardWithTitle"),
+    DefaultCard: () =>
+      import("@/components/cards/DefaultCard"),
     OrganizationForm: () =>
       import("@/components/forms/profile/OrganizationForm"),
   },

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <DefaultCardWithTitle>
+    <DefaultCard>
       <v-layout column>
         <DefaultText class="my-3" bold :color="$vuetify.theme.themes.light.primary"
           >Invest in project</DefaultText
@@ -17,7 +17,7 @@
           >
         </v-flex>
       </v-layout>
-    </DefaultCardWithTitle>
+    </DefaultCard>
     <ErrorPopup
       v-if="errorPopupVisible"
       :value.sync="errorPopupVisible"
@@ -47,8 +47,8 @@ export default {
   components: {
     DefaultText: () => import("@/components/texts/DefaultText"),
     ErrorPopup: () => import("@/components/popups/ErrorPopup"),
-    DefaultCardWithTitle: () =>
-      import("@/components/cards/DefaultCardWithTitle"),
+    DefaultCard: () =>
+      import("@/components/cards/DefaultCard"),
     InvestmentForm: () => import("@/components/forms/project/InvestmentForm"),
     BlockButton: () => import("@/components/buttons/BlockButton"),
   },

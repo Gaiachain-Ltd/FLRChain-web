@@ -1,5 +1,5 @@
 <template>
-  <DefaultCardWithTitle title="Beneficiaries:">
+  <DefaultCard title="Beneficiaries:">
     <v-layout
       column
       ma-0
@@ -12,7 +12,7 @@
         @refresh="onRefresh"
       ></BeneficiaryDelegate>
     </v-layout>
-  </DefaultCardWithTitle>
+  </DefaultCard>
 </template>
 
 <script>
@@ -23,8 +23,8 @@ export default {
     };
   },
   components: {
-    DefaultCardWithTitle: () =>
-      import("@/components/cards/DefaultCardWithTitle"),
+    DefaultCard: () =>
+      import("@/components/cards/DefaultCard"),
     BeneficiaryDelegate: () =>
       import("@/components/delegates/BeneficiaryDelegate"),
   },

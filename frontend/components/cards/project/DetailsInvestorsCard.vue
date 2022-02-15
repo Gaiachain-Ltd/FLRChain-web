@@ -1,21 +1,31 @@
 <template>
-  <DefaultCardWithTitle title="Investors:">
+  <DefaultCard>
     <v-layout column>
-      <InvestmentDelegate v-if="investment" :investment="investment"></InvestmentDelegate>
+      <DefaultText :color="$vuetify.theme.themes.light.primary" bold
+        >Investors</DefaultText
+      >
+      <InvestmentDelegate
+        v-for="investor in investors"
+        :key="investor.id"
+      ></InvestmentDelegate>
     </v-layout>
-  </DefaultCardWithTitle>
+  </DefaultCard>
 </template>
 
 <script>
 export default {
+  props: {
+    project: {},
+  },
   data() {
     return {
-      investment: null,
+      investors: [],
     };
   },
   components: {
-    DefaultCardWithTitle: () =>
-      import("@/components/cards/DefaultCardWithTitle"),
+    DefaultText: () => import("@/components/texts/DefaultText"),
+    DefaultCard: () =>
+      import("@/components/cards/DefaultCard"),
     InvestmentDelegate: () =>
       import("@/components/delegates/InvestmentDelegate"),
   },

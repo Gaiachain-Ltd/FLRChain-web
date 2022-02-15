@@ -1,6 +1,7 @@
 <template>
   <v-layout column pa-6>
     <ToolBar title="Project details"> </ToolBar>
+    <FundraisingProgressCard class="mb-6"></FundraisingProgressCard>
     <v-layout shrink :class="$vuetify.breakpoint.xsOnly && 'wrap'">
       <v-flex xs12 md9 shrink>
         <v-layout column>
@@ -24,6 +25,7 @@
             class="mb-6"
             :project.sync="project"
           ></InputTasksCard>
+          <DetailsBlockchainCard project="project"></DetailsBlockchainCard>
           <v-spacer></v-spacer>
         </v-layout>
       </v-flex>
@@ -31,9 +33,6 @@
         <v-layout column :class="!$vuetify.breakpoint.xsOnly && 'ml-6'">
           <client-only v-if="project.investment" placeholder="Loading...">
             <DetailsInvestmentCard class="mb-6"></DetailsInvestmentCard>
-          </client-only>
-          <client-only v-if="project.investment" placeholder="Loading...">
-            <DetailsInvestorsCard class="mb-6"></DetailsInvestorsCard>
           </client-only>
           <client-only v-if="isFacililator" placeholder="Loading...">
             <BeneficiariesCard class="mb-6"></BeneficiariesCard>
@@ -49,6 +48,9 @@
               :project="project"
               :disabled="!$auth.user.opted_in"
             ></InputInvestmentCard>
+          </client-only>
+          <client-only placeholder="Loading...">
+            <DetailsInvestorsCard class="mb-6"></DetailsInvestorsCard>
           </client-only>
         </v-layout>
       </v-flex>
@@ -110,6 +112,9 @@ export default {
     SuccessPopup: () => import("@/components/popups/SuccessPopup"),
     ProjectStatusLabel: () => import("@/components/texts/ProjectStatusLabel"),
     InfoPopup: () => import("@/components/popups/InfoPopup"),
+    DetailsBlockchainCard: () =>
+      import("@/components/cards/project/DetailsBlockchainCard"),
+    FundraisingProgressCard: () => import("@/components/cards/project/FundraisingProgressCard")
   },
   computed: {
     ...mapGetters(["isFacililator"]),
@@ -127,6 +132,11 @@ export default {
         return "Waiting for investor";
       }
     },
+    goals() {
+      return {
+        
+      }
+    }
   },
   methods: {
     handleEdit() {

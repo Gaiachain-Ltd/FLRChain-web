@@ -1,5 +1,5 @@
 <template>
-  <DefaultCardWithTitle :title="title">
+  <DefaultCard :title="title">
     <v-layout column ma-0>
       <v-layout row mb-6 ma-0>
         <v-flex>
@@ -39,7 +39,7 @@
         </v-flex>
       </v-layout>
     </v-layout>
-  </DefaultCardWithTitle>
+  </DefaultCard>
 </template>
 
 <script>
@@ -76,8 +76,8 @@ export default {
     }
   },
   components: {
-    DefaultCardWithTitle: () =>
-      import("@/components/cards/DefaultCardWithTitle"),
+    DefaultCard: () =>
+      import("@/components/cards/DefaultCard"),
     DefaultText: () => import("@/components/texts/DefaultText"),
   },
   async fetch() {

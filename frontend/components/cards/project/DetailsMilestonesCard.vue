@@ -1,5 +1,5 @@
 <template>
-  <DefaultCardWithTitle>
+  <DefaultCard>
     <DefaultText :color="$vuetify.theme.themes.light.primary" bold>{{
       `Milestones & Tasks`
     }}</DefaultText>
@@ -27,7 +27,7 @@
         </v-layout>
       </v-layout>
     </v-layout>
-  </DefaultCardWithTitle>
+  </DefaultCard>
 </template>
 
 <script>
@@ -36,8 +36,8 @@ export default {
     project: {},
   },
   components: {
-    DefaultCardWithTitle: () =>
-      import("@/components/cards/DefaultCardWithTitle"),
+    DefaultCard: () =>
+      import("@/components/cards/DefaultCard"),
     DefaultText: () => import("@/components/texts/DefaultText"),
     DefaultTitle: () => import("@/components/texts/DefaultTitle"),
   },

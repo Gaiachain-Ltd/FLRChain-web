@@ -1,5 +1,5 @@
 <template>
-  <DefaultCardWithTitle title="Work history:">
+  <DefaultCard title="Work history:">
     <v-layout column ma-0>
       <v-simple-table>
         <template v-slot:default>
@@ -32,7 +32,7 @@
         </template>
       </v-simple-table>
     </v-layout>
-  </DefaultCardWithTitle>
+  </DefaultCard>
 </template>
 
 <script>
@@ -43,8 +43,8 @@ export default {
     };
   },
   components: {
-    DefaultCardWithTitle: () =>
-      import("@/components/cards/DefaultCardWithTitle"),
+    DefaultCard: () =>
+      import("@/components/cards/DefaultCard"),
   },
   methods: {
     formattedReward(value) {
