@@ -1,7 +1,10 @@
 <template>
   <div>
-    <DefaultCardWithTitle title="Invest in project:">
-      <v-layout column ma-0>
+    <DefaultCardWithTitle>
+      <v-layout column>
+        <DefaultText class="my-3" bold :color="$vuetify.theme.themes.light.primary"
+          >Invest in project</DefaultText
+        >
         <v-flex>
           <InvestmentForm
             ref="investmentForm"
@@ -42,6 +45,7 @@ export default {
     };
   },
   components: {
+    DefaultText: () => import("@/components/texts/DefaultText"),
     ErrorPopup: () => import("@/components/popups/ErrorPopup"),
     DefaultCardWithTitle: () =>
       import("@/components/cards/DefaultCardWithTitle"),

@@ -1,33 +1,13 @@
 <template>
   <v-form ref="form">
     <v-layout column>
-      <v-layout row ma-0>
-        <v-flex mr-3 class="date-style">
-          <DateInput
-            label="Start date*"
-            :text.sync="investment.start"
-            :rules="[...requiredRules, ...dateRules]"
-            required
-          ></DateInput>
-        </v-flex>
-        <v-flex ml-3 class="date-style">
-          <DateInput
-            label="End date*"
-            :text.sync="investment.end"
-            :rules="[...requiredRules, ...dateRules]"
-            required
-          ></DateInput>
-        </v-flex>
-      </v-layout>
-      <v-flex>
-        <TextInput
-          label="Coins for investment*"
-          v-model="investment.amount"
-          :rules="[...requiredRules, ...decimalRules, ...nonZeroDecimalRules]"
-          :icon="icon"
-          required
-        ></TextInput>
-      </v-flex>
+      <TextInput
+        label="Coins for investment*"
+        v-model="investment.amount"
+        :rules="[...requiredRules, ...decimalRules, ...nonZeroDecimalRules]"
+        :icon="icon"
+        required
+      ></TextInput>
     </v-layout>
   </v-form>
 </template>

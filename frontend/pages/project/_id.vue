@@ -1,22 +1,9 @@
 <template>
-  <v-layout column mt-2>
+  <v-layout column pa-6>
     <ToolBar title="Project details"> </ToolBar>
-    <v-layout row align-center ma-0 shrink mt-10 mb-5 justify-center>
-      <DefaultTitle class="mr-3">{{ project.title }}</DefaultTitle>
-      <ProjectStatusLabel :status="projectStatus"></ProjectStatusLabel>
-      <v-spacer></v-spacer>
-      <ActionButton
-        v-if="!isFinished && isFacililator"
-        class="white--text mr-3"
-        :label="edit ? 'Save project' : 'Edit project'"
-        :color="edit ? 'primary' : 'septenary'"
-        @clicked="handleEdit"
-        :disabled="!$auth.user.opted_in"
-      ></ActionButton>
-    </v-layout>
-    <v-layout row ma-0 shrink>
-      <v-flex xs12 sm12 md6 lg6 xl6 shrink>
-        <v-layout column mr-3>
+    <v-layout shrink :class="$vuetify.breakpoint.xsOnly && 'wrap'">
+      <v-flex xs12 md9 shrink>
+        <v-layout column>
           <DetailsProjectCard
             v-if="!edit"
             class="mb-6"
@@ -27,20 +14,21 @@
             class="mb-6"
             :project.sync="project"
           ></InputProjectCard>
-          <DetailsTasksCard
+          <DetailsMilestonesCard
             v-if="!edit"
             class="mb-6"
-            :tasks="project.tasks"
-          ></DetailsTasksCard>
+            :project="project"
+          ></DetailsMilestonesCard>
           <InputTasksCard
             v-else
             class="mb-6"
             :project.sync="project"
           ></InputTasksCard>
+          <v-spacer></v-spacer>
         </v-layout>
       </v-flex>
-      <v-flex xs12 sm12 md6 lg6 xl6 shrink>
-        <v-layout column mr-3>
+      <v-flex xs12 md5 shrink>
+        <v-layout column :class="!$vuetify.breakpoint.xsOnly && 'ml-6'">
           <client-only v-if="project.investment" placeholder="Loading...">
             <DetailsInvestmentCard class="mb-6"></DetailsInvestmentCard>
           </client-only>
@@ -103,8 +91,8 @@ export default {
     DefaultTitle: () => import("@/components/texts/DefaultTitle"),
     DetailsProjectCard: () =>
       import("@/components/cards/project/DetailsProjectCard"),
-    DetailsTasksCard: () =>
-      import("@/components/cards/project/DetailsTasksCard"),
+    DetailsMilestonesCard: () =>
+      import("@/components/cards/project/DetailsMilestonesCard"),
     BeneficiariesCard: () =>
       import("@/components/cards/project/BeneficiariesCard"),
     InputInvestmentCard: () =>

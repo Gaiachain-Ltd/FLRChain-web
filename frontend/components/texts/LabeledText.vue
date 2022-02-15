@@ -1,7 +1,7 @@
 <template>
   <v-layout column>
     <v-flex>
-      <DefaultText :color="$vuetify.theme.themes.light.primary">{{
+      <DefaultText :color="$vuetify.theme.themes.light.primary" bold>{{
         label
       }}</DefaultText>
     </v-flex>
@@ -10,7 +10,7 @@
         <DefaultSVGIcon :icon="icon" :size="16"></DefaultSVGIcon>
       </v-flex>
       <v-flex>
-        <DefaultText :size="14">{{ text }}</DefaultText>
+        <DefaultText :size="14" bold>{{ text }}</DefaultText>
       </v-flex>
     </v-layout>
   </v-layout>

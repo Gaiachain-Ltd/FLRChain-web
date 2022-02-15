@@ -1,5 +1,5 @@
 <template>
-  <v-layout column fill-height ma-6>
+  <v-layout column fill-height pa-6>
     <ToolBar title="Create project"></ToolBar>
     <InputProjectCard
       ref="inputProject"
