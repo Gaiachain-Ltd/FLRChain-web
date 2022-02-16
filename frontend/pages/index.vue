@@ -96,7 +96,6 @@ export default {
       return this.status === -1 || this.status == STATUS.FUNDRAISING;
     },
     activeVisible() {
-      console.log("ACTIVE", this.status === -1 || this.status == STATUS.ACTIVE);
       return this.status === -1 || this.status == STATUS.ACTIVE;
     },
     closedVisible() {

@@ -56,7 +56,8 @@ export default {
     project: {},
   },
   components: {
-    StatusIndicator: () => import("@/components/widgets/projects/StatusIndicator"),
+    StatusIndicator: () =>
+      import("@/components/widgets/projects/StatusIndicator"),
     DefaultText: () => import("@/components/texts/DefaultText"),
     DefaultSVGIcon: () => import("@/components/icons/DefaultSVGIcon"),
     LabeledTextWithIcon: () => import("@/components/texts/LabeledTextWithIcon"),
@@ -64,7 +65,7 @@ export default {
   },
   computed: {
     indicatorColor() {
-      switch(this.project.status) {
+      switch (this.project.status) {
         case STATUS.FUNDRAISING:
           return this.$vuetify.theme.themes.light.primary;
         case STATUS.ACTIVE:
@@ -89,8 +90,22 @@ export default {
     },
   },
   methods: {
+    redirectByStatus() {
+      switch (this.project.status) {
+        case STATUS.FUNDRAISING:
+          return "fundraising";
+        case STATUS.ACTIVE:
+          return "active";
+        case STATUS.CLOSED:
+          return "closed";
+        default:
+          return "";
+      }
+    },
     details() {
-      this.$router.push(`/project/${this.project.id}`);
+      this.$router.push(
+        `/project/${this.redirectByStatus()}/${this.project.id}`
+      );
     },
     formattedValue(value) {
       return `${parseFloat(value)} USDC`;
