@@ -1,7 +1,10 @@
 <template>
   <v-layout column pa-6>
     <ToolBar title="Project details"> </ToolBar>
-    <FundraisingProgressCard class="mb-6"></FundraisingProgressCard>
+    <FundraisingProgressCard
+      class="mb-6"
+      :project="project"
+    ></FundraisingProgressCard>
     <v-layout shrink :class="$vuetify.breakpoint.xsOnly && 'wrap'">
       <v-flex xs12 md9 shrink>
         <v-layout column>
@@ -25,7 +28,7 @@
             class="mb-6"
             :project.sync="project"
           ></InputTasksCard>
-          <DetailsBlockchainCard project="project"></DetailsBlockchainCard>
+          <DetailsBlockchainCard :project="project"></DetailsBlockchainCard>
           <v-spacer></v-spacer>
         </v-layout>
       </v-flex>
@@ -113,7 +116,8 @@ export default {
     InfoPopup: () => import("@/components/popups/InfoPopup"),
     DetailsBlockchainCard: () =>
       import("@/components/cards/project/DetailsBlockchainCard"),
-    FundraisingProgressCard: () => import("@/components/cards/project/FundraisingProgressCard")
+    FundraisingProgressCard: () =>
+      import("@/components/cards/project/FundraisingProgressCard"),
   },
   computed: {
     ...mapGetters(["isFacililator"]),
@@ -131,11 +135,6 @@ export default {
         return "Waiting for investor";
       }
     },
-    goals() {
-      return {
-        
-      }
-    }
   },
   methods: {
     handleEdit() {

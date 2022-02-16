@@ -81,7 +81,8 @@ class ProjectSerializer(serializers.ModelSerializer):
             'milestones',
             'fac_adm_funds',
             'facilitator',
-            'created'
+            'created',
+            'app_id'
         )
 
     def get_facilitator(self, obj):
