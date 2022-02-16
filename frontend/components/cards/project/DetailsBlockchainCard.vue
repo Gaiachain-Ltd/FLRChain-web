@@ -1,5 +1,5 @@
 <template>
-<DefaultCard>
+<DefaultCard showOverlay>
     <v-layout column>
         <LabeledText class="mb-6" label="Project wallet" text="LINK"></LabeledText>
         <LabeledText label="Smart contract" text="LINK"></LabeledText>

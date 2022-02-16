@@ -8,6 +8,7 @@ from algosdk import account
 from algosdk.future.transaction import * 
 from algosdk.logic import get_application_address
 from decimal import *
+from collections import defaultdict
 
 
 logger = logging.getLogger(__name__)
@@ -218,11 +219,26 @@ def atomic_transfer(txns):
     CLIENT.send_transactions(sgtxns)
     return base64.b64encode(gtxn).decode('ascii')
 
-def get_transactions(address, asset=settings.ALGO_ASSET, limit=10, next_page_token=""):
+def get_transactions(asset=settings.ALGO_ASSET, **kwargs):
     return INDEXER.search_transactions(
-        limit=limit,
-        next_page=next_page_token,
-        address=address,
         asset_id=asset,
-        min_amount=1,
+        **kwargs
     )
+
+def get_transactions_info(request_fields=dict(), reply_fields=[]):
+    transactions = get_transactions(**request_fields)
+
+    transactions_data = defaultdict(dict)
+    for transaction in transactions['transactions']:
+        for field in reply_fields:
+            if "__" in field:
+                ifields = field.split('__')
+                data = transaction
+                for ifield in ifields:
+                    data = data[ifield]
+                field = ifield
+            else:
+                data = transaction[field]
+            transactions_data[transaction['sender']][field] = data
+
+    return transactions_data

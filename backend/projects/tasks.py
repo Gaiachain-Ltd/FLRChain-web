@@ -115,6 +115,7 @@ def finish_project():
                             if base64.b64decode(key_value['key']).decode() == "role":
                                 if key_value['value']['uint'] in [CustomUser.INVESTOR, CustomUser.FACILITATOR]:
                                     investor_address_list.append(investor_data['address'])
+        
         keys = list()
         txns = list()
         for ial in investor_address_list:

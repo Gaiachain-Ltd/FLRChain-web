@@ -1,13 +1,20 @@
 <template>
-  <DefaultCard>
+  <DefaultCard :showOverlay="showOverlay">
     <v-layout column>
-      <DefaultText :color="$vuetify.theme.themes.light.primary" bold
+      <DefaultText
+        class="mb-3"
+        :color="$vuetify.theme.themes.light.primary"
+        bold
         >Investors</DefaultText
       >
-      <InvestmentDelegate
-        v-for="investor in investors"
-        :key="investor.id"
-      ></InvestmentDelegate>
+      <InvestorDelegate
+        v-for="(investor, index) in investors"
+        :key="index"
+        :investor="investor"
+      ></InvestorDelegate>
+      <DefaultText v-if="!investors.length && !showOverlay"
+        >No investors</DefaultText
+      >
     </v-layout>
   </DefaultCard>
 </template>
@@ -19,20 +26,21 @@ export default {
   },
   data() {
     return {
+      showOverlay: true,
       investors: [],
     };
   },
   components: {
     DefaultText: () => import("@/components/texts/DefaultText"),
-    DefaultCard: () =>
-      import("@/components/cards/DefaultCard"),
-    InvestmentDelegate: () =>
-      import("@/components/delegates/InvestmentDelegate"),
+    DefaultCard: () => import("@/components/cards/DefaultCard"),
+    InvestorDelegate: () =>
+      import("@/components/delegates/projects/InvestorDelegate"),
   },
   async fetch() {
-    this.investment = await this.$axios
-      .get(`projects/${this.$route.params.id}/investments/`)
+    this.investors = await this.$axios
+      .get(`projects/${this.$route.params.id}/investors/`)
       .then((reply) => reply.data);
+    this.showOverlay = false;
   },
 };
 </script>

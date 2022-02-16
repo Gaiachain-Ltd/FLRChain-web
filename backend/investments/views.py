@@ -11,12 +11,53 @@ from django.db import transaction
 from smart_contracts.models import SmartContract
 from users.permissions import isInvestor, isOptedIn
 from rest_framework.permissions import IsAuthenticated
-from algorand.smartcontract import invest
+from algorand.smartcontract import invest, opted_in_addresses
+from django.db.models import Q
+from users.models import CustomUser
+from algorand.utils import get_transactions_info, get_transactions, application_address
+import datetime
+from django.conf import settings
 
 
 class InvestmentView(CommonView):
     serializer_class = InvestmentSerializer
-    permission_classes = [IsAuthenticated, isInvestor, isOptedIn]
+    # permission_classes = [IsAuthenticated, isInvestor, isOptedIn]
+
+    def list(self, _, pk=None):
+        project = get_object_or_404(
+            Project,
+            pk=pk
+        )
+        if project.state == Project.INITIAL:
+            return Response([], status=status.HTTP_200_OK)
+
+        data = get_transactions_info(
+            request_fields={
+                "address": application_address(project.app_id),
+                "address_role": "receiver",
+                "asset": settings.ALGO_ASSET,
+                "min_amount": 1
+            },
+            reply_fields=[
+                "sender",
+                "asset-transfer-transaction__amount",
+                "round-time",
+                "id"
+            ]
+        )
+
+        investors = CustomUser.objects.select_related('account').filter(
+            account__address__in=data.keys()
+        ).values_list('first_name', 'last_name', 'account__address')
+
+        for investor in investors:
+            data[investor[2]] = {
+                **data[investor[2]],
+                "first_name": investor[0],
+                "last_name": investor[1],
+            }
+
+        return Response(data.values(), status=status.HTTP_200_OK)
 
     @swagger_auto_schema(
         operation_summary="Invest in project",

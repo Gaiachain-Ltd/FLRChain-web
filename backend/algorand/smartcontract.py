@@ -1,9 +1,10 @@
 import base64
+from collections import defaultdict
 from algosdk.v2client import *
 from algosdk.future import *
 from algosdk.logic import *
 from pyteal import *
-from algorand.utils import (CLIENT, wait_for_confirmation, prepare_transfer_algos,
+from algorand.utils import (INDEXER, CLIENT, wait_for_confirmation, prepare_transfer_algos,
                             prepare_transfer_assets, sign_send_atomic_trasfer)
 from django.conf import settings
 
@@ -40,10 +41,11 @@ def approval_program():
     is_initialized = App.globalGet(G_STATUS_KEY) == INITIALIZED_STATUS
 
     is_started = App.globalGet(G_STATUS_KEY) == STARTED_STATUS
-    
+
     is_creator = Global.creator_address() == Txn.sender()
 
-    is_facilitator = App.localGet(Txn.sender(), L_ROLE_KEY) == FACILILTATOR_ROLE
+    is_facilitator = App.localGet(
+        Txn.sender(), L_ROLE_KEY) == FACILILTATOR_ROLE
 
     is_opted_in = App.localGet(Txn.sender(), L_ROLE_KEY) != Int(0)
 
@@ -369,6 +371,7 @@ def approval_program():
     )
     return compileTeal(program, Mode.Application, version=5)
 
+
 def clear_program():
     program = Return(Int(1))
     return compileTeal(program, Mode.Application, version=5)
@@ -410,15 +413,15 @@ def create(creator_address, creator_pk):
 
 
 def initialize(
-    creator_address, 
-    creator_priv_key, 
-    facilitator_address, 
-    facilitator_priv_key, 
+    creator_address,
+    creator_priv_key,
+    facilitator_address,
+    facilitator_priv_key,
     app_id
 ):
     params = CLIENT.suggested_params()
     app_address = get_application_address(app_id)
-    
+
     txn1, _ = prepare_transfer_algos(
         creator_address,
         app_address,
@@ -434,7 +437,7 @@ def initialize(
     txn3 = opt_in(facilitator_address, app_id, 1)
 
     txn_id = sign_send_atomic_trasfer(
-        [creator_priv_key, creator_priv_key, facilitator_priv_key], 
+        [creator_priv_key, creator_priv_key, facilitator_priv_key],
         [txn1, txn2, txn3]
     )
     wait_for_confirmation(txn_id)
@@ -470,7 +473,7 @@ def invest(address, priv_key, app_id, amount, asset=settings.ALGO_ASSET):
         amount,
         asset=asset
     )
-    
+
     txn_id = sign_send_atomic_trasfer(priv_key, [txn1, txn2, txn3])
     wait_for_confirmation(txn_id)
 
@@ -500,6 +503,7 @@ def withdraw(address, app_id):
     )
     return txn
 
+
 def delete(address, app_id):
     params = CLIENT.suggested_params()
     txn = transaction.ApplicationDeleteTxn(
@@ -509,3 +513,21 @@ def delete(address, app_id):
         foreign_assets=[settings.ALGO_ASSET]
     )
     return txn
+
+
+def opted_in_addresses(app_id):
+    accounts = INDEXER.accounts(application_id=app_id)['accounts']
+    print("ACCS", accounts)
+    role_addresses = defaultdict(list)
+    for account in accounts:
+        apps_local_state = account['apps-local-state']
+        for app_local_state in apps_local_state:
+            print("AID", app_local_state['id'], app_id)
+            if app_local_state['id'] == app_id:
+                for key_value in app_local_state['key-value']:
+                    print("KEY V", base64.b64decode(key_value['key']).decode())
+                    if base64.b64decode(key_value['key']).decode() == "role":
+                        role_addresses[key_value['value']
+                                       ['uint']].append(account['address'])
+    print("ADDD", role_addresses)
+    return role_addresses
