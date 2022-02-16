@@ -1,4 +1,4 @@
-from django.shortcuts import  get_object_or_404
+from django.shortcuts import get_object_or_404
 from rest_framework import status
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
@@ -65,20 +65,19 @@ class InvestmentView(CommonView):
         tags=['investor'])
     def create(self, request, pk=None):
         project = get_object_or_404(
-            Project, 
+            Project,
             pk=pk,
             status=Project.FUNDRAISING,
             state__in=(Project.INITIALIZED, Project.POSTPONED)
         )
         account = request.user.account
         invest(
-            account.address, 
-            account.private_key, 
-            project.app_id, 
+            account.address,
+            account.private_key,
+            project.app_id,
             int(request.data.get('amount'))
         )
 
-        
         # with transaction.atomic():
         #     serializer = self.serializer_class(data=request.data)
         #     serializer.is_valid(raise_exception=True)
@@ -87,8 +86,8 @@ class InvestmentView(CommonView):
         #     end = serializer.validated_data['end']
 
         #     project = get_object_or_404(
-        #         Project, 
-        #         pk=pk, 
+        #         Project,
+        #         pk=pk,
         #         investment=None,
         #         start__lte=start,
         #         end__gte=end)
@@ -104,16 +103,18 @@ class InvestmentView(CommonView):
 
         #     serializer = self.serializer_class(investment)
         return Response(status=status.HTTP_201_CREATED)
-        
+
     @swagger_auto_schema(
         operation_summary="Investment details",
         tags=['investor'])
     def retrieve(self, request, pk=None):
-        project = get_object_or_404(
-            Project, 
-            pk=pk, 
-            investment__isnull=False)
+        project = get_object_or_404(Project, pk=pk)
 
-        investment = project.investment
-        serializer = self.serializer_class(investment)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        investors = opted_in_addresses(
+            project.app_id).get(CustomUser.INVESTOR, [])
+        return Response(
+            {
+                "invested": request.user.account.address in investors
+            },
+            status=status.HTTP_200_OK
+        )

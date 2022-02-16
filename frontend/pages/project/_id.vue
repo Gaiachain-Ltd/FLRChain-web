@@ -38,12 +38,11 @@
             <BeneficiariesCard class="mb-6"></BeneficiariesCard>
           </client-only>
           <client-only
-            v-if="!isFacililator && !project.investment"
+            v-if="!isFacililator && project.status == 0"
             placeholder="Loading..."
           >
             <InputInvestmentCard
               v-if="project.start"
-              class="mb-6"
               @refresh="$fetch"
               :project="project"
               :disabled="!$auth.user.opted_in"

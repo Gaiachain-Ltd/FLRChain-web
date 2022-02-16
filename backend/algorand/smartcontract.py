@@ -529,5 +529,4 @@ def opted_in_addresses(app_id):
                     if base64.b64decode(key_value['key']).decode() == "role":
                         role_addresses[key_value['value']
                                        ['uint']].append(account['address'])
-    print("ADDD", role_addresses)
     return role_addresses
