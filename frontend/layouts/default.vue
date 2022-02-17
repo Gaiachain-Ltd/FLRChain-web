@@ -62,7 +62,7 @@ export default {
           iconOn: require("@/assets/side/profile_on.svg"),
           iconOff: require("@/assets/side/profile_off.svg"),
           enabled: this.$route.name === "profile",
-          label: "Profile",
+          label: this.$route.path,
           route: "/profile",
           visible: true,
         },
@@ -77,28 +77,30 @@ export default {
           visible: true,
           childrens: [
             {
-              enabled: this.$route.name === "index",
+              enabled:
+                this.$route.path == "/" ||
+                this.$route.path.includes("/project/all"),
               label: "All",
               route: "/",
               fontSize: 13,
               visible: true,
             },
             {
-              enabled: this.$route.name === "project-fundraising",
+              enabled: this.$route.path.includes("/project/fundraising"),
               label: "Fundraising",
               route: "/project/fundraising",
               fontSize: 13,
               visible: true,
             },
             {
-              enabled: this.$route.name === "project-active",
+              enabled: this.$route.path.includes("/project/active"),
               label: "Active",
               route: "/project/active",
               fontSize: 13,
               visible: true,
             },
             {
-              enabled: this.$route.name === "project-closed",
+              enabled: this.$route.path.includes("/project/closed"),
               label: "Closed",
               route: "/project/closed",
               fontSize: 13,

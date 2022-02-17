@@ -22,7 +22,7 @@ const Utility = {
             case STATUS.CLOSED:
                 return "closed";
             default:
-                return "";
+                return "all";
         }
     }
 }

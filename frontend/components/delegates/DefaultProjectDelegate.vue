@@ -92,22 +92,10 @@ export default {
   },
   methods: {
     ...mapActions(["updateDetailsProjectId"]),
-    redirectByStatus() {
-      switch (this.project.status) {
-        case STATUS.FUNDRAISING:
-          return "fundraising";
-        case STATUS.ACTIVE:
-          return "active";
-        case STATUS.CLOSED:
-          return "closed";
-        default:
-          return "";
-      }
-    },
     details() {
       this.updateDetailsProjectId(this.project.id);
       this.$router.push(
-        `/project/${this.redirectByStatus()}/details`
+        `/project/${this.$route.params.status || "all"}/details`
       );
     },
     formattedValue(value) {
