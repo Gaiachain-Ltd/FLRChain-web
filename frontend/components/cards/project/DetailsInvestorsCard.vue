@@ -38,7 +38,7 @@ export default {
   },
   async fetch() {
     this.investors = await this.$axios
-      .get(`projects/${this.$route.params.id}/investors/`)
+      .get(`projects/${this.project.id}/investors/`)
       .then((reply) => reply.data);
     this.showOverlay = false;
   },

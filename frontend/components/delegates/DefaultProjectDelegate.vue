@@ -48,6 +48,7 @@
 </template>
 
 <script>
+import { mapActions } from "vuex";
 import moment from "moment";
 import { STATUS } from "@/constants/project";
 
@@ -90,6 +91,7 @@ export default {
     },
   },
   methods: {
+    ...mapActions(["updateDetailsProjectId"]),
     redirectByStatus() {
       switch (this.project.status) {
         case STATUS.FUNDRAISING:
@@ -103,8 +105,9 @@ export default {
       }
     },
     details() {
+      this.updateDetailsProjectId(this.project.id);
       this.$router.push(
-        `/project/${this.redirectByStatus()}/${this.project.id}`
+        `/project/${this.redirectByStatus()}/details`
       );
     },
     formattedValue(value) {

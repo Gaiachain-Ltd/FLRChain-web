@@ -1,5 +1,5 @@
 <template>
-  <DefaultCard title="New project:">
+  <DefaultCard>
     <v-layout column>
       <ProjectForm ref="projectForm" :project.sync="project"></ProjectForm>
       <DefaultText>{{ `Milestones & Tasks` }}</DefaultText>

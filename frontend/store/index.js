@@ -1,6 +1,7 @@
 export const state = () => ({
     regEmail: '',
     drawerState: null,
+    detailsProjectId: null
 })
 
 export const getters = {
@@ -24,17 +25,23 @@ export const getters = {
         return state.regEmail;
     },
     getDrawerState(state) {
-      return state.drawerState
+        return state.drawerState
     },
+    getDetailsProjectId(state) {
+        return state.detailsProjectId;
+    }
 }
 
 export const mutations = {
     setRegEmail(state, email) {
         state.regEmail = email;
     },
-    setDrawerState(state,value) {
-      state.drawerState = value;
+    setDrawerState(state, value) {
+        state.drawerState = value;
     },
+    setDetailsProjectId(state, value) {
+        state.detailsProjectId = value;
+    }
 }
 
 export const actions = {
@@ -44,4 +51,7 @@ export const actions = {
     updateDrawerState({ commit }, value) {
         commit('setDrawerState', value);
     },
+    updateDetailsProjectId({ commit }, value) {
+        commit("setDetailsProjectId", value);
+    }
 }

@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-expand-transition>
-      <DefaultCard v-if="!invested" class="mb-6">
+      <DefaultCard v-if="!invested" class="ml-6">
         <v-layout column>
           <DefaultText
             class="my-3"
@@ -60,7 +60,7 @@ export default {
       if (this.$refs.investmentForm.validate()) {
         this.$axios
           .post(
-            `projects/${this.$route.params.id}/investments/`,
+            `projects/${this.project.id}/investments/`,
             this.investment
           )
           .then(() => {
@@ -73,7 +73,7 @@ export default {
   },
   async fetch() {
     this.invested = await this.$axios
-      .get(`projects/${this.$route.params.id}/investments/`)
+      .get(`projects/${this.project.id}/investments/`)
       .then((reply) => reply.data.invested);
   },
 };

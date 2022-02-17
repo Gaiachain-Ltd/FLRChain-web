@@ -52,7 +52,7 @@ export default {
   async fetch() {
     this.invested = 0;
     await this.$axios
-      .get(`projects/${this.$route.params.id}/investors/`)
+      .get(`projects/${this.project.id}/investors/`)
       .then((reply) =>
         reply.data
           .map((investor) => algosdk.microalgosToAlgos(investor.amount))
