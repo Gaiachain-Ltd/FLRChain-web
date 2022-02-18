@@ -1,5 +1,5 @@
 <template>
-  <v-app-bar height="100px" app class="toolbar-style elevation-16">
+  <v-app-bar height="80px" app class="toolbar-style elevation-16">
     <v-layout row ma-0 align-center>
       <v-app-bar-nav-icon
         @click="toggleDrawer"

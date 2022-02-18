@@ -2,24 +2,35 @@
   <v-layout column>
     <ToolBar title="Project details"></ToolBar>
     <v-layout column shrink>
-      <v-tabs v-model="currentProjectId" fixed-tabs :height="100">
-        <v-tab
-          v-for="project in projects"
-          :key="project.id"
-          :value="`${project.id}`"
-          >{{ project.title }}</v-tab
-        >
-      </v-tabs>
+      <v-card elevation-16 tile style="z-index: 1">
+        <v-tabs v-model="currentProjectId" :height="80" centered hide-slider>
+          <v-tab
+            v-for="project in projects"
+            :key="project.id"
+            :value="`${project.id}`"
+            active-class="active-project-tab"
+            class="text-none inactive-project-tab"
+            >{{ project.title }}
+          </v-tab>
+        </v-tabs>
+      </v-card>
       <v-tabs-items
+        mt-2
         v-model="currentProjectId"
         style="background-color: transparent"
       >
         <v-tab-item v-for="project in projects" :key="project.id">
-          <v-layout shrink>
-            <v-tabs centered v-model="currentTab">
-              <v-tab v-for="tab in tabs" :key="tab.name">{{ tab.name }}</v-tab>
+          <v-card tile elevation-16>
+            <v-tabs centered v-model="currentTab" :height="60">
+              <v-tab
+                v-for="tab in tabs"
+                :key="tab.name"
+                active-class="active-section-tab"
+                class="text-none inactive-section-tab"
+                >{{ tab.name }}</v-tab
+              >
             </v-tabs>
-          </v-layout>
+          </v-card>
           <v-layout>
             <v-tabs-items
               v-model="currentTab"
@@ -31,6 +42,10 @@
                   v-if="currentProject"
                   :project="currentProject"
                 ></OverviewCard>
+              </v-tab-item>
+              <v-tab-item> </v-tab-item>
+              <v-tab-item>
+                <v-tab-item> </v-tab-item>
               </v-tab-item>
             </v-tabs-items>
           </v-layout>
@@ -115,3 +130,29 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.inactive-project-tab {
+  opacity: 0.6;
+  word-spacing: normal;
+}
+.active-project-tab {
+  background-color: var(--v-primary-base);
+  border-radius: 10px;
+  color: white !important;
+  margin-top: 15px;
+  padding-top: 5px;
+  margin-bottom: 20px;
+  opacity: 1;
+  word-spacing: normal;
+}
+.inactive-section-tab {
+  opacity: 0.6;
+  word-spacing: normal;
+}
+.active-section-tab {
+  color: var(--v-primary-base);
+  opacity: 1;
+  word-spacing: normal;
+}
+</style>
