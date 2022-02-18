@@ -62,7 +62,7 @@ export default {
           iconOn: require("@/assets/side/profile_on.svg"),
           iconOff: require("@/assets/side/profile_off.svg"),
           enabled: this.$route.name === "profile",
-          label: this.$route.path,
+          label: "Profile",
           route: "/profile",
           visible: true,
         },

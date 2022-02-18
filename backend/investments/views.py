@@ -53,8 +53,7 @@ class InvestmentView(CommonView):
         for investor in investors:
             data[investor[2]] = {
                 **data[investor[2]],
-                "first_name": investor[0],
-                "last_name": investor[1],
+                "name": f"{investor[0]} {investor[1]}",
             }
 
         return Response(data.values(), status=status.HTTP_200_OK)

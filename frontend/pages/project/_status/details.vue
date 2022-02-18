@@ -37,15 +37,20 @@
               style="width: 100%; background-color: transparent"
             >
               <v-tab-item>
-                <OverviewCard
+                <OverviewTab
                   class="ma-6"
                   v-if="currentProject"
                   :project="currentProject"
-                ></OverviewCard>
+                ></OverviewTab>
               </v-tab-item>
               <v-tab-item> </v-tab-item>
+              <v-tab-item> </v-tab-item>
               <v-tab-item>
-                <v-tab-item> </v-tab-item>
+                <InvestorsTab
+                class="ma-6"
+                  v-if="currentProject"
+                  :project="currentProject"
+                ></InvestorsTab>
               </v-tab-item>
             </v-tabs-items>
           </v-layout>
@@ -81,18 +86,15 @@ export default {
       },
       set(value) {
         if (this.projects.length) {
-          console.log("REPLACT", this.projects[value].id, value);
           this.updateDetailsProjectId(this.projects[value].id);
         }
       },
     },
     currentProject() {
-      console.log("PROJECTSaa", this.projects);
       const index = _.findIndex(this.projects, [
         "id",
         this.getDetailsProjectId,
       ]);
-      console.log("INDEX", index, this.$route.params.id);
       return index !== -1 ? this.projects[index] : null;
     },
     tabs() {
@@ -117,7 +119,8 @@ export default {
   },
   components: {
     ToolBar: () => import("@/components/toolbar/ToolBar"),
-    OverviewCard: () => import("@/components/cards/project/OverviewCard"),
+    OverviewTab: () => import("@/components/tabs/projects/OverviewTab"),
+    InvestorsTab: () => import("@/components/tabs/projects/InvestorsTab"),
   },
   async fetch() {
     this.projects = await this.$axios

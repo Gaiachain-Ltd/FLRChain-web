@@ -6,7 +6,7 @@
     ></FundraisingProgressCard>
     <v-layout class="mb-6">
       <DetailsBlockchainCard :project="project"></DetailsBlockchainCard>
-      <InputInvestmentCard :project="project"></InputInvestmentCard>
+      <InputInvestmentCard v-if="project.status == 1" :project="project"></InputInvestmentCard>
     </v-layout>
     <InputProjectCard class="mb-6" :project.sync="project"></InputProjectCard>
   </v-layout>
