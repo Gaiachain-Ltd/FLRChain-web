@@ -36,21 +36,13 @@
               v-model="currentTab"
               style="width: 100%; background-color: transparent"
             >
-              <v-tab-item>
-                <OverviewTab
+              <v-tab-item v-for="tab in tabs" :key="tab.name">
+                <component
                   class="ma-6"
                   v-if="currentProject"
                   :project="currentProject"
-                ></OverviewTab>
-              </v-tab-item>
-              <v-tab-item> </v-tab-item>
-              <v-tab-item> </v-tab-item>
-              <v-tab-item>
-                <InvestorsTab
-                class="ma-6"
-                  v-if="currentProject"
-                  :project="currentProject"
-                ></InvestorsTab>
+                  :is="tab.component"
+                ></component>
               </v-tab-item>
             </v-tabs-items>
           </v-layout>
@@ -75,7 +67,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["getDetailsProjectId"]),
+    ...mapGetters(["getDetailsProjectId", "isFacililator"]),
     currentProjectId: {
       get() {
         const index = _.findIndex(this.projects, [
@@ -101,17 +93,28 @@ export default {
       return [
         {
           name: "Overview",
+          component: "OverviewTab",
+          visible: true,
+        },
+        {
+          name: "Stewards",
+          component: "StewardsTab",
+          visible: this.isFacililator,
         },
         {
           name: "Rewards",
+          visible: true,
         },
         {
           name: "Progress",
+          visible: true,
         },
         {
           name: "Investors",
+          component: "InvestorsTab",
+          visible: true,
         },
-      ];
+      ].filter((tab) => tab.visible);
     },
   },
   methods: {
@@ -121,6 +124,7 @@ export default {
     ToolBar: () => import("@/components/toolbar/ToolBar"),
     OverviewTab: () => import("@/components/tabs/projects/OverviewTab"),
     InvestorsTab: () => import("@/components/tabs/projects/InvestorsTab"),
+    StewardsTab: () => import("@/components/tabs/projects/StewardsTab")
   },
   async fetch() {
     this.projects = await this.$axios

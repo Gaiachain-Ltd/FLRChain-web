@@ -58,7 +58,6 @@ export default {
     this.investors = await this.$axios
       .get(`projects/${this.project.id}/investors/`)
       .then((reply) => reply.data);
-    this.showOverlay = false;
   },
 };
 </script>   

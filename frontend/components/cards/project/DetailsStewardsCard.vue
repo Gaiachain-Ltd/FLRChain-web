@@ -5,9 +5,9 @@
         class="mb-3"
         :color="$vuetify.theme.themes.light.primary"
         bold
-        >Investors</DefaultText
+        >Stewards</DefaultText
       >
-      <InvestorsTable :project="project"></InvestorsTable>
+      <StewardsTable :project="project"></StewardsTable>
     </v-layout>
   </DefaultCard>
 </template>
@@ -20,7 +20,7 @@ export default {
   components: {
     DefaultText: () => import("@/components/texts/DefaultText"),
     DefaultCard: () => import("@/components/cards/DefaultCard"),
-    InvestorsTable: () => import("@/components/tables/projects/InvestorsTable"),
+    StewardsTable: () => import("@/components/tables/projects/StewardsTable"),
   },
 };
 </script>
