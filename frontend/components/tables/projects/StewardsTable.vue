@@ -1,16 +1,27 @@
 <template>
-  <v-data-table :headers="headers" :items="investors" hide-default-footer>
+  <v-data-table :headers="headers" :items="beneficiaries" hide-default-footer>
+    <template v-slot:item.datetime="{ item }">
+      {{ datetime(item) }}
+    </template>
+    <template v-slot:item.details="{ item }">
+      <v-layout @click.prevent="() => openExplorerTransactionLink(item.optin_txid)">
+        <a>See more</a>
+      </v-layout>
+    </template>
   </v-data-table>
 </template>
 
 <script>
+import AlgoExplorerMixin from "@/mixins/AlgoExplorerMixin";
+
 export default {
+  mixins: [AlgoExplorerMixin],
   props: {
     project: {},
   },
   data() {
     return {
-      investors: [],
+      beneficiaries: [],
       headers: [
         {
           text: "Steward",
@@ -18,19 +29,31 @@ export default {
         },
         {
           text: "Date",
-          value: "amount",
+          value: "datetime",
         },
         {
-          text: "Status",
-          value: "details",
+          text: "Location",
+          value: "village",
+        },
+        {
+          text: "Request",
+        },
+        {
+          text: "Details",
+          value: "details"
         },
       ],
     };
   },
+  methods: {
+    datetime(item) {
+      return this.$moment.unix(item["round-time"]).format("YYYY-MM-DD HH:mm");
+    },
+  },
   async fetch() {
-    // this.investors = await this.$axios
-    //   .get(`projects/${this.project.id}/investors/`)
-    //   .then((reply) => reply.data);
+    this.beneficiaries = await this.$axios
+      .get(`projects/${this.project.id}/assignments/`)
+      .then((reply) => reply.data.filter(ben => ben.approval == 0));
   },
 };
 </script>   

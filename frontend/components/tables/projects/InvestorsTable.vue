@@ -51,7 +51,7 @@ export default {
       return `${algosdk.microalgosToAlgos(item.amount)} USDC`;
     },
     datetime(item) {
-      return this.$moment.unix(item["round-time"]).format("HH:mm YYYY-MM-DD");
+      return this.$moment.unix(item["round-time"]).format("YYYY-MM-DD HH:mm");
     },
   },
   async fetch() {

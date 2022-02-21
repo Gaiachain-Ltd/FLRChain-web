@@ -564,7 +564,7 @@ def get_beneficiaries(app_id):
                 if base64.b64decode(delta['key']).decode() == "role" and beneficiaries.get(local_state_delta['address'], None) is None and delta['value']['uint'] == 3:
                     beneficiaries[local_state_delta['address']] = {
                         "approval": 0, 
-                        "datetime": datetime.datetime.fromtimestamp(transaction['round-time']),
+                        "round-time": transaction['round-time'],
                         "optin_txid": transaction['id']
                     }
                 elif base64.b64decode(delta['key']).decode() == "join":

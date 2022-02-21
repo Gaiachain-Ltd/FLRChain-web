@@ -6,7 +6,9 @@
 
 <script>
 export default {
-  props: {},
+  props: {
+    project: {}
+  },
   components: {
     DetailsStewardsCard: () =>
       import("@/components/cards/project/DetailsStewardsCard"),
