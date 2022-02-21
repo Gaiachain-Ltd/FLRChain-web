@@ -9,6 +9,8 @@ from drf_yasg.utils import swagger_auto_schema
 from users.models import CustomUser
 from django_filters import rest_framework as filters
 from users.permissions import *
+from algorand.utils import *
+from algorand import smartcontract
 
 
 class ProjectView(CommonView):
@@ -82,26 +84,36 @@ class ProjectView(CommonView):
 
 class AssignmentView(CommonView):
     serializer_class = AssignmentSerializer
+    permission_classes = ()
 
-    def get_permissions(self):
-        """
-        Only beneficiary can make join request.
-        Only facililator can get list of pending beneficiaries.
-        Only facililator can accept/reject join request.
-        """
-        if self.request.method == "POST":
-            return [permission() for permission in [*self.permission_classes, isBeneficiary]]
-        elif self.request.method in ["GET", "PUT"]:
-            return [permission() for permission in [*self.permission_classes, isFacilitator]]
-        return [permission() for permission in self.permission_classes]
+    # def get_permissions(self):
+    #     """
+    #     Only beneficiary can make join request.
+    #     Only facililator can get list of pending beneficiaries.
+    #     Only facililator can accept/reject join request.
+    #     """
+    #     if self.request.method == "POST":
+    #         return [permission() for permission in [*self.permission_classes, isBeneficiary]]
+    #     elif self.request.method in ["GET", "PUT"]:
+    #         return [permission() for permission in [*self.permission_classes, isFacilitator]]
+    #     return [permission() for permission in self.permission_classes]
 
     @swagger_auto_schema(
         operation_summary="Beneficiary list",
         tags=['assignment', 'facililator'])
     def list(self, request, pk=None):
-        assignments = Assignment.objects.filter(
-            project=pk).order_by('-created')
-        return self.paginated_response(assignments, request)
+        project = get_object_or_404(Project, pk=pk)
+        data = smartcontract.get_beneficiaries(project.app_id)
+        beneficiaries = CustomUser.objects.select_related('account').filter(
+            account__address__in=data.keys()
+        ).values_list('id', 'first_name', 'last_name', 'account__address')
+
+        for beneficiary in beneficiaries:
+            data[beneficiary[3]]['name'] = f"{beneficiary[1]} {beneficiary[2]}"
+            data[beneficiary[3]]['id'] = beneficiary[0]
+            data[beneficiary[3]]['address'] = beneficiary[3]
+            
+        return Response(data.values(), status=status.HTTP_200_OK)
 
     @swagger_auto_schema(
         operation_summary="Join to project",
@@ -123,7 +135,6 @@ class AssignmentView(CommonView):
         assignment = get_object_or_404(Assignment, pk=pk)
         serializer = self.serializer_class(assignment, data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save()
-
+        serializer.save(state=Assignment.TO_SYNC)
         return Response(serializer.data, status=status.HTTP_200_OK)
 

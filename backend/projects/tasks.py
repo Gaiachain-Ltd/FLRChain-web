@@ -1,7 +1,7 @@
 import logging
 import datetime
 import base64
-from projects.models import Project
+from projects.models import Project, Assignment
 from accounts.models import Account
 from users.models import CustomUser
 from celery import shared_task
@@ -175,4 +175,36 @@ def close_project():
         project.state = Project.DELETED
         project.save()
 
-        
+@shared_task()
+def join_project():
+    assignments = Assignment.objects.filter(
+        state=Assignment.INITIAL
+    )
+
+    for assignment in assignments:
+        account = assignment.beneficiary.account
+        smartcontract.join(
+            account.address,
+            account.private_key,
+            assignment.project.app_id
+        )
+        assignment.state = Assignment.SYNCED
+        assignment.save()
+
+@shared_task()
+def beneficiary_approval():
+    assignments = Assignment.objects.filter(
+        state=Assignment.TO_SYNC
+    )
+
+    for assignment in assignments:
+        account = assignment.beneficiary.account
+        smartcontract.approval(
+            assignment.project.owner.account.address,
+            assignment.project.owner.account.private_key,
+            account.address,
+            1 if assignment.status == Assignment.ACCEPTED else 0,
+            assignment.project.app_id
+        )
+        assignment.state = Assignment.SYNCED
+        assignment.save()

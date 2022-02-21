@@ -1,4 +1,5 @@
 import base64
+import datetime
 from collections import defaultdict
 from algosdk.v2client import *
 from algosdk.future import *
@@ -530,3 +531,44 @@ def opted_in_addresses(app_id):
                         role_addresses[key_value['value']
                                        ['uint']].append(account['address'])
     return role_addresses
+
+
+def join(address, priv_key, app_id):
+    txn = opt_in(address, app_id, 3)
+    txn_signed = txn.sign(priv_key)
+    txn_id = CLIENT.send_transactions([txn_signed])
+    wait_for_confirmation(txn_id)
+
+
+def approval(address, priv_key, beneficiary_address, value, app_id):
+    params = CLIENT.suggested_params()
+    txn = transaction.ApplicationNoOpTxn(
+        address,
+        params,
+        app_id,
+        ["JOIN", value],
+        foreign_assets=[settings.ALGO_ASSET],
+        accounts=[beneficiary_address]
+    )
+    txn_signed = txn.sign(priv_key)
+    txn_id = CLIENT.send_transactions([txn_signed])
+    wait_for_confirmation(txn_id)
+
+
+def get_beneficiaries(app_id):
+    transactions = INDEXER.search_transactions(application_id=app_id)['transactions']
+    beneficiaries = dict()
+    for transaction in transactions:
+        for local_state_delta in transaction.get('local-state-delta', []):
+            for delta in local_state_delta['delta']:
+                if base64.b64decode(delta['key']).decode() == "role" and beneficiaries.get(local_state_delta['address'], None) is None and delta['value']['uint'] == 3:
+                    beneficiaries[local_state_delta['address']] = {
+                        "approval": 0, 
+                        "datetime": datetime.datetime.fromtimestamp(transaction['round-time']),
+                        "optin_txid": transaction['id']
+                    }
+                elif base64.b64decode(delta['key']).decode() == "join":
+                    beneficiaries[local_state_delta['address']]['approval'] = delta['value']['uint']
+                    beneficiaries[local_state_delta['address']]['approval_txid'] = transaction['id']
+    return beneficiaries
+

@@ -35,7 +35,7 @@ class InvestmentView(CommonView):
             request_fields={
                 "address": application_address(project.app_id),
                 "address_role": "receiver",
-                "asset": settings.ALGO_ASSET,
+                "asset_id": settings.ALGO_ASSET,
                 "min_amount": 1
             },
             reply_fields=[
@@ -51,10 +51,7 @@ class InvestmentView(CommonView):
         ).values_list('first_name', 'last_name', 'account__address')
 
         for investor in investors:
-            data[investor[2]] = {
-                **data[investor[2]],
-                "name": f"{investor[0]} {investor[1]}",
-            }
+            data[investor[2]]['name'] = f"{investor[0]} {investor[1]}"
 
         return Response(data.values(), status=status.HTTP_200_OK)
 

@@ -28,10 +28,6 @@ def check_balance_info(address):
     return CLIENT.account_info(address)
 
 
-def status():
-    return CLIENT.status()
-
-
 def application_address(app_id):
     return get_application_address(app_id)
 
@@ -219,15 +215,14 @@ def atomic_transfer(txns):
     CLIENT.send_transactions(sgtxns)
     return base64.b64encode(gtxn).decode('ascii')
 
-def get_transactions(asset=settings.ALGO_ASSET, **kwargs):
+def get_transactions(**kwargs):
     return INDEXER.search_transactions(
-        asset_id=asset,
         **kwargs
     )
 
 def get_transactions_info(request_fields=dict(), reply_fields=[]):
     transactions = get_transactions(**request_fields)
-
+    print("TRANSACTIONS", transactions)
     transactions_data = defaultdict(dict)
     for transaction in transactions['transactions']:
         for field in reply_fields:

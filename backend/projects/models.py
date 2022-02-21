@@ -105,10 +105,21 @@ class Assignment(models.Model):
         (WAITING, 'Waiting'),
     )
 
+    INITIAL = 0
+    TO_SYNC = 1
+    SYNCED = 2
+
+    STATES = (
+        (INITIAL, "Initial"),
+        (TO_SYNC, "To sync"),
+        (SYNCED, "Synced")
+    )
+
     beneficiary = models.ForeignKey(
         'users.CustomUser', on_delete=models.SET_NULL, null=True)
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
-    status = models.PositiveSmallIntegerField(default=2, choices=STATUS)
+    status = models.PositiveSmallIntegerField(default=WAITING, choices=STATUS)
+    state = models.PositiveSmallIntegerField(default=INITIAL, choices=STATES)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
