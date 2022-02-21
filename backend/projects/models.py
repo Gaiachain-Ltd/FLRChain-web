@@ -95,9 +95,9 @@ class Task(models.Model):
 
 
 class Assignment(models.Model):
-    REJECTED = 0
+    WAITING = 0
     ACCEPTED = 1
-    WAITING = 2
+    REJECTED = 2
 
     STATUS = (
         (REJECTED, 'Rejected'),

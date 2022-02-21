@@ -104,14 +104,21 @@ class AssignmentView(CommonView):
     def list(self, request, pk=None):
         project = get_object_or_404(Project, pk=pk)
         data = smartcontract.get_beneficiaries(project.app_id)
-        beneficiaries = CustomUser.objects.select_related('account').filter(
-            account__address__in=data.keys()
-        ).values_list('id', 'first_name', 'last_name', 'account__address')
+        beneficiaries = Assignment.objects.select_related('beneficiary','beneficiary__account').filter(
+            beneficiary__account__address__in=data.keys()
+        ).values_list(
+            'id', 
+            'beneficiary__id', 
+            'beneficiary__first_name', 
+            'beneficiary__last_name', 
+            'beneficiary__account__address'
+        )
 
         for beneficiary in beneficiaries:
-            data[beneficiary[3]]['name'] = f"{beneficiary[1]} {beneficiary[2]}"
-            data[beneficiary[3]]['id'] = beneficiary[0]
-            data[beneficiary[3]]['address'] = beneficiary[3]
+            data[beneficiary[4]]['name'] = f"{beneficiary[2]} {beneficiary[3]}"
+            data[beneficiary[4]]['id'] = beneficiary[0]
+            data[beneficiary[4]]['user_id'] = beneficiary[1]
+            data[beneficiary[4]]['address'] = beneficiary[4]
             
         return Response(data.values(), status=status.HTTP_200_OK)
 
@@ -132,7 +139,12 @@ class AssignmentView(CommonView):
         request_body=AssignmentSerializer,
         tags=['assignment', 'facililator'])
     def update(self, request, pk=None):
-        assignment = get_object_or_404(Assignment, pk=pk)
+        assignment = get_object_or_404(
+            Assignment, 
+            pk=pk,
+            status=Assignment.WAITING,
+            state=Assignment.SYNCED
+        )
         serializer = self.serializer_class(assignment, data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save(state=Assignment.TO_SYNC)

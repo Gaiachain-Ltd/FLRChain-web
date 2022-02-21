@@ -17,14 +17,14 @@ logger = logging.getLogger(__name__)
 @shared_task()
 def create_project():
     projects = Project.objects.filter(
-        state=Project.INITIAL, 
+        state=Project.INITIAL,
         status=Project.FUNDRAISING
     )
 
     for project in projects:
         if not hasattr(project, "account"):
             account = Account.generate(
-                project, 
+                project,
                 Account.PROJECT_ACCOUNT,
                 settings.ALGO_APP_CREATE_AMOUNT,
                 sync=True
@@ -40,13 +40,13 @@ def create_project():
 @shared_task()
 def initialize_project():
     projects = Project.objects.filter(
-        state=Project.CREATED, 
+        state=Project.CREATED,
         status=Project.FUNDRAISING
     )
 
     for project in projects:
         smartcontract.initialize(
-            project.account.address, 
+            project.account.address,
             project.account.private_key,
             project.owner.account.address,
             project.owner.account.private_key,
@@ -59,13 +59,13 @@ def initialize_project():
 @shared_task()
 def start_project():
     projects = Project.objects.filter(
-        state=Project.INITIALIZED, 
+        state=Project.INITIALIZED,
         status=Project.FUNDRAISING,
         start__lte=datetime.datetime.now().date()
     ).annotate(reward_total=Sum(
         F('task__reward') * F('task__count')
     )).annotate(batch_total=Sum('task__batch')).annotate(
-       total = F('fac_adm_funds') + F('reward_total') + F('batch_total')
+        total=F('fac_adm_funds') + F('reward_total') + F('batch_total')
     )
 
     for project in projects:
@@ -79,14 +79,14 @@ def start_project():
                 project.app_id,
                 int(
                     datetime.datetime.combine(
-                        project.start, 
-                        datetime.time(0,0,0,0)
+                        project.start,
+                        datetime.time(0, 0, 0, 0)
                     ).timestamp()
                 ),
                 int(
                     datetime.datetime.combine(
-                        project.end, 
-                        datetime.time(0,0,0,0)
+                        project.end,
+                        datetime.time(0, 0, 0, 0)
                     ).timestamp()
                 ),
                 project.fac_adm_funds
@@ -99,28 +99,31 @@ def start_project():
 @shared_task()
 def finish_project():
     projects = Project.objects.filter(
-        state=Project.STARTED, 
+        state=Project.STARTED,
         status=Project.ACTIVE,
         end__lte=datetime.datetime.now().date()
     )
 
     for project in projects:
-        investors_data = INDEXER.accounts(application_id=project.app_id)['accounts']
+        investors_data = INDEXER.accounts(
+            application_id=project.app_id)['accounts']
         investor_address_list = list()
         for investor_data in investors_data:
             apps_local_state = investor_data['apps-local-state']
             for app_local_state in apps_local_state:
                 if app_local_state['id'] == project.app_id:
-                        for key_value in app_local_state['key-value']:
-                            if base64.b64decode(key_value['key']).decode() == "role":
-                                if key_value['value']['uint'] in [CustomUser.INVESTOR, CustomUser.FACILITATOR]:
-                                    investor_address_list.append(investor_data['address'])
-        
+                    for key_value in app_local_state['key-value']:
+                        if base64.b64decode(key_value['key']).decode() == "role":
+                            if key_value['value']['uint'] in [CustomUser.INVESTOR, CustomUser.FACILITATOR]:
+                                investor_address_list.append(
+                                    investor_data['address'])
+
         keys = list()
         txns = list()
         for ial in investor_address_list:
             account = Account.objects.get(address=ial)
-            txns.append(smartcontract.withdraw(account.address, project.app_id))
+            txns.append(smartcontract.withdraw(
+                account.address, project.app_id))
             keys.append(account.private_key)
 
             txns.append(smartcontract.opt_out(account.address, project.app_id))
@@ -136,7 +139,7 @@ def finish_project():
         if len(txns) > 0:
             txn = sign_send_atomic_trasfer(keys, txns)
             wait_for_confirmation(txn)
-    
+
         project.state = Project.FINISHED
         project.status = Project.CLOSED
         project.save()
@@ -145,14 +148,14 @@ def finish_project():
 @shared_task()
 def close_project():
     projects = Project.objects.filter(
-        state=Project.FINISHED, 
+        state=Project.FINISHED,
         status=Project.CLOSED
     )
 
     for project in projects:
         main = Account.get_main_account()
         account = project.account
-        
+
         txn1 = smartcontract.delete(account.address, project.app_id)
         txn2, _ = prepare_transfer_assets(
             account.address,
@@ -175,6 +178,7 @@ def close_project():
         project.state = Project.DELETED
         project.save()
 
+
 @shared_task()
 def join_project():
     assignments = Assignment.objects.filter(
@@ -191,6 +195,7 @@ def join_project():
         assignment.state = Assignment.SYNCED
         assignment.save()
 
+
 @shared_task()
 def beneficiary_approval():
     assignments = Assignment.objects.filter(
@@ -203,7 +208,7 @@ def beneficiary_approval():
             assignment.project.owner.account.address,
             assignment.project.owner.account.private_key,
             account.address,
-            1 if assignment.status == Assignment.ACCEPTED else 0,
+            Assignment.ACCEPTED if assignment.status == Assignment.ACCEPTED else Assignment.REJECTED,
             assignment.project.app_id
         )
         assignment.state = Assignment.SYNCED
