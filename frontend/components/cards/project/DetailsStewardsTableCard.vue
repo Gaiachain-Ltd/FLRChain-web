@@ -5,9 +5,9 @@
         class="mb-3"
         :color="$vuetify.theme.themes.light.primary"
         bold
-        >Stewards</DefaultText
+        >Steward request to join the project</DefaultText
       >
-      <StewardsList :project="project"></StewardsList>
+      <StewardsTable :project="project"></StewardsTable>
     </v-layout>
   </DefaultCard>
 </template>
@@ -20,7 +20,7 @@ export default {
   components: {
     DefaultText: () => import("@/components/texts/DefaultText"),
     DefaultCard: () => import("@/components/cards/DefaultCard"),
-    StewardsList: () => import("@/components/lists/projects/StewardsList")
+    StewardsTable: () => import("@/components/tables/projects/StewardsTable"),
   },
 };
 </script>

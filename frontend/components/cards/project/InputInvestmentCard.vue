@@ -1,7 +1,7 @@
 <template>
-  <div>
+  <div class="pa-3">
     <v-expand-transition>
-      <DefaultCard v-if="!invested" class="ml-6">
+      <DefaultCard v-if="!invested">
         <v-layout column>
           <DefaultText
             class="my-3"

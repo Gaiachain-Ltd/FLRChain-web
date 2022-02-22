@@ -1,8 +1,8 @@
 <template>
   <v-form ref="form">
     <v-layout column>
-      <v-layout align-center>
-        <v-flex md5 class="mr-3">
+      <v-layout wrap align-center>
+        <v-flex md5 class="pr-3">
           <v-layout column>
             <TextInput
               label="Project title*"

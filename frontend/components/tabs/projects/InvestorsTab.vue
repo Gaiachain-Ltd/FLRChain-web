@@ -4,7 +4,7 @@
       class="mb-6"
       :project="project"
     ></FundraisingProgressCard>
-    <DetailsInvestorsCard :project="project"></DetailsInvestorsCard>
+    <DetailsInvestorsTableCard :project="project"></DetailsInvestorsTableCard>
   </v-layout>
 </template>
 
@@ -16,8 +16,8 @@ export default {
   components: {
     FundraisingProgressCard: () =>
       import("@/components/cards/project/FundraisingProgressCard"),
-    DetailsInvestorsCard: () =>
-      import("@/components/cards/project/DetailsInvestorsCard"),
+    DetailsInvestorsTableCard: () =>
+      import("@/components/cards/project/DetailsInvestorsTableCard"),
   },
 };
 </script>

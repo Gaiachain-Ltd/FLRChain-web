@@ -38,7 +38,7 @@
             >
               <v-tab-item v-for="tab in tabs" :key="tab.name">
                 <component
-                  class="ma-6"
+                  class="ma-3"
                   v-if="currentProject"
                   :project="currentProject"
                   :is="tab.component"

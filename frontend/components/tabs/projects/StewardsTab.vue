@@ -1,6 +1,6 @@
 <template>
   <v-layout column>
-    <DetailsStewardsCard :project="project"></DetailsStewardsCard>
+    <DetailsStewardsTableCard :project="project"></DetailsStewardsTableCard>
   </v-layout>
 </template>
 
@@ -10,8 +10,8 @@ export default {
     project: {}
   },
   components: {
-    DetailsStewardsCard: () =>
-      import("@/components/cards/project/DetailsStewardsCard"),
+    DetailsStewardsTableCard: () =>
+      import("@/components/cards/project/DetailsStewardsTableCard"),
   },
 };
 </script>

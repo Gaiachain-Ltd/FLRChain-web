@@ -3,7 +3,7 @@
     <v-layout column>
       <ProjectForm ref="projectForm" :project.sync="project"></ProjectForm>
       <DefaultText>{{ `Milestones & Tasks` }}</DefaultText>
-      <v-layout>
+      <v-layout wrap>
         <v-flex xs2>
           <v-layout column class="mr-6">
             <ProjectStructure :project="project"></ProjectStructure>
