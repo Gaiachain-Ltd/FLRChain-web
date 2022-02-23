@@ -103,10 +103,12 @@ export default {
         },
         {
           name: "Rewards",
+          component: "RewardsTab",
           visible: true,
         },
         {
           name: "Progress",
+          component: "ProgressTab",
           visible: true,
         },
         {
@@ -124,7 +126,9 @@ export default {
     ToolBar: () => import("@/components/toolbar/ToolBar"),
     OverviewTab: () => import("@/components/tabs/projects/OverviewTab"),
     InvestorsTab: () => import("@/components/tabs/projects/InvestorsTab"),
-    StewardsTab: () => import("@/components/tabs/projects/StewardsTab")
+    StewardsTab: () => import("@/components/tabs/projects/StewardsTab"),
+    RewardsTab: () => import("@/components/tabs/projects/RewardsTab"),
+    ProgressTab: () => import("@/components/tabs/projects/ProgressTab")
   },
   async fetch() {
     this.projects = await this.$axios

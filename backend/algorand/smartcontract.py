@@ -189,8 +189,8 @@ def approval_program():
         Assert(is_accepted(Txn.accounts[1])),
         Assert(
             Or(
-                Btoi(Txn.application_args[1]) == ACCEPTED_VERIFY,
-                Btoi(Txn.application_args[1]) == REJECTED_VERIFY
+                Btoi(Txn.application_args[2]) == ACCEPTED_VERIFY,
+                Btoi(Txn.application_args[2]) == REJECTED_VERIFY
             )
         ),
         App.localPut(
@@ -198,7 +198,7 @@ def approval_program():
             L_TOTAL_KEY,
             Minus(
                 App.localGet(Txn.accounts[1], L_TOTAL_KEY),
-                Btoi(Txn.application_args[2])
+                Btoi(Txn.application_args[1])
             )
         ),
         App.localPut(
@@ -209,7 +209,7 @@ def approval_program():
                 Int(1)
             )
         ),
-        If(Btoi(Txn.application_args[1]) == ACCEPTED_VERIFY).
+        If(Btoi(Txn.application_args[2]) == ACCEPTED_VERIFY).
         Then(
             Seq([
                 App.localPut(
@@ -217,7 +217,7 @@ def approval_program():
                     L_BALANCE_KEY,
                     Add(
                         App.localGet(Txn.accounts[1], L_BALANCE_KEY),
-                        Btoi(Txn.application_args[2])
+                        Btoi(Txn.application_args[1])
                     )
                 ),
                 InnerTxnBuilder.Begin(),
@@ -225,7 +225,7 @@ def approval_program():
                     TxnField.type_enum: TxnType.AssetTransfer,
                     TxnField.xfer_asset: Txn.assets[0],
                     TxnField.asset_receiver: Txn.accounts[1],
-                    TxnField.asset_amount: Btoi(Txn.application_args[2]),
+                    TxnField.asset_amount: Btoi(Txn.application_args[1]),
                 }),
                 InnerTxnBuilder.Submit(),
             ])
@@ -572,3 +572,30 @@ def get_beneficiaries(app_id):
                     beneficiaries[local_state_delta['address']]['approval_txid'] = transaction['id']
     return beneficiaries
 
+def work(address, priv_key, activity_id, amount, app_id):
+    params = CLIENT.suggested_params()
+    txn = transaction.ApplicationNoOpTxn(
+        address,
+        params,
+        app_id,
+        ["WORK", amount],
+        note=f"W|W|{activity_id}"
+    )
+    txn_signed = txn.sign(priv_key)
+    txn_id = CLIENT.send_transactions([txn_signed])
+    wait_for_confirmation(txn_id)
+
+def verify(address, priv_key, beneficiary_address, activity_id, amount, value, app_id):
+    params = CLIENT.suggested_params()
+    txn = transaction.ApplicationNoOpTxn(
+        address,
+        params,
+        app_id,
+        ["VERIFY", amount, value],
+        note=f"W|V|{activity_id}",
+        foreign_assets=[settings.ALGO_ASSET],
+        accounts=[beneficiary_address]
+    )
+    txn_signed = txn.sign(priv_key)
+    txn_id = CLIENT.send_transactions([txn_signed])
+    wait_for_confirmation(txn_id)

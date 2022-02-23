@@ -118,6 +118,7 @@ class ProjectSerializer(serializers.ModelSerializer):
                 
                 for task in milestone['tasks']:
                     task_obj = Task.objects.create(
+                        name=task['name'],
                         project=project_obj,
                         milestone=milestone_obj,
                         reward=task['reward'],

@@ -26,3 +26,7 @@ class ActivitySerializer(serializers.ModelSerializer):
                   'created', 'beneficiary', 'txid')
         read_only_fields = ('id', 'project', 'task', 'beneficiary',
                             'txid')
+
+
+class ActivityVerificationSerializer(serializers.Serializer):
+    status = serializers.IntegerField()

@@ -114,12 +114,11 @@ def finish_project():
                 if app_local_state['id'] == project.app_id:
                     for key_value in app_local_state['key-value']:
                         if base64.b64decode(key_value['key']).decode() == "role":
-                            if key_value['value']['uint'] in [CustomUser.INVESTOR, CustomUser.FACILITATOR]:
-                                investor_address_list.append(
-                                    investor_data['address'])
+                            investor_address_list.append(investor_data['address'])
 
         keys = list()
         txns = list()
+        print("ADDRESSES", investor_address_list)
         for ial in investor_address_list:
             account = Account.objects.get(address=ial)
             txns.append(smartcontract.withdraw(

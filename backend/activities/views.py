@@ -1,3 +1,4 @@
+import base64
 from django.shortcuts import get_object_or_404
 from common.views import CommonView
 from activities.serializers import ActivitySerializer
@@ -12,30 +13,67 @@ from transactions.models import Transaction
 from users.models import CustomUser
 from users.permissions import isBeneficiary, isOptedIn
 from algorand import utils
+from algorand import smartcontract
+from activities.serializers import *
 
 
 class ActivityView(CommonView):
-    serializer_class = ActivitySerializer
-    parser_classes = (MultiPartParser,)
+    # serializer_class = ActivitySerializer
+    # parser_classes = (MultiPartParser,)
 
-    def get_permissions(self):
-        """
-        Only facililator can make and update projects.
-        """
-        if self.request.method == "POST":
-            return [permission() for permission in [
-                *self.permission_classes, isBeneficiary, isOptedIn]]
-        return [permission() for permission in self.permission_classes]
+    # def get_permissions(self):
+    #     """
+    #     Only facililator can make and update projects.
+    #     """
+    #     if self.request.method == "POST":
+    #         return [permission() for permission in [
+    #             *self.permission_classes, isBeneficiary, isOptedIn]]
+    #     return [permission() for permission in self.permission_classes]
 
     @swagger_auto_schema(
         operation_summary="History activity",
         tags=['activities', 'beneficiary', 'investor', 'facililator'])
     def list(self, request, pk=None):
-        if request.user.type == CustomUser.BENEFICIARY:
-            activities = Activity.objects.filter(project=pk, user=request.user)
-        else:
-            activities = Activity.objects.filter(project=pk)
-        return self.paginated_response(activities, request)
+        project = get_object_or_404(Project, pk=pk)
+        transactions = utils.get_transactions(
+            application_id=project.app_id,
+            note_prefix="W|".encode()
+        )['transactions']
+
+        data = dict()
+        for transaction in transactions:
+            notes = base64.b64decode(transaction['note']).decode().split('|')
+            if len(notes) != 3:
+                continue
+
+            amount = base64.b64decode(transaction['application-transaction']['application-args'][1])
+            activity_status = notes[1]
+            if activity_status == "W":
+                activity_status = 0
+            elif activity_status == "V":
+                value = base64.b64decode(transaction['application-transaction']['application-args'][2])
+                activity_status = int.from_bytes(value, "big")
+
+            activity_id = notes[2]
+            data[activity_id] = {
+                "id": activity_id,
+                "txid": transaction['id'],
+                "amount": int.from_bytes(amount, "big"),
+                "status": activity_status,
+                "round-time": transaction['round-time']
+            }
+        
+        activities = Activity.objects.filter(id__in=data.keys())
+        for activity in activities:
+            data[str(activity.id)]['name'] = f"{activity.user.first_name} {activity.user.last_name}"
+            data[str(activity.id)]['task_id'] = activity.task.id
+        
+        return Response(data.values(), status=status.HTTP_200_OK)
+        # if request.user.type == CustomUser.BENEFICIARY:
+        #     activities = Activity.objects.filter(project=pk, user=request.user)
+        # else:
+        #     activities = Activity.objects.filter(project=pk)
+        # return self.paginated_response(activities, request)
 
     @swagger_auto_schema(
         operation_summary="Create new activity",
@@ -46,41 +84,66 @@ class ActivityView(CommonView):
             project = get_object_or_404(
                 Project.objects.with_beneficiary_assignment_status(request.user),
                 assignment_status=Assignment.ACCEPTED,
-                pk=project_pk)
+                pk=project_pk
+            )
 
             task = get_object_or_404(
                 Task, 
                 project=project, 
-                pk=task_pk)
+                pk=task_pk
+            )
 
-            # Check if smartcontract got sufficient balance to pay reward:
-            if not project.smartcontract.check_if_sufficient_balance(task.reward):
-                return Response(
-                    { "reward": "Insufficient balance." }, status=status.HTTP_400_BAD_REQUEST)
+            # # Check if smartcontract got sufficient balance to pay reward:
+            # if not project.smartcontract.check_if_sufficient_balance(task.reward):
+            #     return Response(
+            #         { "reward": "Insufficient balance." }, status=status.HTTP_400_BAD_REQUEST)
 
             serializer = self.serializer_class(data=request.data)
             serializer.is_valid(raise_exception=True)
             activity = serializer.save(
                 user=request.user,
                 project=project,
-                task=task)
+                task=task
+            )
 
-            # Check balance before transfer to determine if after reward investment should be closed:
-            balance_check = project.smartcontract.check_if_sufficient_balance(extra=task.reward)
+            # # Check balance before transfer to determine if after reward investment should be closed:
+            # balance_check = project.smartcontract.check_if_sufficient_balance(extra=task.reward)
 
-            transfer = Transaction.transfer(
-                project.smartcontract.account,
-                request.user.account,
-                task.reward,
-                Transaction.USDC,
-                Transaction.REWARD,
-                project=project)
+            # transfer = Transaction.transfer(
+            #     project.smartcontract.account,
+            #     request.user.account,
+            #     task.reward,
+            #     Transaction.USDC,
+            #     Transaction.REWARD,
+            #     project=project)
 
-            activity.transaction = transfer
-            activity.save()
+            # activity.transaction = transfer
+            # activity.save()
 
-            if not balance_check:
-                project.investment.finish()
+            # if not balance_check:
+            #     project.investment.finish()
 
             serializer = self.serializer_class(activity)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def update(self, request, project_pk=None, activity_pk=None):
+        serializer = ActivityVerificationSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        project = get_object_or_404(
+            Project, 
+            pk=project_pk, 
+            owner=request.user
+        )
+        activity = get_object_or_404(
+            Activity, 
+            pk=activity_pk,
+            project=project
+        )
+        
+        activity.status = serializer.validated_data['status']
+        activity.state = Activity.TO_SYNC
+        activity.save()
+
+        return Response(status=status.HTTP_200_OK)
+
