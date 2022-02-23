@@ -1,17 +1,17 @@
 <template>
   <v-layout column>
-    <DetailsStewardsTableCard :project="project"></DetailsStewardsTableCard>
+    <DetailsProgressTableCard :project="project"></DetailsProgressTableCard>
   </v-layout>
 </template>
 
 <script>
 export default {
   props: {
-    project: {}
+    project: {},
   },
   components: {
-    DetailsStewardsTableCard: () =>
-      import("@/components/cards/project/DetailsStewardsTableCard"),
+    DetailsProgressTableCard: () =>
+      import("@/components/cards/project/DetailsProgressTableCard"),
   },
 };
 </script>
