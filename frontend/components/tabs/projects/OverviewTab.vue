@@ -19,16 +19,24 @@
         <DetailsStewardsCard :project="project"></DetailsStewardsCard>
       </v-col>
       <v-col class="ma-0 pa-3" :md="project.status != 0 ? 12 : 8" sm="12">
-        <InputProjectCard :project.sync="project"></InputProjectCard>
+        <InputProjectCard
+          :project.sync="project"
+          :readonly="!isFacililator"
+        ></InputProjectCard>
       </v-col>
     </v-layout>
   </v-layout>
 </template>
 
 <script>
+import { mapGetters } from "vuex";
+
 export default {
   props: {
     project: {},
+  },
+  computed: {
+    ...mapGetters(["isFacililator"]),
   },
   components: {
     DetailsBlockchainCard: () =>

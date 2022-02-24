@@ -1,7 +1,11 @@
 <template>
   <DefaultCard>
     <v-layout column>
-      <ProjectForm ref="projectForm" :project.sync="project"></ProjectForm>
+      <ProjectForm
+        ref="projectForm"
+        :project.sync="project"
+        :readonly="readonly"
+      ></ProjectForm>
       <DefaultText>{{ `Milestones & Tasks` }}</DefaultText>
       <v-layout wrap>
         <v-flex xs2>
@@ -14,9 +18,13 @@
           </v-layout>
         </v-flex>
         <v-layout column>
-          <InputMilestonesCard :project.sync="project"></InputMilestonesCard>
+          <InputMilestonesCard
+            :project.sync="project"
+            :readonly="readonly"
+          ></InputMilestonesCard>
           <InputBudgetCard
             :project.sync="project"
+            :readonly="readonly"
             class="mt-6"
           ></InputBudgetCard>
         </v-layout>
@@ -29,11 +37,14 @@
 export default {
   props: {
     project: {},
+    readonly: {
+      type: Boolean,
+      default: false,
+    },
   },
   components: {
     DefaultText: () => import("@/components/texts/DefaultText"),
-    DefaultCard: () =>
-      import("@/components/cards/DefaultCard"),
+    DefaultCard: () => import("@/components/cards/DefaultCard"),
     ProjectForm: () => import("@/components/forms/project/ProjectForm"),
     InputMilestonesCard: () =>
       import("@/components/cards/project/InputMilestonesCard"),

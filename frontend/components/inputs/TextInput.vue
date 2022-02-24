@@ -6,10 +6,16 @@
     <v-text-field
       class="text-field-style"
       :placeholder="placeholder"
-      solo
+      :solo="!readonly"
+      :readonly="readonly"
+      :disabled="readonly"
       flat
       :background-color="
-        hasError ? '#FBF7F7' : $vuetify.theme.themes.light.tertiary
+        readonly
+          ? 'white'
+          : hasError
+          ? '#FBF7F7'
+          : $vuetify.theme.themes.light.tertiary
       "
       height="50"
       v-model="internalText"
@@ -55,12 +61,16 @@ export default {
     },
     type: {
       type: String,
-      default: 'text'
+      default: "text",
     },
     mask: {
       type: String,
-      default: undefined
-    }
+      default: undefined,
+    },
+    readonly: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {

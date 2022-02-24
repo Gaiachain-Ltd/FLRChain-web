@@ -1,7 +1,11 @@
 <template>
   <v-form>
     <v-layout column>
-      <TextInput label="Milestone name" v-model="milestone.name"></TextInput>
+      <TextInput
+        label="Milestone name"
+        v-model="milestone.name"
+        :readonly="readonly"
+      ></TextInput>
     </v-layout>
   </v-form>
 </template>
@@ -10,6 +14,10 @@
 export default {
   props: {
     value: {},
+    readonly: {
+      type: Boolean,
+      default: false,
+    },
   },
   computed: {
     milestone: {

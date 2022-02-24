@@ -16,13 +16,14 @@
         }}</DefaultText>
         <v-text-field
           class="text-field-style"
-          background-color="#f7f9fb"
+          :background-color="readonly ? 'white' : '#f7f9fb'"
           height="50"
           v-model="date"
           v-bind="attrs"
           v-on="on"
           @click.prevent="showMenu = showMenu"
-          solo
+          :solo="!readonly"
+          :disabled="readonly"
           flat
           readonly
           :required="required"
@@ -70,6 +71,10 @@ export default {
       type: Array,
       default: () => [],
     },
+    readonly: {
+      type: Boolean,
+      default: false
+    }
   },
   data() {
     return {

@@ -20,6 +20,7 @@
         <v-layout column>
           <MilestoneForm
             v-model="project.milestones[milestoneIndex]"
+            :readonly="readonly"
           ></MilestoneForm>
           <v-layout column class="border-wrapper pa-6">
             <v-layout
@@ -32,6 +33,7 @@
                 :index="taskIndex"
                 :milestoneIndex="milestoneIndex + 1"
                 :showDeleteBtn="milestone.tasks.length > 1"
+                :readonly="readonly"
                 @delete="() => onDeleteTask(milestone, taskIndex)"
               ></TaskForm>
               <v-divider class="mb-4"></v-divider>
@@ -59,6 +61,10 @@
 export default {
   props: {
     project: {},
+    readonly: {
+      type: Boolean,
+      default: false
+    }
   },
   data() {
     return {

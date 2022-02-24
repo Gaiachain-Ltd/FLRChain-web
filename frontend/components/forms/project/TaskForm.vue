@@ -18,17 +18,20 @@
           v-model="task.name"
           placeholder="Please enter task name..."
           :rules="requiredRules"
+          :readonly="readonly"
           required
         ></TextInput>
         <TextAreaInput
           label="Instructions for steward"
           v-model="task.instructions"
+          :readonly="readonly"
         ></TextAreaInput>
         <TextInput
           label="Batch"
           v-model="task.batch"
           :rules="requiredRules"
           :icon="icon"
+          :readonly="readonly"
           required
         ></TextInput>
         <TextInput
@@ -36,12 +39,14 @@
           v-model="task.reward"
           :rules="[...requiredRules, ...decimalRules, ...nonZeroDecimalRules]"
           :icon="icon"
+          :readonly="readonly"
           required
         ></TextInput>
         <TextInput
           label="How many times can this task be performed?"
           v-model="task.count"
           :rules="requiredRules"
+          :readonly="readonly"
           required
         ></TextInput>
       </v-layout>
@@ -65,6 +70,10 @@ export default {
       default: 1,
     },
     showDeleteBtn: {
+      type: Boolean,
+      default: false,
+    },
+    readonly: {
       type: Boolean,
       default: false,
     },

@@ -1,6 +1,6 @@
 <template>
   <v-layout column class="border-wrapper pa-3">
-    <BudgetForm :project="project"></BudgetForm>
+    <BudgetForm :project="project" :readonly="readonly"></BudgetForm>
   </v-layout>
 </template>
 
@@ -8,6 +8,10 @@
 export default {
   props: {
     project: {},
+    readonly: {
+      type: Boolean,
+      default: false,
+    },
   },
   components: {
     BudgetForm: () => import("@/components/forms/project/BudgetForm"),

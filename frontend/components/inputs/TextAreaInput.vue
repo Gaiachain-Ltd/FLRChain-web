@@ -6,9 +6,11 @@
     <v-textarea
       class="text-field-style"
       :placeholder="placeholder"
-      solo
+      :solo="!readonly"
+      :readonly="readonly"
+      :disabled="readonly"
       flat
-      background-color="#f7f9fb"
+      :background-color="readonly ? 'white' : '#f7f9fb'"
       v-model="internalText"
       auto-grow
       :rows="4"
@@ -32,6 +34,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    readonly: {
+      type: Boolean,
+      default: false
+    }
   },
   computed: {
     internalText: {

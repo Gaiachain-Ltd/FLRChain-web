@@ -6,6 +6,7 @@
     <TextInput
       label="Facilitator administration funds"
       v-model="project.fac_adm_funds"
+      :readonly="readonly"
     ></TextInput>
   </v-layout>
 </template>
@@ -14,6 +15,10 @@
 export default {
   props: {
     project: {},
+    readonly: {
+      type: Boolean,
+      default: false
+    }
   },
   components: {
     DefaultText: () => import("@/components/texts/DefaultText"),

@@ -9,6 +9,7 @@
               placeholder="Please enter project name..."
               v-model="project.title"
               :rules="requiredRules"
+              :readonly="readonly"
               required
             ></TextInput>
             <TextInput
@@ -16,6 +17,7 @@
               placeholder="Please enter project name..."
               v-model="project.action"
               :rules="requiredRules"
+              :readonly="readonly"
               required
             ></TextInput>
             <v-layout>
@@ -24,6 +26,7 @@
                   label="Start of project*"
                   :text.sync="project.start"
                   :rules="[...requiredRules, ...dateRules]"
+                  :readonly="readonly"
                   required
                 ></DateInput>
               </v-flex>
@@ -33,6 +36,7 @@
                   class="ml-3"
                   :text.sync="project.end"
                   :rules="[...requiredRules, ...dateRules]"
+                  :readonly="readonly"
                   required
                 ></DateInput>
               </v-flex>
@@ -49,6 +53,7 @@
         label="Description"
         placeholder="Please enter project description..."
         v-model="project.description"
+        :readonly="readonly"
       ></TextAreaInput>
     </v-layout>
   </v-form>
@@ -62,6 +67,10 @@ export default {
   mixins: [ValidatorMixin],
   props: {
     project: {},
+    readonly: {
+      type: Boolean,
+      default: false
+    }
   },
   data() {
     return {

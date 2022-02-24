@@ -72,11 +72,17 @@ class Project(models.Model):
 
     objects = ProjectManager.from_queryset(ProjectQuerySet)()
 
+    def __str__(self) -> str:
+        return self.title
+
 
 class Milestone(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     tasks = models.ManyToManyField('projects.Task', related_name='tasks')
+
+    def __str__(self) -> str:
+        return self.name
 
 
 class Task(models.Model):
@@ -92,6 +98,9 @@ class Task(models.Model):
     batch = models.DecimalField(
         max_digits=26, decimal_places=6, default=0)
     count = models.PositiveIntegerField(default=0)
+
+    def __str__(self) -> str:
+        return self.name
 
 
 class Assignment(models.Model):
@@ -125,3 +134,6 @@ class Assignment(models.Model):
 
     class Meta:
         unique_together = ('beneficiary', 'project')
+
+    def __str__(self) -> str:
+        return f"{self.beneficiary} {self.project}"
