@@ -3,7 +3,13 @@
     <ToolBar title="Project details"></ToolBar>
     <v-layout column shrink>
       <v-card elevation-16 tile style="z-index: 1">
-        <v-tabs v-model="currentProjectId" :height="80" centered hide-slider>
+        <v-tabs
+          v-model="currentProjectId"
+          :height="80"
+          centered
+          hide-slider
+          show-arrows
+        >
           <v-tab
             v-for="project in projects"
             :key="project.id"
@@ -21,7 +27,7 @@
       >
         <v-tab-item v-for="project in projects" :key="project.id">
           <v-card tile elevation-16>
-            <v-tabs centered v-model="currentTab" :height="60">
+            <v-tabs centered v-model="currentTab" :height="60" show-arrows>
               <v-tab
                 v-for="tab in tabs"
                 :key="tab.name"
@@ -36,10 +42,10 @@
               v-model="currentTab"
               style="width: 100%; background-color: transparent"
             >
-              <v-tab-item v-for="tab in tabs" :key="tab.name">
+              <v-tab-item v-for="(tab, index) in tabs" :key="tab.name">
                 <component
                   class="ma-3"
-                  v-if="currentProject"
+                  v-if="currentProject && currentTab == index"
                   :project="currentProject"
                   :is="tab.component"
                 ></component>
@@ -128,7 +134,7 @@ export default {
     InvestorsTab: () => import("@/components/tabs/projects/InvestorsTab"),
     StewardsTab: () => import("@/components/tabs/projects/StewardsTab"),
     RewardsTab: () => import("@/components/tabs/projects/RewardsTab"),
-    ProgressTab: () => import("@/components/tabs/projects/ProgressTab")
+    ProgressTab: () => import("@/components/tabs/projects/ProgressTab"),
   },
   async fetch() {
     this.projects = await this.$axios

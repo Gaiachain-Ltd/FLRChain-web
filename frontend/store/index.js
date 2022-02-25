@@ -1,7 +1,9 @@
+const DETAILS_PROJECT_ID = "details_project_id";
+
 export const state = () => ({
     regEmail: '',
     drawerState: null,
-    detailsProjectId: null
+    detailsProjectId: parseInt(localStorage.getItem(DETAILS_PROJECT_ID))
 })
 
 export const getters = {
@@ -41,6 +43,7 @@ export const mutations = {
     },
     setDetailsProjectId(state, value) {
         state.detailsProjectId = value;
+        localStorage.setItem(DETAILS_PROJECT_ID, value);
     }
 }
 
