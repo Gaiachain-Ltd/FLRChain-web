@@ -6,8 +6,8 @@
     <template v-slot:item.datetime="{ item }">
       {{ datetime(item) }}
     </template>
-    <template v-slot:item.request="{ item }">
-      <v-layout align-center>
+    <template v-slot:item.status="{ item }">
+      <v-layout align-center v-if="item.status == 0">
         <ActionButton
           class="mr-1"
           :border="`1px ${$vuetify.theme.themes.light.success} solid !important`"
@@ -25,6 +25,9 @@
           >Reject</ActionButton
         >
       </v-layout>
+      <div v-else :style="{ color: statusColor(item.status) }">
+        {{ status(item.status) }}
+      </div>
     </template>
     <template v-slot:item.details="{ item }">
       <v-layout @click.prevent="() => openExplorerTransactionLink(item.txid)">
@@ -46,6 +49,9 @@ export default {
   data() {
     return {
       activities: [],
+      options: {
+        sortBy: ["status"],
+      },
       headers: [
         {
           text: "Steward",
@@ -65,7 +71,7 @@ export default {
         },
         {
           text: "Request",
-          value: "request",
+          value: "status",
         },
         {
           text: "Details",
@@ -86,13 +92,29 @@ export default {
         .put(`projects/${this.project.id}/activities/${activity.id}/`, {
           status: value,
         })
-        .then(() => {
-          const index = _.findIndex(this.activities, ["id", activity.id]);
-          console.log("INDEX", index);
-          if (index !== -1) {
-            this.activities.splice(index, 1);
-          }
-        });
+        .then(() => this.$fetch());
+    },
+    status(value) {
+      switch (value) {
+        case 0:
+          return "Pending";
+        case 1:
+          return "Accepted";
+        case 2:
+          return "Rejected";
+        default:
+          return value;
+      }
+    },
+    statusColor(value) {
+      switch (value) {
+        case 1:
+          return this.$vuetify.theme.themes.light.success;
+        case 2:
+          return this.$vuetify.theme.themes.light.error;
+        default:
+          return undefined;
+      }
     },
   },
   components: {
@@ -101,7 +123,7 @@ export default {
   async fetch() {
     this.activities = await this.$axios
       .get(`projects/${this.project.id}/activities/`)
-      .then((reply) => reply.data.filter(activity => activity.status == 0));
+      .then((reply) => reply.data);
   },
 };
 </script>   
