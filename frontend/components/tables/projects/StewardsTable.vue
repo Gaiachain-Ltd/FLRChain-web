@@ -1,10 +1,10 @@
 <template>
-  <v-data-table :headers="headers" :items="beneficiaries" hide-default-footer>
+  <v-data-table :headers="headers" :items="beneficiaries" :options.sync="options" hide-default-footer>
     <template v-slot:item.datetime="{ item }">
       {{ datetime(item) }}
     </template>
-    <template v-slot:item.request="{ item }">
-      <v-layout align-center>
+    <template v-slot:item.approval="{ item }">
+      <v-layout align-center v-if="item.approval == 0">
         <ActionButton
           class="mr-1"
           :border="`1px ${$vuetify.theme.themes.light.success} solid !important`"
@@ -22,10 +22,21 @@
           >Reject</ActionButton
         >
       </v-layout>
+      <div v-else :style="{ color: statusColor(item.approval) }">
+        {{ status(item.approval) }}
+      </div>
     </template>
     <template v-slot:item.details="{ item }">
       <v-layout
-        @click.prevent="() => openExplorerTransactionLink(item.optin_txid)"
+        @click.prevent="
+          () => {
+            if (item.approval) {
+              openExplorerTransactionLink(item.approval_txid);
+            } else {
+              openExplorerTransactionLink(item.optin_txid);
+            }
+          }
+        "
       >
         <a>See more</a>
       </v-layout>
@@ -45,6 +56,9 @@ export default {
   data() {
     return {
       beneficiaries: [],
+      options: {
+        "sortBy": ['approval']
+      },
       headers: [
         {
           text: "Steward",
@@ -60,7 +74,7 @@ export default {
         },
         {
           text: "Request",
-          value: "request",
+          value: "approval",
         },
         {
           text: "Details",
@@ -78,13 +92,29 @@ export default {
         .put(`projects/assignments/${beneficiary.id}/`, {
           status: value,
         })
-        .then(() => {
-          const index = _.findIndex(this.beneficiaries, ["id", beneficiary.id]);
-          console.log("INDEX", index);
-          if (index !== -1) {
-            this.beneficiaries.splice(index, 1);
-          }
-        });
+        .then(() => this.$fetch());
+    },
+    status(value) {
+      switch (value) {
+        case 0:
+          return "Pending";
+        case 1:
+          return "Accepted";
+        case 2:
+          return "Rejected";
+        default:
+          return value;
+      }
+    },
+    statusColor(value) {
+      switch (value) {
+        case 1:
+          return this.$vuetify.theme.themes.light.success;
+        case 2:
+          return this.$vuetify.theme.themes.light.error;
+        default:
+          return undefined;
+      }
     },
   },
   components: {
@@ -93,7 +123,7 @@ export default {
   async fetch() {
     this.beneficiaries = await this.$axios
       .get(`projects/${this.project.id}/assignments/`)
-      .then((reply) => reply.data.filter((ben) => ben.approval == 0));
+      .then((reply) => reply.data);
   },
 };
 </script>   
