@@ -465,8 +465,9 @@ def invest(address, priv_key, app_id, amount, asset=settings.ALGO_ASSET):
         address,
         params,
         app_id,
-        ["INVEST"],
-        foreign_assets=[asset]
+        ["INVEST", int(amount * 1000000)],
+        foreign_assets=[asset],
+        note="I|"
     )
     txn3, _ = prepare_transfer_assets(
         address,

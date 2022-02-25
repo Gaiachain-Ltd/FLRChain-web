@@ -1,28 +1,36 @@
 <template>
-  <div class="pa-3">
-    <v-expand-transition>
-      <DefaultCard v-if="!invested">
-        <v-layout column>
-          <DefaultText
-            class="my-3"
-            bold
-            :color="$vuetify.theme.themes.light.primary"
-            >Invest in project</DefaultText
+  <div>
+    <DefaultCard>
+      <v-layout column>
+        <DefaultText
+          class="my-3"
+          bold
+          :color="$vuetify.theme.themes.light.primary"
+          >Invest in project</DefaultText
+        >
+        <v-flex>
+          <InvestmentForm
+            ref="investmentForm"
+            :investment.sync="investment"
+            :readonly="status"
+          ></InvestmentForm>
+        </v-flex>
+        <v-flex>
+          <BlockButton
+            @clicked="
+              () => {
+                if (status) {
+                  openExplorerTransactionLink(investment.txid);
+                } else {
+                  invest();
+                }
+              }
+            "
+            >{{ btnLabel }}</BlockButton
           >
-          <v-flex>
-            <InvestmentForm
-              ref="investmentForm"
-              :investment.sync="investment"
-            ></InvestmentForm>
-          </v-flex>
-          <v-flex>
-            <BlockButton :disabled="disabled" @clicked="invest"
-              >Invest</BlockButton
-            >
-          </v-flex>
-        </v-layout>
-      </DefaultCard>
-    </v-expand-transition>
+        </v-flex>
+      </v-layout>
+    </DefaultCard>
     <ErrorPopup
       v-if="errorPopupVisible"
       :value.sync="errorPopupVisible"
@@ -31,22 +39,29 @@
 </template>
 
 <script>
+import algosdk from "algosdk";
+import AlgoExplorerMixin from "@/mixins/AlgoExplorerMixin";
+
 export default {
+  mixins: [AlgoExplorerMixin],
   props: {
     project: {},
-    disabled: {
-      type: Boolean,
-      default: false,
-    },
   },
   data() {
     return {
-      invested: true,
       errorPopupVisible: false,
       investment: {
         amount: "0",
       },
     };
+  },
+  computed: {
+    status() {
+      return this.investment && this.investment.status;
+    },
+    btnLabel() {
+      return this.status ? "Details" : "Invest";
+    },
   },
   components: {
     DefaultText: () => import("@/components/texts/DefaultText"),
@@ -59,10 +74,7 @@ export default {
     invest() {
       if (this.$refs.investmentForm.validate()) {
         this.$axios
-          .post(
-            `projects/${this.project.id}/investments/`,
-            this.investment
-          )
+          .post(`projects/${this.project.id}/investments/`, this.investment)
           .then(() => {
             this.invested = true;
             this.$emit("refresh");
@@ -72,9 +84,12 @@ export default {
     },
   },
   async fetch() {
-    this.invested = await this.$axios
+    this.investment = await this.$axios
       .get(`projects/${this.project.id}/investments/`)
-      .then((reply) => reply.data.invested);
+      .then((reply) => reply.data);
+    if (this.investment.status) {
+      this.investment.amount = algosdk.microalgosToAlgos(this.investment.amount)
+    }
   },
 };
 </script>

@@ -6,6 +6,7 @@
         v-model="investment.amount"
         :rules="[...requiredRules, ...decimalRules, ...nonZeroDecimalRules]"
         :icon="icon"
+        :readonly="readonly"
         required
       ></TextInput>
     </v-layout>
@@ -19,6 +20,10 @@ export default {
   mixins: [ValidatorMixin],
   props: {
     investment: {},
+    readonly: {
+      type: Boolean,
+      default: false
+    }
   },
   data() {
     return {

@@ -222,7 +222,7 @@ def get_transactions(**kwargs):
 
 def get_transactions_info(request_fields=dict(), reply_fields=[]):
     transactions = get_transactions(**request_fields)
-    print("TRANSACTIONS", transactions)
+    # print("TRANSACTIONS", transactions)
     transactions_data = defaultdict(dict)
     for transaction in transactions['transactions']:
         for field in reply_fields:

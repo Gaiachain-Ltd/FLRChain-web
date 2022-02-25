@@ -8,11 +8,11 @@
       <v-col class="ma-0 pa-3" md="8" sm="12">
         <DetailsBlockchainCard :project="project"></DetailsBlockchainCard>
       </v-col>
-      <v-col class="ma-0 pa-0" md="4" sm="12" v-if="project.status == 0">
+      <v-col class="ma-0 pa-3" md="4" sm="12" v-if="!isFacililator">
         <InputInvestmentCard :project="project"></InputInvestmentCard>
       </v-col>
       <v-col
-        :class="['ma-0 pa-3', project.status == 0 && 'order-md-2']"
+        :class="['ma-0 pa-3', !isFacililator && project.status == 0 && 'order-md-2']"
         md="4"
         sm="12"
       >

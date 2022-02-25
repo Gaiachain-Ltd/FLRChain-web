@@ -17,6 +17,7 @@ from users.models import CustomUser
 from algorand.utils import get_transactions_info, get_transactions, application_address
 import datetime
 from django.conf import settings
+import base64
 
 
 class InvestmentView(CommonView):
@@ -105,12 +106,28 @@ class InvestmentView(CommonView):
         tags=['investor'])
     def retrieve(self, request, pk=None):
         project = get_object_or_404(Project, pk=pk)
+        transactions = get_transactions(
+            application_id=project.app_id,
+            address=request.user.account.address,
+            address_role="sender",
+            note_prefix="I|".encode(),
+            limit=1
+        )['transactions']
 
-        investors = opted_in_addresses(
-            project.app_id).get(CustomUser.INVESTOR, [])
-        return Response(
-            {
-                "invested": request.user.account.address in investors
-            },
-            status=status.HTTP_200_OK
-        )
+        if len(transactions) > 0 and len(transactions[0]['application-transaction']['application-args']) > 1:
+            amount = base64.b64decode(transactions[0]['application-transaction']['application-args'][1])
+            return Response(
+                {
+                    "status": True,
+                    "txid": transactions[0]['id'],
+                    "amount": int.from_bytes(amount, "big")
+                },
+                status=status.HTTP_200_OK
+            )
+        else:
+            return Response(
+                {
+                    "status": False,
+                },
+                status=status.HTTP_200_OK
+            )
