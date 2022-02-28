@@ -15,6 +15,7 @@ from users.permissions import isBeneficiary, isOptedIn
 from algorand import utils
 from algorand import smartcontract
 from activities.serializers import *
+from decimal import *
 
 
 class ActivityView(CommonView):
@@ -146,4 +147,31 @@ class ActivityView(CommonView):
         activity.save()
 
         return Response(status=status.HTTP_200_OK)
+
+    def distributed(self, request, project_pk=None):
+        project = get_object_or_404(Project, pk=project_pk)
+        transactions = utils.get_transactions(
+            application_id=project.app_id,
+            note_prefix="W|V|".encode()
+        )['transactions']
+
+        sum = 0
+        for transaction in transactions:
+            amount = base64.b64decode(transaction['application-transaction']['application-args'][1])
+            sum += int.from_bytes(amount, "big")
+
+        return Response({"sum": sum}, status=status.HTTP_200_OK)
+        #     data[activity_id] = {
+        #         "id": activity_id,
+        #         "txid": transaction['id'],
+        #         "amount": int.from_bytes(amount, "big"),
+        #         "status": activity_status,
+        #         "round-time": transaction['round-time']
+        #     }
+        
+        # activities = Activity.objects.filter(id__in=data.keys())
+        # for activity in activities:
+        #     data[str(activity.id)]['name'] = f"{activity.user.first_name} {activity.user.last_name}"
+        #     data[str(activity.id)]['task_id'] = activity.task.id
+
 
