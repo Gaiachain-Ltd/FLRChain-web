@@ -18,10 +18,10 @@
           </v-layout>
         </v-flex>
         <v-layout column>
-          <InputMilestonesCard
+          <InputActionsCard
             :project.sync="project"
             :readonly="readonly"
-          ></InputMilestonesCard>
+          ></InputActionsCard>
           <InputBudgetCard
             :project.sync="project"
             :readonly="readonly"
@@ -46,8 +46,8 @@ export default {
     DefaultText: () => import("@/components/texts/DefaultText"),
     DefaultCard: () => import("@/components/cards/DefaultCard"),
     ProjectForm: () => import("@/components/forms/project/ProjectForm"),
-    InputMilestonesCard: () =>
-      import("@/components/cards/project/InputMilestonesCard"),
+    InputActionsCard: () =>
+      import("@/components/cards/project/InputActionsCard"),
     ProjectStructure: () =>
       import("@/components/widgets/projects/ProjectStructure"),
     ProjectFundDistribution: () =>

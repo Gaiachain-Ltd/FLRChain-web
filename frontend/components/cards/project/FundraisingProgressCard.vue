@@ -16,16 +16,18 @@ export default {
   },
   computed: {
     total() {
-      if (!this.project.milestones) {
+      if (!this.project.actions) {
         return 0;
       }
       let t = 0;
-      this.project.milestones.forEach((milestone) =>
-        milestone.tasks.forEach(
-          (task) =>
-            (t =
-              parseFloat(task.batch) +
-              parseFloat(task.reward) * parseFloat(task.count))
+      this.project.actions.forEach((action) =>
+        action.milestones.forEach((milestone) =>
+          milestone.tasks.forEach(
+            (task) =>
+              (t =
+                parseFloat(task.batch) +
+                parseFloat(task.reward) * parseFloat(task.count))
+          )
         )
       );
       return t;

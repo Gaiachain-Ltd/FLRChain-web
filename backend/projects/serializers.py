@@ -39,6 +39,15 @@ class MilestoneSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'tasks')
 
 
+class ActionSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(required=False)
+    milestones = MilestoneSerializer(many=True)
+
+    class Meta:
+        model = Action
+        fields = ('id', 'name', 'milestones')
+
+
 class ProjectSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(read_only=True)
 
@@ -54,7 +63,7 @@ class ProjectSerializer(serializers.ModelSerializer):
     start = serializers.DateField()
     end = serializers.DateField()
     
-    milestones = MilestoneSerializer(many=True)
+    actions = ActionSerializer(many=True)
 
     fac_adm_funds = models.DecimalField(
         max_digits=26, decimal_places=6, default=0
@@ -78,7 +87,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             'status',
             'start',
             'end',
-            'milestones',
+            'actions',
             'fac_adm_funds',
             'facilitator',
             'created',
@@ -98,7 +107,6 @@ class ProjectSerializer(serializers.ModelSerializer):
         return data
 
     def create(self, validated_data):
-        now = datetime.datetime.now()
         with transaction.atomic():
             project_obj = Project.objects.create(
                 owner=self.context['owner'],
@@ -109,23 +117,30 @@ class ProjectSerializer(serializers.ModelSerializer):
                 fac_adm_funds=validated_data['fac_adm_funds']
             )
 
-            for milestone in validated_data['milestones']:
-                milestone_obj = Milestone.objects.create(
+            for action in validated_data['actions']:
+                action_obj = Action.objects.create(
                     project=project_obj,
-                    name=milestone['name'],
+                    name=action['name']
                 )
-                project_obj.milestones.add(milestone_obj)
-                
-                for task in milestone['tasks']:
-                    task_obj = Task.objects.create(
-                        name=task['name'],
+                project_obj.actions.add(action_obj)
+
+                for milestone in validated_data['milestones']:
+                    milestone_obj = Milestone.objects.create(
                         project=project_obj,
-                        milestone=milestone_obj,
-                        reward=task['reward'],
-                        batch=task['batch'],
-                        count=task['count']
+                        name=milestone['name'],
                     )
-                    milestone_obj.tasks.add(task_obj)
+                    action_obj.milestones.add(milestone_obj)
+                    
+                    for task in milestone['tasks']:
+                        task_obj = Task.objects.create(
+                            name=task['name'],
+                            project=project_obj,
+                            milestone=milestone_obj,
+                            reward=task['reward'],
+                            batch=task['batch'],
+                            count=task['count']
+                        )
+                        milestone_obj.tasks.add(task_obj)
 
             project_obj.save()
             return project_obj

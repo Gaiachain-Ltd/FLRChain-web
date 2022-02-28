@@ -52,20 +52,24 @@ export default {
   computed: {
     rewards() {
       let rewards = 0;
-      this.project.milestones.forEach((milestone) => {
-        milestone.tasks.forEach((task) => {
-          rewards += parseFloat(task.reward) * parseInt(task.count);
-        });
-      });
+      this.project.actions.forEach((action) =>
+        action.milestones.forEach((milestone) => {
+          milestone.tasks.forEach((task) => {
+            rewards += parseFloat(task.reward) * parseInt(task.count);
+          });
+        })
+      );
       return rewards;
     },
     batches() {
       let batches = 0;
-      this.project.milestones.forEach((milestone) => {
-        milestone.tasks.forEach((task) => {
-          batches += parseFloat(task.batch);
-        });
-      });
+      this.project.actions.forEach((action) =>
+        action.milestones.forEach((milestone) => {
+          milestone.tasks.forEach((task) => {
+            batches += parseFloat(task.batch);
+          });
+        })
+      );
       return batches;
     },
     facAdmFunds() {

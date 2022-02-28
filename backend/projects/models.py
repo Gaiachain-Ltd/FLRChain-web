@@ -42,7 +42,6 @@ class Project(models.Model):
 
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
-    action = models.CharField(max_length=255, blank=True, null=True)
 
     image = models.FileField(upload_to=upload_project_image, null=True, blank=True)
     document = models.FileField(upload_to=upload_project_document, null=True, blank=True)
@@ -60,7 +59,7 @@ class Project(models.Model):
         related_name='beneficiary_list'
     )
         
-    milestones = models.ManyToManyField('projects.Milestone', related_name='milestones')
+    actions = models.ManyToManyField('projects.Action', related_name="actions")
     
     fac_adm_funds = models.DecimalField(
         max_digits=26, decimal_places=6, default=0)
@@ -76,6 +75,15 @@ class Project(models.Model):
         return self.title
 
 
+class Action(models.Model):
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    name = models.CharField(max_length=255)
+    milestones = models.ManyToManyField('projects.Milestone', related_name='milestones')
+
+    def __str__(self) -> str:
+        return self.name
+
+
 class Milestone(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
@@ -86,9 +94,8 @@ class Milestone(models.Model):
 
 
 class Task(models.Model):
-    name = models.CharField(max_length=255)
-    milestone = models.ForeignKey(Milestone, on_delete=models.CASCADE, null=True)
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    name = models.CharField(max_length=255)
     deleted = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)

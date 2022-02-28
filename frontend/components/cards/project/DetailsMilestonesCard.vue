@@ -3,7 +3,7 @@
     <DefaultText :color="$vuetify.theme.themes.light.primary" bold>{{
       `Milestones & Tasks`
     }}</DefaultText>
-    <v-layout
+    <!-- <v-layout
       mt-3
       column
       v-for="(milestone, milestoneIndex) in project.milestones"
@@ -26,7 +26,7 @@
           }}</DefaultText>
         </v-layout>
       </v-layout>
-    </v-layout>
+    </v-layout> -->
   </DefaultCard>
 </template>
 

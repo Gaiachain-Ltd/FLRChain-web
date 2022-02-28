@@ -35,16 +35,21 @@ export default {
         description: "",
         start: this.$moment().format("YYYY-MM-DD"),
         end: this.$moment().format("YYYY-MM-DD"),
-        milestones: [
+        actions: [
           {
             name: "",
-            tasks: [
+            milestones: [
               {
                 name: "",
-                instructions: "",
-                batch: "0",
-                reward: "0",
-                count: 1,
+                tasks: [
+                  {
+                    name: "",
+                    instructions: "",
+                    batch: "0",
+                    reward: "0",
+                    count: 1,
+                  },
+                ],
               },
             ],
           },

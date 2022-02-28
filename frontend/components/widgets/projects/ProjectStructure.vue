@@ -3,27 +3,42 @@
     <v-layout
       column
       shrink
-      v-for="(milestone, milestoneIndex) in project.milestones"
-      :key="milestoneIndex"
+      v-for="(action, actionIndex) in project.actions"
+      :key="actionIndex"
       class="mb-1"
     >
       <ProjectStructureDelegate
-        :index="milestoneIndex + 1"
-        :name="milestone.name"
-        milestone
-        class="mb-1"
+        :name="action.name"
+        kind="action"
+        class="mt-1 mb-1 mb-1"
       ></ProjectStructureDelegate>
       <v-layout
         column
         shrink
-        v-for="(task, taskIndex) in milestone.tasks"
-        :key="taskIndex"
+        v-for="(milestone, milestoneIndex) in action.milestones"
+        :key="milestoneIndex"
         class="mb-1"
       >
         <ProjectStructureDelegate
-          :index="`${milestoneIndex + 1}.${taskIndex + 1}`"
-          :name="task.name"
+          :index="milestoneIndex + 1"
+          :name="milestone.name"
+          kind="milestone"
+          class="mb-1 ml-1"
         ></ProjectStructureDelegate>
+        <v-layout
+          column
+          shrink
+          v-for="(task, taskIndex) in milestone.tasks"
+          :key="taskIndex"
+          class="mb-1"
+        >
+          <ProjectStructureDelegate
+            :index="`${milestoneIndex + 1}.${taskIndex + 1}`"
+            :name="task.name"
+            kind="task"
+            class="ml-2"
+          ></ProjectStructureDelegate>
+        </v-layout>
       </v-layout>
     </v-layout>
   </v-layout>

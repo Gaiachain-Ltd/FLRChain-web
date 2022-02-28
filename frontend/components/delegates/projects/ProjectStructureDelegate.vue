@@ -1,9 +1,12 @@
 <template>
   <v-layout align-center style="width: 100%">
-    <DefaultText class="mr-3" :color="$vuetify.theme.themes.light.primary">{{
-      index
-    }}</DefaultText>
-    <div :class="['decorator mr-3 mb-1', milestone && 'full']"></div>
+    <DefaultText
+      v-if="index"
+      class="mr-3"
+      :color="$vuetify.theme.themes.light.primary"
+      >{{ index }}</DefaultText
+    >
+    <div :class="['decorator mr-3 mb-1', kind]"></div>
     <v-layout>
       <DefaultText>{{ internalName }}</DefaultText>
     </v-layout>
@@ -18,10 +21,11 @@ export default {
     },
     index: {
       type: Number | String,
+      default: "",
     },
-    milestone: {
-      type: Boolean,
-      default: false,
+    kind: {
+      type: String,
+      default: "task",
     },
   },
   computed: {
@@ -49,7 +53,7 @@ export default {
   border-radius: 4px;
   rotate: 45deg;
 
-  &.full {
+  &.action {
     background-color: var(--v-primary-base);
   }
 }
