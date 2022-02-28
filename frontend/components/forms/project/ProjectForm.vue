@@ -12,14 +12,6 @@
               :readonly="readonly"
               required
             ></TextInput>
-            <TextInput
-              label="FLR Action"
-              placeholder="Please enter project name..."
-              v-model="project.action"
-              :rules="requiredRules"
-              :readonly="readonly"
-              required
-            ></TextInput>
             <v-layout>
               <v-flex mr-3>
                 <DateInput

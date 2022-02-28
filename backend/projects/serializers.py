@@ -51,7 +51,6 @@ class ActionSerializer(serializers.ModelSerializer):
 class ProjectSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(read_only=True)
 
-    action = serializers.CharField(required=False, allow_blank=True)
     description = serializers.CharField(required=False, allow_blank=True)
 
     image = serializers.FileField(required=False)
@@ -80,7 +79,6 @@ class ProjectSerializer(serializers.ModelSerializer):
             'id', 
             'title', 
             'description',
-            'action',
             'image',
             'document',
             'budget',
@@ -124,7 +122,7 @@ class ProjectSerializer(serializers.ModelSerializer):
                 )
                 project_obj.actions.add(action_obj)
 
-                for milestone in validated_data['milestones']:
+                for milestone in action['milestones']:
                     milestone_obj = Milestone.objects.create(
                         project=project_obj,
                         name=milestone['name'],
@@ -135,7 +133,6 @@ class ProjectSerializer(serializers.ModelSerializer):
                         task_obj = Task.objects.create(
                             name=task['name'],
                             project=project_obj,
-                            milestone=milestone_obj,
                             reward=task['reward'],
                             batch=task['batch'],
                             count=task['count']
@@ -151,28 +148,73 @@ class ProjectSerializer(serializers.ModelSerializer):
             instance.description = validated_data['description']
             instance.start = validated_data['start']
             instance.end = validated_data['end']
+            instance.fac_adm_funds = validated_data['fac_adm_funds']
 
-            tasks_dict = {
-                task.id: task for task in instance.tasks.filter(deleted=False)}
-            for task in validated_data['tasks']:
-                if task.get('id', None):
-                    task_obj = Task.objects.get(
-                        id=task['id'],
-                        project=instance)
-                    task_obj.action = task['action']
-                    task_obj.reward = task['reward']
-                    task_obj.save()
-                    del tasks_dict[task_obj.id]
+            actions_dict = {
+                action.id: action for action in instance.actions.all()
+            }
+            for action in validated_data['actions']:
+                if action.get('id', None):
+                    action_obj = Action.objects.get(
+                        id=action['id'],
+                        project=instance
+                    )
+                    action_obj.name = action['name']
+                    action_obj.save()
+                    del actions_dict[action_obj.id]
                 else:
-                    task_obj = Task.objects.create(
+                    action_obj = Action.objects.create(
                         project=instance,
-                        action=task['action'],
-                        reward=task['reward'])
-                    instance.tasks.add(task_obj)
+                        name=action['name']
+                    )
+                    instance.actions.add(action_obj)
+                
+                milestones_dict = {
+                    milestone.id: milestone for milestone in action_obj.milestones.all()
+                }
+                for milestone in action['milestones']:
+                    if milestone.get('id', None):
+                        milestone_obj = Milestone.objects.get(
+                            id=milestone['id'],
+                            project=instance
+                        )
+                        milestone_obj.name = milestone['name']
+                        milestone_obj.save()
+                        del milestones_dict[milestone_obj.id]
+                    else:
+                        milestone_obj = Milestone.objects.create(
+                            project=instance,
+                            name=action['name']
+                        )
+                        action_obj.milestones.add(milestone_obj)
 
-            for task in tasks_dict.values():
-                task.deleted = True
-                task.save()
+                    tasks_dict = {
+                        task.id: task for task in milestone_obj.tasks.all()
+                    }
+                    for task in milestone['tasks']:
+                        if task.get('id', None):
+                            task_obj = Task.objects.get(
+                                id=task['id'],
+                                project=instance,
+                            )
+                            task_obj.name = task['name']
+                            task_obj.reward = task['reward'],
+                            task_obj.batch = task['batch'],
+                            task_obj.count = task['count']
+                            task_obj.save()
+                            del tasks_dict[task_obj.id]
+                        else:
+                            task_obj = Task.objects.create(
+                                project=instance,
+                                name=task['name'],
+                                reward=task['reward'],
+                                batch=task['batch'],
+                                count=task['count']
+                            )
+                            milestone_obj.tasks.add(task_obj)
+            # for task in tasks_dict.values():
+            #     task.deleted = True
+            #     task.save()
 
             instance.save()
             return instance

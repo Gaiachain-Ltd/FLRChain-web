@@ -75,7 +75,7 @@
             </v-layout>
           </v-layout>
         </v-layout>
-        <v-layout justify-center class="mb-2 mt-2">
+        <v-layout justify-center class="">
           <DefaultIconButton
             :config="addActionBtnConfig"
             @clicked="() => onAddAction()"

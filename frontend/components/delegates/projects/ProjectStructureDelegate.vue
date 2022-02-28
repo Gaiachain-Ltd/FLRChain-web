@@ -3,7 +3,7 @@
     <DefaultText
       v-if="index"
       class="mr-3"
-      :color="$vuetify.theme.themes.light.primary"
+      :color="kind == 'milestone' ? '#00868A' : '#06BCC1'"
       >{{ index }}</DefaultText
     >
     <div :class="['decorator mr-3 mb-1', kind]"></div>
@@ -41,9 +41,8 @@ export default {
 
 <style scoped lang="scss">
 .decorator {
-  border-color: var(--v-primary-base);
   border-style: solid;
-  border-width: 1px;
+  border-width: 2px;
   width: 12px;
   height: 12px;
   min-width: 12px;
@@ -52,9 +51,17 @@ export default {
   max-width: 12px;
   border-radius: 4px;
   rotate: 45deg;
-
-  &.action {
-    background-color: var(--v-primary-base);
-  }
+}
+.action {
+  background-color: #02595b;
+  border-color: #02595b;
+}
+.milestone {
+  background-color: white;
+  border-color: #00868a;
+}
+.task {
+  background-color: white;
+  border-color: #06bcc1;
 }
 </style>

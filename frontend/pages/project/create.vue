@@ -7,6 +7,7 @@
       :project.sync="project"
     ></InputProjectCard>
     <ActionBarCard
+      class="mt-6"
       :disabled="!$auth.user.opted_in"
       @save="handleCreate"
       @cancel="handleCancel"

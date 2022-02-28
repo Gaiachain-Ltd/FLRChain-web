@@ -12,7 +12,7 @@
           <v-layout column class="mr-6">
             <ProjectStructure :project="project"></ProjectStructure>
             <ProjectFundDistribution
-              class="mt-3"
+              class="mt-6"
               :project="project"
             ></ProjectFundDistribution>
           </v-layout>

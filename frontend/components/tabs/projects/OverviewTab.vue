@@ -25,6 +25,7 @@
         ></InputProjectCard>
       </v-col>
     </v-layout>
+    <ActionBarCard class="ma-3"></ActionBarCard>
   </v-layout>
 </template>
 
@@ -39,6 +40,7 @@ export default {
     ...mapGetters(["isFacililator"]),
   },
   components: {
+    ActionBarCard: () => import("@/components/cards/ActionBarCard"),
     DetailsBlockchainCard: () =>
       import("@/components/cards/project/DetailsBlockchainCard"),
     DetailsStewardsCard: () =>
