@@ -4,6 +4,7 @@
       <slot>
         <v-spacer></v-spacer>
         <ActionButton
+          v-if="!hideCancel"
           class="mr-3"
           label="Cancel"
           color="white"
@@ -32,6 +33,10 @@ export default {
       default: false,
     },
     loading: {
+      type: Boolean,
+      default: false
+    },
+    hideCancel: {
       type: Boolean,
       default: false
     }

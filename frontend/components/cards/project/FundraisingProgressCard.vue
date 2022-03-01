@@ -4,8 +4,10 @@
 
 <script>
 import algosdk from "algosdk";
+import ProjectMixin from "@/mixins/ProjectMixin";
 
 export default {
+  mixins: [ProjectMixin],
   props: {
     project: {},
   },
@@ -15,23 +17,6 @@ export default {
     };
   },
   computed: {
-    total() {
-      if (!this.project.actions) {
-        return 0;
-      }
-      let t = 0;
-      this.project.actions.forEach((action) =>
-        action.milestones.forEach((milestone) =>
-          milestone.tasks.forEach(
-            (task) =>
-              (t =
-                parseFloat(task.batch) +
-                parseFloat(task.reward) * parseFloat(task.count))
-          )
-        )
-      );
-      return t;
-    },
     min() {
       return {
         label: "Raised",

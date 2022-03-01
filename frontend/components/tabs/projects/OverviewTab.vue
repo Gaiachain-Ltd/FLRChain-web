@@ -12,7 +12,10 @@
         <InputInvestmentCard :project="project"></InputInvestmentCard>
       </v-col>
       <v-col
-        :class="['ma-0 pa-3', !isFacililator && project.status == 0 && 'order-md-2']"
+        :class="[
+          'ma-0 pa-3',
+          !isFacililator && project.status == 0 && 'order-md-2',
+        ]"
         md="4"
         sm="12"
       >
@@ -25,7 +28,7 @@
         ></InputProjectCard>
       </v-col>
     </v-layout>
-    <ActionBarCard class="ma-3"></ActionBarCard>
+    <ActionBarCard class="ma-3" @save="update" hideCancel></ActionBarCard>
   </v-layout>
 </template>
 
@@ -51,6 +54,15 @@ export default {
       import("@/components/cards/project/InputProjectCard"),
     InputInvestmentCard: () =>
       import("@/components/cards/project/InputInvestmentCard"),
+  },
+  methods: {
+    update() {
+      this.$axios
+        .put(`projects/${this.project.id}/`, this.project)
+        .then((reply) => {
+          console.log("SAVED!", reply);
+        });
+    },
   },
 };
 </script>

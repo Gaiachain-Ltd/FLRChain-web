@@ -23,10 +23,14 @@ class TaskSerializer(serializers.ModelSerializer):
                   'name')
         read_only_fields = ('id',)
 
-    def validate(self, data):
-        if Decimal(data['reward']) < 0:
-            raise serializers.ValidationError(
-                {"reward": "reward must be greater than zero"})
+    def to_representation(self, instance):
+        data = super(TaskSerializer, self).to_representation(instance)
+        data.update(
+            {
+                "reward": Decimal(instance.reward).normalize(),
+                "batch": Decimal(instance.batch).normalize()
+            }
+        )
         return data
 
 
@@ -53,31 +57,24 @@ class ProjectSerializer(serializers.ModelSerializer):
 
     description = serializers.CharField(required=False, allow_blank=True)
 
-    image = serializers.FileField(required=False)
-    document = serializers.FileField(required=False)
-    budget = serializers.FileField(required=False)
+    image = serializers.FileField(required=False, allow_null=True)
+    document = serializers.FileField(required=False, allow_null=True)
+    budget = serializers.FileField(required=False, allow_null=True)
 
     status = serializers.IntegerField(read_only=True)
 
     start = serializers.DateField()
     end = serializers.DateField()
-    
+
     actions = ActionSerializer(many=True)
 
-    fac_adm_funds = models.DecimalField(
-        max_digits=26, decimal_places=6, default=0
-    )
-
     created = serializers.DateTimeField(read_only=True)
-
-    facilitator = serializers.SerializerMethodField(
-        required=False, read_only=True)
 
     class Meta:
         model = Project
         fields = (
-            'id', 
-            'title', 
+            'id',
+            'title',
             'description',
             'image',
             'document',
@@ -87,10 +84,18 @@ class ProjectSerializer(serializers.ModelSerializer):
             'end',
             'actions',
             'fac_adm_funds',
-            'facilitator',
             'created',
             'app_id'
         )
+
+    def to_representation(self, instance):
+        data = super(ProjectSerializer, self).to_representation(instance)
+        data.update(
+            {
+                "fac_adm_funds": Decimal(instance.fac_adm_funds).normalize()
+            }
+        )
+        return data
 
     def get_facilitator(self, obj):
         return f"{obj.owner.first_name} {obj.owner.last_name}"
@@ -128,7 +133,7 @@ class ProjectSerializer(serializers.ModelSerializer):
                         name=milestone['name'],
                     )
                     action_obj.milestones.add(milestone_obj)
-                    
+
                     for task in milestone['tasks']:
                         task_obj = Task.objects.create(
                             name=task['name'],
@@ -168,7 +173,7 @@ class ProjectSerializer(serializers.ModelSerializer):
                         name=action['name']
                     )
                     instance.actions.add(action_obj)
-                
+
                 milestones_dict = {
                     milestone.id: milestone for milestone in action_obj.milestones.all()
                 }
@@ -198,8 +203,8 @@ class ProjectSerializer(serializers.ModelSerializer):
                                 project=instance,
                             )
                             task_obj.name = task['name']
-                            task_obj.reward = task['reward'],
-                            task_obj.batch = task['batch'],
+                            task_obj.reward = task['reward']
+                            task_obj.batch = task['batch']
                             task_obj.count = task['count']
                             task_obj.save()
                             del tasks_dict[task_obj.id]
