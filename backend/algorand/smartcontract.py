@@ -4,6 +4,7 @@ from collections import defaultdict
 from algosdk.v2client import *
 from algosdk.future import *
 from algosdk.logic import *
+from algosdk.util import *
 from pyteal import *
 from algorand.utils import (INDEXER, CLIENT, wait_for_confirmation, prepare_transfer_algos,
                             prepare_transfer_assets, sign_send_atomic_trasfer)
@@ -93,7 +94,9 @@ def approval_program():
             project_balance
         )
 
+    # OPT-IN USDC:
     on_init = Seq([
+        Assert(is_creator),
         Assert(Not(is_initialized)),
         InnerTxnBuilder.Begin(),
         InnerTxnBuilder.SetFields({
@@ -107,6 +110,8 @@ def approval_program():
         Approve()
     ])
 
+    # Invest:
+    # 
     on_invest = Seq([
         Assert(Or(is_initialized, is_started)),
         Assert(is_investor),
@@ -285,6 +290,8 @@ def approval_program():
         Approve()
     ])
 
+    # Project start:
+    # Update project properties.
     on_start = Seq([
         Assert(is_initialized),
         Assert(is_facilitator),
@@ -293,11 +300,12 @@ def approval_program():
         Approve()
     ])
 
+    # Project update:
+    # Update project properties.
     on_update = Seq([
-        Assert(is_started),
+        Assert(Or(is_initialized, is_started)),
         Assert(is_facilitator),
         set_project_properties(),
-        App.globalPut(G_STATUS_KEY, Txn.application_args[4]),
         Approve()
     ])
 
@@ -355,6 +363,8 @@ def approval_program():
         Approve()
     ])
 
+    # OPT-IN application:
+    # Set local state "role". In this way we will identify users.
     handle_optin = Seq([
         Assert(Or(is_initialized, is_started)),
         Assert(Not(is_opted_in)),
@@ -486,7 +496,21 @@ def start(address, priv_key, app_id, start, end, fac_adm_funds):
         address,
         params,
         app_id,
-        ["START", start, end, int(fac_adm_funds * 1000000)],
+        ["START", start, end, algos_to_microalgos(fac_adm_funds)],
+    )
+
+    txn_signed = txn.sign(priv_key)
+    txn_id = CLIENT.send_transactions([txn_signed])
+    wait_for_confirmation(txn_id)
+
+
+def update(address, priv_key, app_id, start, end, fac_adm_funds):
+    params = CLIENT.suggested_params()
+    txn = transaction.ApplicationNoOpTxn(
+        address,
+        params,
+        app_id,
+        ["UPDATE", start, end, algos_to_microalgos(fac_adm_funds)],
     )
 
     txn_signed = txn.sign(priv_key)
@@ -506,7 +530,7 @@ def withdraw(address, app_id):
     return txn
 
 
-def delete(address, app_id):
+def delete_(address, app_id):
     params = CLIENT.suggested_params()
     txn = transaction.ApplicationDeleteTxn(
         address,
@@ -515,23 +539,6 @@ def delete(address, app_id):
         foreign_assets=[settings.ALGO_ASSET]
     )
     return txn
-
-
-def opted_in_addresses(app_id):
-    accounts = INDEXER.accounts(application_id=app_id)['accounts']
-    print("ACCS", accounts)
-    role_addresses = defaultdict(list)
-    for account in accounts:
-        apps_local_state = account['apps-local-state']
-        for app_local_state in apps_local_state:
-            print("AID", app_local_state['id'], app_id)
-            if app_local_state['id'] == app_id:
-                for key_value in app_local_state['key-value']:
-                    print("KEY V", base64.b64decode(key_value['key']).decode())
-                    if base64.b64decode(key_value['key']).decode() == "role":
-                        role_addresses[key_value['value']
-                                       ['uint']].append(account['address'])
-    return role_addresses
 
 
 def join(address, priv_key, app_id):

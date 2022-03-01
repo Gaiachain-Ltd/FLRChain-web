@@ -11,7 +11,7 @@ from django.db import transaction
 from smart_contracts.models import SmartContract
 from users.permissions import isInvestor, isOptedIn
 from rest_framework.permissions import IsAuthenticated
-from algorand.smartcontract import invest, opted_in_addresses
+from algorand.smartcontract import invest
 from django.db.models import Q
 from users.models import CustomUser
 from algorand.utils import get_transactions_info, get_transactions, application_address

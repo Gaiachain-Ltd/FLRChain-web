@@ -5,8 +5,10 @@ from projects.managers import ProjectManager, ProjectQuerySet
 def upload_project_image(instance, filename):
     return f"projects/{instance.pk}/images/{filename}"
 
+
 def upload_project_document(instance, filename):
     return f"projects/{instance.pk}/documents/{filename}"
+
 
 class Project(models.Model):
     FUNDRAISING = 0
@@ -37,30 +39,45 @@ class Project(models.Model):
         (DELETED, "Deleted")
     )
 
+    TO_SYNC = 1
+    SYNCED = 2
+
+    SYNC_STATES = (
+        (INITIAL, "Initial"),
+        (TO_SYNC, "To sync"),
+        (SYNCED, "Synced")
+    )
+
     owner = models.ForeignKey(
         'users.CustomUser', on_delete=models.CASCADE)
 
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
 
-    image = models.FileField(upload_to=upload_project_image, null=True, blank=True)
-    document = models.FileField(upload_to=upload_project_document, null=True, blank=True)
-    budget = models.FileField(upload_to=upload_project_document, null=True, blank=True)
+    image = models.FileField(
+        upload_to=upload_project_image, null=True, blank=True)
+    document = models.FileField(
+        upload_to=upload_project_document, null=True, blank=True)
+    budget = models.FileField(
+        upload_to=upload_project_document, null=True, blank=True)
 
-    status = models.PositiveSmallIntegerField(choices=STATUSES, default=FUNDRAISING)
+    status = models.PositiveSmallIntegerField(
+        choices=STATUSES, default=FUNDRAISING)
     state = models.PositiveSmallIntegerField(choices=STATES, default=INITIAL)
+    sync = models.PositiveSmallIntegerField(
+        choices=SYNC_STATES, default=INITIAL)
 
     start = models.DateField()
     end = models.DateField()
 
     beneficiaries = models.ManyToManyField(
-        'users.CustomUser', 
-        through='Assignment', 
+        'users.CustomUser',
+        through='Assignment',
         related_name='beneficiary_list'
     )
-        
+
     actions = models.ManyToManyField('projects.Action', related_name="actions")
-    
+
     fac_adm_funds = models.DecimalField(
         max_digits=26, decimal_places=6, default=0)
 
@@ -71,6 +88,16 @@ class Project(models.Model):
 
     objects = ProjectManager.from_queryset(ProjectQuerySet)()
 
+    def save(self, *args, **kwargs):
+        if self.pk is not None:
+            old_instance = Project.objects.get(pk=self.pk)
+            if (old_instance.fac_adm_funds != self.fac_adm_funds or 
+                old_instance.start != self.start or 
+                old_instance.end != self.end
+            ):
+                self.sync = Project.TO_SYNC
+        return super().save(*args, **kwargs)
+
     def __str__(self) -> str:
         return self.title
 
@@ -78,7 +105,8 @@ class Project(models.Model):
 class Action(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
-    milestones = models.ManyToManyField('projects.Milestone', related_name='milestones')
+    milestones = models.ManyToManyField(
+        'projects.Milestone', related_name='milestones')
 
     def __str__(self) -> str:
         return self.name

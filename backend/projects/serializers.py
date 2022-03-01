@@ -149,6 +149,13 @@ class ProjectSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         with transaction.atomic():
+            if (instance.fac_adm_funds != validated_data['fac_adm_funds'] or
+                instance.start != validated_data['start'] or
+                instance.end != validated_data['end']
+            ):
+                instance.sync = Project.TO_SYNC
+
+            print("DDD", instance.fac_adm_funds != validated_data['fac_adm_funds'])
             instance.title = validated_data['title']
             instance.description = validated_data['description']
             instance.start = validated_data['start']

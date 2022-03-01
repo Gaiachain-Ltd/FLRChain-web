@@ -8,7 +8,7 @@ from celery import shared_task
 from algorand import smartcontract
 from algorand.utils import *
 from django.conf import settings
-from django.db.models import F, Sum
+from django.db.models import F, Sum, Q
 
 
 logger = logging.getLogger(__name__)
@@ -53,6 +53,7 @@ def initialize_project():
             project.app_id
         )
         project.state = Project.INITIALIZED
+        project.sync = Project.SYNCED
         project.save()
 
 
@@ -61,6 +62,7 @@ def start_project():
     projects = Project.objects.filter(
         state=Project.INITIALIZED,
         status=Project.FUNDRAISING,
+        sync=Project.SYNCED,
         start__lte=datetime.datetime.now().date()
     ).annotate(reward_total=Sum(
         F('task__reward') * F('task__count')
@@ -94,6 +96,36 @@ def start_project():
             project.state = Project.STARTED
             project.status = Project.ACTIVE
             project.save()
+
+@shared_task()
+def update_project():
+    projects = Project.objects.filter(
+        Q(sync=Project.TO_SYNC) & 
+        (~Q(state__in=[Project.FINISHED, Project.DELETED]) | ~Q(status=Project.CLOSED))
+    ).order_by('-modified')
+
+    for project in projects:
+        smartcontract.update(
+            project.owner.account.address,
+            project.owner.account.private_key,
+            project.app_id,
+            int(
+                datetime.datetime.combine(
+                    project.start,
+                    datetime.time(0, 0, 0, 0)
+                ).timestamp()
+            ),
+            int(
+                datetime.datetime.combine(
+                    project.end,
+                    datetime.time(0, 0, 0, 0)
+                ).timestamp()
+            ),
+            project.fac_adm_funds
+        )
+        project.state = Project.INITIALIZED
+        project.sync = Project.SYNCED
+        project.save()
 
 
 @shared_task()
