@@ -12,35 +12,46 @@
         <InputInvestmentCard :project="project"></InputInvestmentCard>
       </v-col>
       <v-col
-        :class="[
-          'ma-0 pa-3',
-          !isFacililator && project.status == 0 && 'order-md-2',
-        ]"
+        :class="['ma-0 pa-3', !isFacililator && isFundraising && 'order-md-2']"
         md="4"
         sm="12"
       >
         <DetailsStewardsCard :project="project"></DetailsStewardsCard>
       </v-col>
-      <v-col class="ma-0 pa-3" :md="project.status != 0 ? 12 : 8" sm="12">
+      <v-col class="ma-0 pa-3" :md="!isFundraising ? 12 : 8" sm="12">
         <InputProjectCard
           :project.sync="project"
-          :readonly="!isFacililator"
+          :readonly="!isFacililator || isSyncing"
         ></InputProjectCard>
       </v-col>
     </v-layout>
-    <ActionBarCard class="ma-3" @save="update" hideCancel></ActionBarCard>
+    <ActionBarCard
+      class="ma-3"
+      v-if="isFacililator"
+      @save="update"
+      hideCancel
+      :loading="isSyncing"
+    ></ActionBarCard>
   </v-layout>
 </template>
 
 <script>
+import ProjectMixin from "@/mixins/ProjectMixin";
+import { SYNC, STATUS } from "@/constants/project";
 import { mapGetters } from "vuex";
 
 export default {
-  props: {
-    project: {},
+  mixins: [ProjectMixin],
+  data() {
+    return {
+      FUNDRAISING: STATUS.FUNDRAISING,
+    };
   },
   computed: {
     ...mapGetters(["isFacililator"]),
+    isFundraising() {
+      return this.project.status == this.FUNDRAISING;
+    },
   },
   components: {
     ActionBarCard: () => import("@/components/cards/ActionBarCard"),
@@ -57,12 +68,27 @@ export default {
   },
   methods: {
     update() {
+      this.project.sync = SYNC.TO_SYNC;
       this.$axios
         .put(`projects/${this.project.id}/`, this.project)
         .then((reply) => {
-          console.log("SAVED!", reply);
+          this.requestRefresh();
+          this.onProjectUpdate(reply.data);
         });
     },
+    fetch() {
+      this.$axios.get(`projects/${this.project.id}/`).then((reply) => {
+        if (!this.requestRefresh()) {
+          this.onProjectUpdate(reply.data);
+        }
+      });
+    },
+    onProjectUpdate(project) {
+      this.$emit("update:project", project);
+    },
+  },
+  mounted() {
+    this.requestRefresh();
   },
 };
 </script>

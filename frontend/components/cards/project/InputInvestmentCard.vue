@@ -17,6 +17,7 @@
         </v-flex>
         <v-flex>
           <BlockButton
+            :disabled="project.sync == SYNCING"
             @clicked="
               () => {
                 if (status) {
@@ -39,6 +40,7 @@
 </template>
 
 <script>
+import { SYNC } from "@/constants/project";
 import algosdk from "algosdk";
 import AlgoExplorerMixin from "@/mixins/AlgoExplorerMixin";
 
@@ -50,6 +52,7 @@ export default {
   data() {
     return {
       errorPopupVisible: false,
+      SYNCING: SYNC.TO_SYNC,
       investment: {
         amount: "0",
       },

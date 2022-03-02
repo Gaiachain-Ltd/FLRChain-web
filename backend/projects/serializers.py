@@ -62,6 +62,7 @@ class ProjectSerializer(serializers.ModelSerializer):
     budget = serializers.FileField(required=False, allow_null=True)
 
     status = serializers.IntegerField(read_only=True)
+    sync = serializers.IntegerField(read_only=True)
 
     start = serializers.DateField()
     end = serializers.DateField()
@@ -80,6 +81,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             'document',
             'budget',
             'status',
+            'sync',
             'start',
             'end',
             'actions',
@@ -237,5 +239,5 @@ class AssignmentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Assignment
-        fields = ('id', 'beneficiary', 'status')
+        fields = ('id', 'beneficiary', 'status', 'sync')
         read_only_fields = ('beneficiary', )

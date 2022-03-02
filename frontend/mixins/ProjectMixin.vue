@@ -1,7 +1,12 @@
 <script>
+import { SYNC } from "@/constants/project";
+
 export default {
   props: {
     project: {},
+  },
+  timers: {
+    refresh: { time: 5000, autostart: false, repeat: false },
   },
   computed: {
     total() {
@@ -21,6 +26,26 @@ export default {
       );
       t += parseFloat(this.project.fac_adm_funds);
       return t;
+    },
+    isSyncing() {
+      return !this.project || this.project.sync == SYNC.TO_SYNC;
+    },
+  },
+  methods: {
+    refresh() {
+      this.$axios.get(`projects/${this.project.id}/`).then((reply) => {
+        this.requestRefresh();
+        this.onProjectUpdate(reply.data);
+      });
+    },
+    onProjectUpdate(project) {},
+    requestRefresh() {
+      if (this.isSyncing) {
+        this.$timer.stop("refresh");
+        this.$timer.start("refresh");
+        return true;
+      }
+      return false;
     },
   },
 };

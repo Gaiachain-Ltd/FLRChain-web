@@ -46,7 +46,7 @@
                 <component
                   class="ma-3"
                   v-if="currentProject && currentTab == index"
-                  :project="currentProject"
+                  :project.sync="currentProject"
                   :is="tab.component"
                 ></component>
               </v-tab-item>
@@ -88,12 +88,21 @@ export default {
         }
       },
     },
-    currentProject() {
-      const index = _.findIndex(this.projects, [
-        "id",
-        this.getDetailsProjectId,
-      ]);
-      return index !== -1 ? this.projects[index] : null;
+    currentProject: {
+      get() {
+        const index = _.findIndex(this.projects, [
+          "id",
+          this.getDetailsProjectId,
+        ]);
+        return index !== -1 ? this.projects[index] : null;
+      },
+      set(value) {
+        const index = _.findIndex(this.projects, [
+          "id",
+          this.getDetailsProjectId,
+        ]);
+        this.$set(this.projects, index, value);
+      }
     },
     tabs() {
       return [

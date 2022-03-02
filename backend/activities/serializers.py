@@ -23,9 +23,9 @@ class ActivitySerializer(serializers.ModelSerializer):
     class Meta:
         model = Activity
         fields = ('id', 'photo', 'task', 'project', 'task',
-                  'created', 'beneficiary', 'txid')
+                  'created', 'beneficiary', 'txid', 'sync')
         read_only_fields = ('id', 'project', 'task', 'beneficiary',
-                            'txid')
+                            'txid', 'sync')
 
 
 class ActivityVerificationSerializer(serializers.Serializer):

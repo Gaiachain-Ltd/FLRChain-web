@@ -106,18 +106,24 @@ class AssignmentView(CommonView):
         beneficiaries = Assignment.objects.select_related('beneficiary','beneficiary__account').filter(
             beneficiary__account__address__in=data.keys()
         ).values_list(
-            'id', 
-            'beneficiary__id', 
-            'beneficiary__first_name', 
-            'beneficiary__last_name', 
-            'beneficiary__account__address'
+            "id", 
+            "status",
+            "sync",
+            "beneficiary__id", 
+            "beneficiary__first_name", 
+            "beneficiary__last_name", 
+            "beneficiary__account__address"
         )
 
         for beneficiary in beneficiaries:
-            data[beneficiary[4]]['name'] = f"{beneficiary[2]} {beneficiary[3]}"
-            data[beneficiary[4]]['id'] = beneficiary[0]
-            data[beneficiary[4]]['user_id'] = beneficiary[1]
-            data[beneficiary[4]]['address'] = beneficiary[4]
+            data[beneficiary[6]].update({
+                "id": beneficiary[0],
+                "status": beneficiary[1],
+                "sync": beneficiary[2],
+                "user_id": beneficiary[3],
+                "name": f"{beneficiary[4]} {beneficiary[5]}",
+                "address": beneficiary[6],
+            })
             
         return Response(data.values(), status=status.HTTP_200_OK)
 
@@ -142,10 +148,10 @@ class AssignmentView(CommonView):
             Assignment, 
             pk=pk,
             status=Assignment.WAITING,
-            state=Assignment.SYNCED
+            sync=Assignment.SYNCED
         )
         serializer = self.serializer_class(assignment, data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save(state=Assignment.TO_SYNC)
+        serializer.save(sync=Assignment.TO_SYNC)
         return Response(serializer.data, status=status.HTTP_200_OK)
 

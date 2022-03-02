@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 @shared_task()
 def create_activity():
     activities = Activity.objects.filter(
-        state=Activity.INITIAL,
+        sync=Activity.INITIAL,
     )
 
     for activity in activities:
@@ -21,14 +21,14 @@ def create_activity():
             int(activity.task.reward * 1000000),
             activity.project.app_id
         )
-        activity.state = Activity.SYNCED
+        activity.sync = Activity.SYNCED
         activity.save()
 
 
 @shared_task()
 def verify_activity():
     activities = Activity.objects.filter(
-        state=Activity.TO_SYNC
+        sync=Activity.TO_SYNC
     )
 
     for activity in activities:
@@ -41,5 +41,5 @@ def verify_activity():
             activity.status,
             activity.project.app_id
         )
-        activity.state = Activity.SYNCED
+        activity.sync = Activity.SYNCED
         activity.save()

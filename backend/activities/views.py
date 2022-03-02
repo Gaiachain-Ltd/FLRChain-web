@@ -66,8 +66,12 @@ class ActivityView(CommonView):
         
         activities = Activity.objects.filter(id__in=data.keys())
         for activity in activities:
-            data[str(activity.id)]['name'] = f"{activity.user.first_name} {activity.user.last_name}"
-            data[str(activity.id)]['task_id'] = activity.task.id
+            data[str(activity.id)].update({
+                "name": f"{activity.user.first_name} {activity.user.last_name}",
+                "task_id": activity.task.id,
+                "status": activity.status,
+                "sync": activity.sync
+            })
         
         return Response(data.values(), status=status.HTTP_200_OK)
         # if request.user.type == CustomUser.BENEFICIARY:
@@ -143,7 +147,7 @@ class ActivityView(CommonView):
         )
         
         activity.status = serializer.validated_data['status']
-        activity.state = Activity.TO_SYNC
+        activity.sync = Activity.TO_SYNC
         activity.save()
 
         return Response(status=status.HTTP_200_OK)

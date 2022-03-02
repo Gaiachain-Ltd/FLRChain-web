@@ -31,6 +31,6 @@ class Activity(models.Model):
         max_digits=26, decimal_places=6, default=0)
     photo = models.ImageField()
     status = models.PositiveSmallIntegerField(default=WAITING, choices=STATUS)
-    state = models.PositiveSmallIntegerField(default=INITIAL, choices=STATES)
+    sync = models.PositiveSmallIntegerField(default=INITIAL, choices=STATES)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)

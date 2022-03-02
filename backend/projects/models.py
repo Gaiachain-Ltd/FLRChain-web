@@ -11,9 +11,9 @@ def upload_project_document(instance, filename):
 
 
 class Project(models.Model):
-    FUNDRAISING = 0
-    ACTIVE = 1
-    CLOSED = 2
+    FUNDRAISING = 1
+    ACTIVE = 2
+    CLOSED = 3
 
     STATUSES = (
         (FUNDRAISING, "Fundraising"),
@@ -65,7 +65,7 @@ class Project(models.Model):
         choices=STATUSES, default=FUNDRAISING)
     state = models.PositiveSmallIntegerField(choices=STATES, default=INITIAL)
     sync = models.PositiveSmallIntegerField(
-        choices=SYNC_STATES, default=INITIAL)
+        choices=SYNC_STATES, default=TO_SYNC)
 
     start = models.DateField()
     end = models.DateField()
@@ -163,7 +163,7 @@ class Assignment(models.Model):
         'users.CustomUser', on_delete=models.SET_NULL, null=True)
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     status = models.PositiveSmallIntegerField(default=WAITING, choices=STATUS)
-    state = models.PositiveSmallIntegerField(default=INITIAL, choices=STATES)
+    sync = models.PositiveSmallIntegerField(default=INITIAL, choices=STATES)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 

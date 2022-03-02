@@ -107,6 +107,7 @@ def approval_program():
         }),
         InnerTxnBuilder.Submit(),
         App.globalPut(G_STATUS_KEY, INITIALIZED_STATUS),
+        set_project_properties(),
         Approve()
     ])
 
@@ -290,22 +291,13 @@ def approval_program():
         Approve()
     ])
 
-    # Project start:
-    # Update project properties.
-    on_start = Seq([
-        Assert(is_initialized),
-        Assert(is_facilitator),
-        App.globalPut(G_STATUS_KEY, STARTED_STATUS),
-        set_project_properties(),
-        Approve()
-    ])
-
     # Project update:
     # Update project properties.
     on_update = Seq([
         Assert(Or(is_initialized, is_started)),
         Assert(is_facilitator),
         set_project_properties(),
+        App.globalPut(G_STATUS_KEY, Btoi(Txn.application_args[4])),
         Approve()
     ])
 
@@ -331,7 +323,6 @@ def approval_program():
         [Txn.application_args[0] == Bytes("WORK"), on_work],
         [Txn.application_args[0] == Bytes("VERIFY"), on_verify],
         [Txn.application_args[0] == Bytes("WITHDRAW"), on_withdraw],
-        [Txn.application_args[0] == Bytes("START"), on_start],
         [Txn.application_args[0] == Bytes("UPDATE"), on_update],
         [Txn.application_args[0] == Bytes("BATCH"), on_batch],
     )
@@ -428,7 +419,11 @@ def initialize(
     creator_priv_key,
     facilitator_address,
     facilitator_priv_key,
-    app_id
+    app_id,
+    start,
+    end,
+    fac_adm_funds,
+    status
 ):
     params = CLIENT.suggested_params()
     app_address = get_application_address(app_id)
@@ -442,7 +437,7 @@ def initialize(
         creator_address,
         params,
         app_id,
-        ["INIT"],
+        ["INIT", start, end, algos_to_microalgos(fac_adm_funds), status],
         foreign_assets=[settings.ALGO_ASSET]
     )
     txn3 = opt_in(facilitator_address, app_id, 1)
@@ -490,27 +485,13 @@ def invest(address, priv_key, app_id, amount, asset=settings.ALGO_ASSET):
     wait_for_confirmation(txn_id)
 
 
-def start(address, priv_key, app_id, start, end, fac_adm_funds):
+def update(address, priv_key, app_id, start, end, fac_adm_funds, status):
     params = CLIENT.suggested_params()
     txn = transaction.ApplicationNoOpTxn(
         address,
         params,
         app_id,
-        ["START", start, end, algos_to_microalgos(fac_adm_funds)],
-    )
-
-    txn_signed = txn.sign(priv_key)
-    txn_id = CLIENT.send_transactions([txn_signed])
-    wait_for_confirmation(txn_id)
-
-
-def update(address, priv_key, app_id, start, end, fac_adm_funds):
-    params = CLIENT.suggested_params()
-    txn = transaction.ApplicationNoOpTxn(
-        address,
-        params,
-        app_id,
-        ["UPDATE", start, end, algos_to_microalgos(fac_adm_funds)],
+        ["UPDATE", start, end, algos_to_microalgos(fac_adm_funds), status],
     )
 
     txn_signed = txn.sign(priv_key)
@@ -571,13 +552,16 @@ def get_beneficiaries(app_id):
             for delta in local_state_delta['delta']:
                 if base64.b64decode(delta['key']).decode() == "role" and beneficiaries.get(local_state_delta['address'], None) is None and delta['value']['uint'] == 3:
                     beneficiaries[local_state_delta['address']] = {
-                        "approval": 0, 
+                        "status": 0,
+                        "sync": 0,
                         "round-time": transaction['round-time'],
                         "optin_txid": transaction['id']
                     }
                 elif base64.b64decode(delta['key']).decode() == "join":
-                    beneficiaries[local_state_delta['address']]['approval'] = delta['value']['uint']
-                    beneficiaries[local_state_delta['address']]['approval_txid'] = transaction['id']
+                    beneficiaries[local_state_delta['address']].update({
+                        "status": delta['value']['uint'],
+                        "approval_txid": transaction['id']
+                    })
     return beneficiaries
 
 def work(address, priv_key, activity_id, amount, app_id):

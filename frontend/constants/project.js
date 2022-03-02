@@ -1,7 +1,19 @@
 const STATUS = {
-    FUNDRAISING: 0,
-    ACTIVE: 1,
-    CLOSED: 2,
+    FUNDRAISING: 1,
+    ACTIVE: 2,
+    CLOSED: 3,
 };
 
-export { STATUS };
+const APPROVAL = {
+    INITIAL: 0,
+    ACCEPTED: 1,
+    REJECTED: 2
+}
+
+const SYNC = {
+    INITIAL: 0,
+    TO_SYNC: 1,
+    SYNCED: 2
+};
+
+export { STATUS, SYNC, APPROVAL };

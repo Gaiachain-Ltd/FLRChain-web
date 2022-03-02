@@ -50,12 +50,25 @@ def initialize_project():
             project.account.private_key,
             project.owner.account.address,
             project.owner.account.private_key,
-            project.app_id
+            project.app_id,
+                        int(
+                datetime.datetime.combine(
+                    project.start,
+                    datetime.time(0, 0, 0, 0)
+                ).timestamp()
+            ),
+            int(
+                datetime.datetime.combine(
+                    project.end,
+                    datetime.time(0, 0, 0, 0)
+                ).timestamp()
+            ),
+            project.fac_adm_funds,
+            project.status
         )
         project.state = Project.INITIALIZED
         project.sync = Project.SYNCED
         project.save()
-
 
 @shared_task()
 def start_project():
@@ -73,35 +86,19 @@ def start_project():
     for project in projects:
         if usdc_balance(application_address(project.app_id)) < project.total:
             project.state = Project.POSTPONED
-            project.save()
         else:
-            smartcontract.start(
-                project.owner.account.address,
-                project.owner.account.private_key,
-                project.app_id,
-                int(
-                    datetime.datetime.combine(
-                        project.start,
-                        datetime.time(0, 0, 0, 0)
-                    ).timestamp()
-                ),
-                int(
-                    datetime.datetime.combine(
-                        project.end,
-                        datetime.time(0, 0, 0, 0)
-                    ).timestamp()
-                ),
-                project.fac_adm_funds
-            )
             project.state = Project.STARTED
             project.status = Project.ACTIVE
-            project.save()
+            project.sync = Project.TO_SYNC
+        project.save()
+
 
 @shared_task()
 def update_project():
     projects = Project.objects.filter(
         Q(sync=Project.TO_SYNC) & 
-        (~Q(state__in=[Project.FINISHED, Project.DELETED]) | ~Q(status=Project.CLOSED))
+        (~Q(state__in=[Project.CREATED, Project.FINISHED, Project.DELETED]) | 
+        ~Q(status=Project.CLOSED))
     ).order_by('-modified')
 
     for project in projects:
@@ -121,7 +118,8 @@ def update_project():
                     datetime.time(0, 0, 0, 0)
                 ).timestamp()
             ),
-            project.fac_adm_funds
+            project.fac_adm_funds,
+            project.status
         )
         project.state = Project.INITIALIZED
         project.sync = Project.SYNCED
@@ -213,7 +211,7 @@ def close_project():
 @shared_task()
 def join_project():
     assignments = Assignment.objects.filter(
-        state=Assignment.INITIAL
+        sync=Assignment.INITIAL
     )
 
     for assignment in assignments:
@@ -223,14 +221,14 @@ def join_project():
             account.private_key,
             assignment.project.app_id
         )
-        assignment.state = Assignment.SYNCED
+        assignment.sync = Assignment.SYNCED
         assignment.save()
 
 
 @shared_task()
 def beneficiary_approval():
     assignments = Assignment.objects.filter(
-        state=Assignment.TO_SYNC
+        sync=Assignment.TO_SYNC
     )
 
     for assignment in assignments:
@@ -242,5 +240,5 @@ def beneficiary_approval():
             Assignment.ACCEPTED if assignment.status == Assignment.ACCEPTED else Assignment.REJECTED,
             assignment.project.app_id
         )
-        assignment.state = Assignment.SYNCED
+        assignment.sync = Assignment.SYNCED
         assignment.save()
