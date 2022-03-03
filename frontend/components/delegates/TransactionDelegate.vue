@@ -1,45 +1,60 @@
 <template>
-  <v-layout row align-center ma-0>
-    <DefaultSVGIcon
-      class="mr-6 mb-1"
-      :size="40"
-      :icon="transactionIcon"
-    ></DefaultSVGIcon>
-    <DefaultText
-      size="22"
-      :color="
-        isReceived
-          ? $vuetify.theme.themes.light.primary
-          : $vuetify.theme.themes.light.octonary
-      "
-      >{{ formattedValue }}</DefaultText
-    >
+  <v-row align-center>
+    <v-col>
+      <v-layout align-center>
+        <DefaultSVGIcon
+          class="mr-6 mb-1"
+          :size="40"
+          :icon="transactionIcon"
+        ></DefaultSVGIcon>
+        <DefaultText
+          size="22"
+          :color="
+            isReceived
+              ? $vuetify.theme.themes.light.primary
+              : $vuetify.theme.themes.light.octonary
+          "
+          >{{ formattedValue }}</DefaultText
+        >
+      </v-layout>
+    </v-col>
     <v-spacer></v-spacer>
-    <v-layout column ma-0 align-center>
-      <DefaultText size="14">{{ actionText }}</DefaultText>
+    <v-col>
+      <DefaultText size="14">Project</DefaultText>
+      <DefaultText size="18" :color="$vuetify.theme.themes.light.octonary">{{
+        transaction.project_title ? transaction.project_title : "-"
+      }}</DefaultText>
+    </v-col>
+    <v-col>
+      <DefaultText size="14">Action</DefaultText>
+      <DefaultText size="18" :color="$vuetify.theme.themes.light.octonary">{{
+        actionText
+      }}</DefaultText>
+    </v-col>
+    <v-spacer></v-spacer>
+    <v-col>
+      <v-layout align-center fill-height>
+        <DefaultSVGIcon
+          class="mb-1 mr-2"
+          :icon="require('@/assets/icons/calendar.svg')"
+        ></DefaultSVGIcon>
+        <DefaultText :color="$vuetify.theme.themes.light.octonary">{{
+          formatedDateTime
+        }}</DefaultText>
+      </v-layout>
+    </v-col>
+    <v-col shrink>
+      <v-layout justify-center align-center fill-height>
       <DefaultText
-        size="18"
-        :color="$vuetify.theme.themes.light.octonary"
-        v-if="transaction.project_title"
-        >{{ transaction.project_title }}</DefaultText
-      >
-    </v-layout>
-    <v-spacer></v-spacer>
-    <DefaultText
-      class="mr-10"
-      @clicked="() => openExplorerTransactionLink(transaction.id)"
-      :color="$vuetify.theme.themes.light.primary"
-      clickable
-      >Explorer Link
-    </DefaultText>
-    <DefaultSVGIcon
-      class="mb-1 mr-2"
-      :icon="require('@/assets/icons/calendar.svg')"
-    ></DefaultSVGIcon>
-    <DefaultText :color="$vuetify.theme.themes.light.octonary">{{
-      formatedDateTime
-    }}</DefaultText>
-  </v-layout>
+        class="mr-10"
+        @clicked="() => openExplorerTransactionLink(transaction.id)"
+        :color="$vuetify.theme.themes.light.primary"
+        clickable
+        >Details
+      </DefaultText>
+      </v-layout>
+    </v-col>
+  </v-row>
 </template>
 
 <script>
@@ -95,7 +110,9 @@ export default {
     },
     formattedValue() {
       let sign = this.isReceived ? "+" : "-";
-      return `${sign}${algosdk.microalgosToAlgos(this.transaction.amount)} USDC`;;
+      return `${sign}${algosdk.microalgosToAlgos(
+        this.transaction.amount
+      )} USDC`;
     },
     formatedDateTime() {
       return this.$moment

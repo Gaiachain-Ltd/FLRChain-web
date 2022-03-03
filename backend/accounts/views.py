@@ -105,3 +105,8 @@ class AccountView(CommonView):
             'spent': spent if spent else 0,
             'facililator_fee': facililator_fee
         }, status=status.HTTP_200_OK)
+
+    def details(self, request):
+        return Response({
+            "address": request.user.account.address
+        }, status=status.HTTP_200_OK)

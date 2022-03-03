@@ -1,6 +1,12 @@
 <template>
-  <DefaultCard title="History">
-    <v-layout column ma-0>
+  <DefaultCard>
+    <v-layout column>
+      <DefaultText
+        class="mb-3"
+        :color="$vuetify.theme.themes.light.primary"
+        bold
+        >Wallet History</DefaultText
+      >
       <template v-for="transaction in transactions">
         <v-layout column :key="transaction.id" ma-0>
           <v-layout

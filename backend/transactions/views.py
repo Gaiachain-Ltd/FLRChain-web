@@ -51,6 +51,7 @@ class TransactionView(CommonView):
         transactions = get_transactions(
             address=request.user.account.address,
             asset_id=settings.ALGO_ASSET,
+            min_amount=1,
             txn_type="axfer"
         )['transactions']
         data = list()
