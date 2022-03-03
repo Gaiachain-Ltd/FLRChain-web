@@ -14,23 +14,20 @@
       "
       >{{ formattedValue }}</DefaultText
     >
-    <DefaultText size="14" :color="statusColor" class="ml-10">
-      {{ status }}
-    </DefaultText>
     <v-spacer></v-spacer>
     <v-layout column ma-0 align-center>
       <DefaultText size="14">{{ actionText }}</DefaultText>
       <DefaultText
         size="18"
         :color="$vuetify.theme.themes.light.octonary"
-        v-if="transaction.project_name"
-        >{{ transaction.project_name }}</DefaultText
+        v-if="transaction.project_title"
+        >{{ transaction.project_title }}</DefaultText
       >
     </v-layout>
     <v-spacer></v-spacer>
     <DefaultText
       class="mr-10"
-      @clicked="openExplorerLink"
+      @clicked="() => openExplorerTransactionLink(transaction.id)"
       :color="$vuetify.theme.themes.light.primary"
       clickable
       >Explorer Link
@@ -46,9 +43,12 @@
 </template>
 
 <script>
+import AlgoExplorerMixin from "@/mixins/AlgoExplorerMixin";
+import algosdk from "algosdk";
 import { mapGetters } from "vuex";
 
 export default {
+  mixins: [AlgoExplorerMixin],
   props: {
     transaction: {
       type: Object,
@@ -70,55 +70,24 @@ export default {
       switch (this.transaction.action) {
         case 1:
           return "Received";
-        case 3:
-          return "Return on investment project";
-        case 4:
-          return "Invest in project";
-        case 6:
-          return "Facililator fee";
-        case 7:
-          return "Return from investment";
-        case 8:
-          return "Top up";
         default:
-          return `Action: ${this.transaction.action}`;
+          return "Sent";
       }
     },
     isReceived() {
       switch (this.transaction.action) {
         case 1:
-        case 8:
           return true;
-        case 3:
-          return true;
-        case 4:
+        default:
           return false;
-        case 6:
-          return this.isFacililator ? true : false;
-        case 7:
-          return true;
-        default:
-          return true;
-      }
-    },
-    status() {
-      switch (this.transaction.status) {
-        case 0:
-          return "Rejected";
-        case 1:
-          return "Confirmed";
-        default:
-          return "Pending";
       }
     },
     statusColor() {
-      switch (this.transaction.status) {
-        case 0:
-          return this.$vuetify.theme.themes.light.error;
+      switch (this.transaction.action) {
         case 1:
           return this.$vuetify.theme.themes.light.primary;
         default:
-          return this.$vuetify.theme.themes.light.septenary;
+          return this.$vuetify.theme.themes.light.error;
       }
     },
     transactionIcon() {
@@ -126,18 +95,12 @@ export default {
     },
     formattedValue() {
       let sign = this.isReceived ? "+" : "-";
-      return `${sign}${parseFloat(this.transaction.amount)} USDC`;
+      return `${sign}${algosdk.microalgosToAlgos(this.transaction.amount)} USDC`;;
     },
     formatedDateTime() {
-      return this.$moment(this.transaction.created).format("HH:mm YYYY-MM-DD");
-    },
-    explorerSrc() {
-      return `https://testnet.algoexplorer.io/tx/${this.transaction.txid}`;
-    },
-  },
-  methods: {
-    openExplorerLink() {
-      window.open(this.explorerSrc, "_blank");
+      return this.$moment
+        .unix(this.transaction["round-time"])
+        .format("YYYY-MM-DD HH:mm");
     },
   },
 };

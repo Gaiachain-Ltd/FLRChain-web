@@ -48,11 +48,12 @@ export default {
         const element = transactions[index];
         let addSeparatorWithDate = false;
         
+        const dt = this.$moment.unix(element['round-time']).format("YYYY-MM-DD HH:mm")
         if (!date) {
-          date = element.created;
+          date = dt;
           addSeparatorWithDate = true;
-        } else if (this.$moment(date).diff(element.created, "days") != 0) {
-          date = element.created;
+        } else if (this.$moment(date).diff(dt, "days") != 0) {
+          date = dt;
           addSeparatorWithDate = true;
         }
 
@@ -70,7 +71,7 @@ export default {
   },
   async fetch() {
     this.transactions = this.processTransactions(
-      await this.$axios.get("transactions/").then((reply) => reply.data.results)
+      await this.$axios.get("transactions/").then((reply) => reply.data)
     );
   },
 };

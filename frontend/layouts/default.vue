@@ -123,7 +123,7 @@ export default {
           iconOn: require("@/assets/side/investment_on.svg"),
           iconOff: require("@/assets/side/investment_off.svg"),
           enabled: this.$route.name === "balance",
-          label: "Investments",
+          label: "Wallet",
           route: "/balance",
           visible: true,
         },
