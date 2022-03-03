@@ -7,7 +7,10 @@
         bold
         >Rewards</DefaultText
       >
-      <RewardsTable :project="project"></RewardsTable>
+      <RewardsTable
+        :project="project"
+        @refresh="$emit('refresh')"
+      ></RewardsTable>
     </v-layout>
   </DefaultCard>
 </template>

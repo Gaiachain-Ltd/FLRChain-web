@@ -7,7 +7,10 @@
       {{ datetime(item) }}
     </template>
     <template v-slot:item.request="{ item }">
-      <v-layout align-center v-if="item.status == INITIAL || item.sync == SYNCING">
+      <v-layout
+        align-center
+        v-if="item.status == INITIAL || item.sync == SYNCING"
+      >
         <ActionButton
           class="mr-1"
           color="white"
@@ -23,7 +26,7 @@
           color="white"
           :border="`1px ${$vuetify.theme.themes.light.error} solid !important`"
           :textColor="$vuetify.theme.themes.light.error"
-                    :loading="item.status == REJECTED"
+          :loading="item.status == REJECTED"
           :disabled="item.status == ACCEPTED"
           @click.prevent="() => handleApproval(item, REJECTED)"
           >Reject</ActionButton
@@ -104,7 +107,7 @@ export default {
     },
     url() {
       return `projects/${this.project.id}/activities/`;
-    }
+    },
   },
   methods: {
     amount(item) {
@@ -148,18 +151,17 @@ export default {
     },
     onUpdate(value) {
       this.activities = value;
-    }
+      this.$emit("refresh");
+    },
   },
   components: {
     ActionButton: () => import("@/components/buttons/ActionButton"),
   },
   async fetch() {
-    await this.$axios
-      .get(this.url)
-      .then((reply) => {
-        this.onUpdate(reply.data);
-        this.requestRefresh();
-      });
+    await this.$axios.get(this.url).then((reply) => {
+      this.activities = reply.data;
+      this.requestRefresh();
+    });
   },
 };
 </script>   
