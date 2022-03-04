@@ -11,8 +11,8 @@
           size="22"
           :color="
             isReceived
-              ? $vuetify.theme.themes.light.primary
-              : $vuetify.theme.themes.light.octonary
+              ? $vuetify.theme.themes.light.success
+              : $vuetify.theme.themes.light.error
           "
           >{{ formattedValue }}</DefaultText
         >
@@ -71,8 +71,8 @@ export default {
   },
   data() {
     return {
-      receivedIcon: require("@/assets/balance/received.svg"),
-      sentIcon: require("@/assets/balance/sent.svg"),
+      receivedIcon: require("@/assets/balance/Up.svg"),
+      sentIcon: require("@/assets/balance/Down.svg"),
     };
   },
   components: {
