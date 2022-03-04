@@ -1,15 +1,37 @@
 <template>
-  <v-layout shrink class="justify-space-around">
-    <v-layout xs12 sm5 md3 lg2 xl1 ma-3>
-      <BalanceCard :value="allocated" label="Allocated USDC"></BalanceCard>
+  <DefaultCard>
+    <v-layout column>
+      <DefaultText
+        bold
+        :color="$vuetify.theme.themes.light.primary"
+        class="mb-3"
+        >Summary</DefaultText
+      >
+      <v-row shrink>
+        <v-col>
+          <BalanceCard
+            :value="allocated"
+            label="Allocated"
+            text="Total amount of your investitions"
+          ></BalanceCard>
+        </v-col>
+        <v-col>
+          <BalanceCard
+            :value="distributed"
+            label="Distributed"
+            text="Total amount of distributed USDC to stewards from your projects"
+          ></BalanceCard>
+        </v-col>
+        <v-col>
+          <BalanceCard
+            :value="balance"
+            label="Balance"
+            text="Your current wallet balance"
+          ></BalanceCard>
+        </v-col>
+      </v-row>
     </v-layout>
-    <v-layout xs12 sm5 md3 lg2 xl1 ma-3>
-      <BalanceCard :value="distributed" label="Distributed USDC"></BalanceCard>
-    </v-layout>
-    <v-layout xs12 sm5 md3 lg2 xl1 ma-3>
-      <BalanceCard :value="balance" label="Balance USDC"></BalanceCard>
-    </v-layout>
-  </v-layout>
+  </DefaultCard>
 </template>
 
 <script>
@@ -22,6 +44,8 @@ export default {
     };
   },
   components: {
+    DefaultText: () => import("@/components/texts/DefaultText"),
+    DefaultCard: () => import("@/components/cards/DefaultCard"),
     BalanceCard: () => import("@/components/cards/balance/BalanceCard"),
     ButtonCard: () => import("@/components/cards/balance/ButtonCard"),
   },
