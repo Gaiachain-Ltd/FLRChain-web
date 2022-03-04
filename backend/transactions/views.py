@@ -47,7 +47,7 @@ class TransactionView(CommonView):
                 "project_id": project[0],
                 "project_title": project[1]
             }
-        print("PROJECTS", project_dict)
+
         transactions = get_transactions(
             address=request.user.account.address,
             asset_id=settings.ALGO_ASSET,
@@ -56,7 +56,6 @@ class TransactionView(CommonView):
         )['transactions']
         data = list()
         for transaction in transactions:
-            print("TRANSACT", transaction)
             # TODO: Handle inner transactions:
             if transaction.get('asset-transfer-transaction', None) is None:
                 continue
@@ -72,7 +71,6 @@ class TransactionView(CommonView):
                     {}
                 )
             })
-        print(transactions)
         return Response(data, status=status.HTTP_200_OK)
         # Fetch transactions from indexer:
         # algo_txns = get_transactions(

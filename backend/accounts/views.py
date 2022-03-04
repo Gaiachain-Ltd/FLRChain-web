@@ -1,4 +1,5 @@
 import logging
+import base64
 from common.views import CommonView
 from rest_framework.response import Response
 from rest_framework import status
@@ -9,6 +10,9 @@ from django.db.models import Sum, Q
 from projects.models import Project
 from django.shortcuts import get_object_or_404
 from decimal import *
+from algorand.utils import get_transactions
+from activities.models import Activity
+from algosdk import util
 
 
 logger = logging.getLogger(__name__)
@@ -19,61 +23,43 @@ class AccountView(CommonView):
         operation_summary="Balance",
         tags=['accounts', 'facililator', 'beneficiary', 'investor'])
     def list(self, request):
-        account = request.user.account
-        spent = Transaction.objects.filter(
-            from_account=request.user.account,
-            currency=Transaction.USDC,
-            status__in=[Transaction.CONFIRMED, Transaction.PENDING, 
-                        Transaction.PAYOUT]).aggregate(
-                total_spent=Sum('amount')).get('total_spent', 0)
-        received = Transaction.objects.filter(
-            Q(to_account=request.user.account,
-            currency=Transaction.USDC,
-            status__in=[Transaction.CONFIRMED, Transaction.PENDING]) &
-            ~Q(action__in=[Transaction.FUELING, Transaction.TOP_UP])).aggregate(
-            total_received=Sum('amount')).get('total_received', 0)
-        top_ups = Transaction.objects.filter(
-            to_account=request.user.account,
-            currency=Transaction.USDC,
-            status__in=[Transaction.CONFIRMED, Transaction.PENDING],
-            action__in=[Transaction.FUELING, Transaction.TOP_UP]).aggregate(
-            total_received=Sum('amount')).get('total_received', 0)
-        ret = Transaction.objects.filter(
-            to_account=request.user.account,
-            currency=Transaction.USDC,
-            status__in=[Transaction.CONFIRMED, Transaction.PENDING],
-            action=Transaction.RETURN_INVESTMENT).aggregate(
-            total_return=Sum('amount')).get('total_return', 0)
+        invest_transactions = get_transactions(
+            address=request.user.account.address,
+            address_role="sender",
+            note_prefix="I|".encode(),
+            txn_type="appl"
+        )['transactions']
+        print("INVEST", invest_transactions)
 
-        if not received:
-            received = Decimal(0)
-        else:
-            received = Decimal(received)
+        app_ids = dict()
+        for invest_transaction in invest_transactions:
+            print("TRR", invest_transaction)
+            invest_details = invest_transaction['application-transaction']
+            if len(invest_details['application-args']) > 1:
+                amount = base64.b64decode(
+                    invest_details['application-args'][1])
+                app_ids[invest_details['application-id']
+                        ] = int.from_bytes(amount, "big")
 
-        if not spent:
-            spent = Decimal(0)
-        else:
-            spent = Decimal(spent)
+        projects = Project.objects.filter(
+            app_id__in=app_ids.keys()
+        )
 
-        if not top_ups:
-            top_ups = Decimal(0)
-        else:
-            top_ups = Decimal(top_ups)
+        distributed = Activity.objects.filter(
+            project__in=projects
+        ).aggregate(distributed=Sum('reward'))['distributed']
 
-        if not ret:
-            ret = Decimal(0)
-        else:
-            ret = Decimal(ret)
+        allocated = 0
+        for project in projects:
+            amount = app_ids.get(project.app_id, None)
+            if amount:
+                allocated += amount
 
-        getcontext().prec = 6
-        balance = account.usdc_balance()
         return Response(
             {
-                'balance': balance,
-                'spent': (spent - ret),
-                'received': received,
-                'total': balance + (spent - ret),
-                'address': account.address
+                'allocated': util.microalgos_to_algos(allocated),
+                'distributed': distributed,
+                'balance': request.user.account.usdc_balance()
             },
             status=status.HTTP_200_OK)
 
