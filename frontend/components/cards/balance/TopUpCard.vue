@@ -2,13 +2,13 @@
   <DefaultCard>
     <v-layout column shrink>
       <DefaultText
-        class="my-3"
         bold
         :color="$vuetify.theme.themes.light.primary"
+        class="mb-3"
         >Top up</DefaultText
       >
-      <ActionButton @click.prevent="paymentPopupVisible = true"
-        >Add USDC</ActionButton
+      <BlockButton @clicked="paymentPopupVisible = true"
+        >Add USDC</BlockButton
       >
     </v-layout>
     <PaymentTypePopup
@@ -53,6 +53,7 @@ export default {
     };
   },
   components: {
+    BlockButton: () => import("@/components/buttons/BlockButton"),
     DefaultText: () => import("@/components/texts/DefaultText"),
     ActionButton: () => import("@/components/buttons/ActionButton"),
     DefaultCard: () => import("@/components/cards/DefaultCard"),

@@ -1,20 +1,22 @@
 <template>
-  <v-layout wrap>
+  <v-layout column>
     <ToolBar title="Balance"></ToolBar>
-    <!-- <FacililatorBalanceCards
+    <v-layout wrap shrink>
+      <!-- <FacililatorBalanceCards
       v-if="isFacililator"
       class="mt-10"
     ></FacililatorBalanceCards>
     <InvestorBalanceCards v-else class="mt-10"></InvestorBalanceCards> -->
-    <v-col class="ma-0 pr-3 pl-6 pt-6 pb-3" md="9" shrink>
-      <MyWalletCard></MyWalletCard>
-    </v-col>
-    <v-col class="ma-0 pr-6 pl-3 pt-6 pb-3" md="3">
-      <TopUpCard></TopUpCard>
-    </v-col>
-    <v-col class="ma-0 px-6 pt-3 pb-6" sm="12">
-      <TransactionHistoryCard></TransactionHistoryCard>
-    </v-col>
+      <v-col class="ma-0 pr-3 pl-6 pt-6 pb-3 shrink" md="9" sm="12">
+        <MyWalletCard></MyWalletCard>
+      </v-col>
+      <v-col class="ma-0 pr-6 pl-3 pt-6 pb-3 shrink" md="3" sm="12">
+        <TopUpCard></TopUpCard>
+      </v-col>
+      <v-col class="ma-0 px-6 pt-3 pb-6" sm="12">
+        <TransactionHistoryCard></TransactionHistoryCard>
+      </v-col>
+    </v-layout>
     <v-spacer></v-spacer>
   </v-layout>
 </template>
