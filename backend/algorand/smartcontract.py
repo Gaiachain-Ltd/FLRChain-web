@@ -95,7 +95,7 @@ def approval_program():
 
     # OPT-IN USDC:
     on_init = Seq([
-        Assert(is_facilitator),
+        Assert(Or(is_creator, is_facilitator)),
         Assert(Not(is_initialized)),
         InnerTxnBuilder.Begin(),
         InnerTxnBuilder.SetFields({
@@ -248,6 +248,8 @@ def approval_program():
         Txn.assets[0]
     )
 
+    tmp = ScratchVar(TealType.uint64)
+
     on_withdraw = Seq([
         Assert(
             Or(
@@ -258,13 +260,14 @@ def approval_program():
         If(And(is_facilitator, is_started)).
         Then(
             Seq([
-                Assert(facilitator_adm_fee_withdraw() > Int(0)),
+                tmp.store(facilitator_adm_fee_withdraw()),
+                Assert(tmp.load() > Int(0)),
                 InnerTxnBuilder.Begin(),
                 InnerTxnBuilder.SetFields({
                     TxnField.type_enum: TxnType.AssetTransfer,
                     TxnField.xfer_asset: Txn.assets[0],
                     TxnField.asset_receiver: Txn.sender(),
-                    TxnField.asset_amount: facilitator_adm_fee_withdraw()
+                    TxnField.asset_amount: tmp.load()
                 }),
                 InnerTxnBuilder.Submit(),
                 App.localPut(
@@ -278,14 +281,16 @@ def approval_program():
         ElseIf(And(is_investor, is_finished)).
         Then(
             Seq([
+                app_balance,
+                tmp.store(investor_withdraw(app_balance.value())),
                 Assert(App.localGet(Txn.sender(), L_COUNT_KEY) == Int(0)),
-                Assert(investor_withdraw(app_balance.value()) > Int(0)),
+                Assert(tmp.load() > Int(0)),
                 InnerTxnBuilder.Begin(),
                 InnerTxnBuilder.SetFields({
                     TxnField.type_enum: TxnType.AssetTransfer,
                     TxnField.xfer_asset: Txn.assets[0],
                     TxnField.asset_receiver: Txn.sender(),
-                    TxnField.asset_amount: investor_withdraw(app_balance.value()),
+                    TxnField.asset_amount: tmp.load(),
                 }),
                 InnerTxnBuilder.Submit(),
                 App.localPut(Txn.sender(), L_COUNT_KEY, Int(1))
@@ -438,16 +443,16 @@ def initialize(
         settings.ALGO_OPT_IN_AMOUNT
     )
     txn2 = transaction.ApplicationNoOpTxn(
-        facilitator_address,
+        creator_address,
         params,
         app_id,
         ["INIT", start, end, algos_to_microalgos(fac_adm_funds), status],
         foreign_assets=[settings.ALGO_ASSET]
     )
     txn3 = opt_in(facilitator_address, app_id, 1)
-
+    
     txn_id = sign_send_atomic_trasfer(
-        [creator_priv_key, facilitator_address, facilitator_priv_key],
+        [creator_priv_key, creator_priv_key, facilitator_priv_key],
         [txn1, txn2, txn3]
     )
     wait_for_confirmation(txn_id)
