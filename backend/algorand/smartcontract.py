@@ -41,19 +41,18 @@ def approval_program():
     REJECTED_VERIFY = Int(2)
 
     is_initialized = App.globalGet(G_STATUS_KEY) == INITIALIZED_STATUS
-
     is_started = App.globalGet(G_STATUS_KEY) == STARTED_STATUS
-
-    is_creator = Global.creator_address() == Txn.sender()
-
-    is_facilitator = App.localGet(
-        Txn.sender(), L_ROLE_KEY) == FACILILTATOR_ROLE
+    is_finished = App.globalGet(G_STATUS_KEY) == FINISHED_STATUS
 
     is_opted_in = App.localGet(Txn.sender(), L_ROLE_KEY) != Int(0)
 
+    is_creator = Global.creator_address() == Txn.sender()
     is_beneficiary = App.localGet(Txn.sender(), L_ROLE_KEY) == BENEFICIARY_ROLE
-
     is_investor = App.localGet(Txn.sender(), L_ROLE_KEY) == INVESTOR_ROLE
+    is_facilitator = App.localGet(
+        Txn.sender(), L_ROLE_KEY) == FACILILTATOR_ROLE
+
+    has_invested = App.localGet(Txn.sender(), L_COUNT_KEY) != Int(0)
 
     @Subroutine(TealType.uint64)
     def is_accepted(account):
@@ -96,7 +95,7 @@ def approval_program():
 
     # OPT-IN USDC:
     on_init = Seq([
-        Assert(is_creator),
+        Assert(is_facilitator),
         Assert(Not(is_initialized)),
         InnerTxnBuilder.Begin(),
         InnerTxnBuilder.SetFields({
@@ -112,10 +111,10 @@ def approval_program():
     ])
 
     # Invest:
-    # 
     on_invest = Seq([
-        Assert(Or(is_initialized, is_started)),
         Assert(is_investor),
+        Assert(Not(has_invested)),
+        Assert(Or(is_initialized, is_started)),
         Assert(
             And(
                 Global.group_size() == Int(3),
@@ -149,12 +148,17 @@ def approval_program():
                 Gtxn[2].asset_amount()
             )
         ),
+        App.localPut(
+            Txn.sender(),
+            L_COUNT_KEY,
+            Int(1)
+        ),
         Approve()
     ])
 
     on_join = Seq([
-        Assert(Or(is_initialized, is_started)),
         Assert(is_facilitator),
+        Assert(Or(is_initialized, is_started)),
         Assert(
             Or(
                 Btoi(Txn.application_args[1]) == ACCEPTED_JOIN,
@@ -167,8 +171,8 @@ def approval_program():
     ])
 
     on_work = Seq([
-        Assert(Or(is_initialized, is_started)),
         Assert(is_beneficiary),
+        Assert(Or(is_initialized, is_started)),
         Assert(is_accepted(Txn.sender())),
         App.localPut(
             Txn.sender(),
@@ -189,8 +193,8 @@ def approval_program():
         Approve()
     ])
 
-    # TODO: Checks
     on_verify = Seq([
+        Assert(is_facilitator),
         Assert(Or(is_initialized, is_started)),
         Assert(is_accepted(Txn.accounts[1])),
         Assert(
@@ -251,27 +255,27 @@ def approval_program():
                 is_investor
             )
         ),
-        app_balance,
-        If(is_facilitator).
+        If(And(is_facilitator, is_started)).
         Then(
             Seq([
-                Approve(),
-                # Assert(facilitator_adm_fee_withdraw() > Int(0)),
-                # InnerTxnBuilder.Begin(),
-                # InnerTxnBuilder.SetFields({
-                #     TxnField.type_enum: TxnType.AssetTransfer,
-                #     TxnField.xfer_asset: Txn.assets[0],
-                #     TxnField.asset_receiver: Txn.sender(),
-                #     TxnField.asset_amount: facilitator_adm_fee_withdraw()
-                # }),
-                # InnerTxnBuilder.Submit(),
-                # App.localPut(Txn.sender(), L_TOTAL_KEY, Add(
-                #     App.localGet(Txn.sender(), L_TOTAL_KEY),
-                #     facilitator_adm_fee_withdraw()
-                # ))
+                Assert(facilitator_adm_fee_withdraw() > Int(0)),
+                InnerTxnBuilder.Begin(),
+                InnerTxnBuilder.SetFields({
+                    TxnField.type_enum: TxnType.AssetTransfer,
+                    TxnField.xfer_asset: Txn.assets[0],
+                    TxnField.asset_receiver: Txn.sender(),
+                    TxnField.asset_amount: facilitator_adm_fee_withdraw()
+                }),
+                InnerTxnBuilder.Submit(),
+                App.localPut(
+                    Txn.sender(), 
+                    L_TOTAL_KEY, 
+                    App.globalGet(G_ADM_KEY)
+                ),
+                Approve()
             ])
         ).
-        ElseIf(is_investor).
+        ElseIf(And(is_investor, is_finished)).
         Then(
             Seq([
                 Assert(App.localGet(Txn.sender(), L_COUNT_KEY) == Int(0)),
@@ -294,16 +298,16 @@ def approval_program():
     # Project update:
     # Update project properties.
     on_update = Seq([
-        Assert(Or(is_initialized, is_started)),
         Assert(is_facilitator),
+        Assert(Or(is_initialized, is_started)),
         set_project_properties(),
         App.globalPut(G_STATUS_KEY, Btoi(Txn.application_args[4])),
         Approve()
     ])
 
     on_batch = Seq([
-        Assert(is_started),
         Assert(is_facilitator),
+        Assert(is_started),
         Assert(App.localGet(Txn.accounts[1], L_ROLE_KEY) == BENEFICIARY_ROLE),
         InnerTxnBuilder.Begin(),
         InnerTxnBuilder.SetFields({
@@ -357,8 +361,8 @@ def approval_program():
     # OPT-IN application:
     # Set local state "role". In this way we will identify users.
     handle_optin = Seq([
-        Assert(Or(is_initialized, is_started)),
         Assert(Not(is_opted_in)),
+        Assert(Or(is_initialized, is_started)),
         App.localPut(Txn.sender(), L_ROLE_KEY, Btoi(Txn.application_args[0])),
         Approve()
     ])
@@ -434,7 +438,7 @@ def initialize(
         settings.ALGO_OPT_IN_AMOUNT
     )
     txn2 = transaction.ApplicationNoOpTxn(
-        creator_address,
+        facilitator_address,
         params,
         app_id,
         ["INIT", start, end, algos_to_microalgos(fac_adm_funds), status],
@@ -443,7 +447,7 @@ def initialize(
     txn3 = opt_in(facilitator_address, app_id, 1)
 
     txn_id = sign_send_atomic_trasfer(
-        [creator_priv_key, creator_priv_key, facilitator_priv_key],
+        [creator_priv_key, facilitator_address, facilitator_priv_key],
         [txn1, txn2, txn3]
     )
     wait_for_confirmation(txn_id)
