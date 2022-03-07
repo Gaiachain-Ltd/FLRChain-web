@@ -10,9 +10,10 @@
       <v-layout shrink>
         <ActionButton
           class="mt-1"
-          :border="`1px ${$vuetify.theme.themes.light.primary} solid !important`"
           color="white"
+          :border="`1px ${$vuetify.theme.themes.light.primary} solid !important`"
           :textColor="`${$vuetify.theme.themes.light.primary} !important`"
+          @click.prevent="() => openExplorerAddressLink(address.address)"
           >Details</ActionButton
         >
       </v-layout>
