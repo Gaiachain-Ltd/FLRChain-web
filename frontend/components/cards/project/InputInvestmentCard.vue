@@ -18,7 +18,7 @@
         <v-flex>
           <BlockButton
             :disabled="project.sync == SYNCING"
-            :loading="investment && investment.sync == SYNCING"
+            :loading="isSyncing"
             @clicked="
               () => {
                 if (status) {
@@ -59,7 +59,7 @@ export default {
   },
   computed: {
     status() {
-      return this.investment && this.investment.status;
+      return this.investment && this.investment.sync == SYNC.SYNCED;
     },
     btnLabel() {
       return this.status ? "Details" : "Invest";
@@ -68,7 +68,7 @@ export default {
       return `projects/${this.project.id}/investments/`;
     },
     isSyncing() {
-      return this.investment && this.investment.sync == this.SYNCING;
+      return this.investment && (this.investment.sync == SYNC.SYNCING || this.investment.sync == SYNC.TO_SYNC);
     },
   },
   components: {

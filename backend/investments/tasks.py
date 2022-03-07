@@ -7,7 +7,7 @@ from algorand.smartcontract import invest
 @shared_task()
 def project_invest():
     investments = Investment.objects.filter(
-        status=Investment.INITIAL
+        sync=Investment.TO_SYNC
     )
 
     for investment in investments:

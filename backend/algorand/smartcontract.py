@@ -95,7 +95,7 @@ def approval_program():
 
     # OPT-IN USDC:
     on_init = Seq([
-        Assert(Or(is_creator, is_facilitator)),
+        Assert(is_facilitator),
         Assert(Not(is_initialized)),
         InnerTxnBuilder.Begin(),
         InnerTxnBuilder.SetFields({
@@ -367,7 +367,8 @@ def approval_program():
     # Set local state "role". In this way we will identify users.
     handle_optin = Seq([
         Assert(Not(is_opted_in)),
-        Assert(Or(is_initialized, is_started)),
+        If(Btoi(Txn.application_args[0]) != FACILILTATOR_ROLE).
+        Then(Assert(Or(is_initialized, is_started))),
         App.localPut(Txn.sender(), L_ROLE_KEY, Btoi(Txn.application_args[0])),
         Approve()
     ])
@@ -442,17 +443,17 @@ def initialize(
         app_address,
         settings.ALGO_OPT_IN_AMOUNT
     )
-    txn2 = transaction.ApplicationNoOpTxn(
-        creator_address,
+    txn2 = opt_in(facilitator_address, app_id, 1)
+    txn3 = transaction.ApplicationNoOpTxn(
+        facilitator_address,
         params,
         app_id,
         ["INIT", start, end, algos_to_microalgos(fac_adm_funds), status],
         foreign_assets=[settings.ALGO_ASSET]
     )
-    txn3 = opt_in(facilitator_address, app_id, 1)
     
     txn_id = sign_send_atomic_trasfer(
-        [creator_priv_key, creator_priv_key, facilitator_priv_key],
+        [creator_priv_key, facilitator_priv_key, facilitator_priv_key],
         [txn1, txn2, txn3]
     )
     wait_for_confirmation(txn_id)

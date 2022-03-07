@@ -23,7 +23,7 @@ class Investment(models.Model):
     project = models.ForeignKey('projects.Project', on_delete=models.CASCADE)
     amount = models.DecimalField(
         max_digits=26, decimal_places=6, default=0)
-    sync = models.PositiveSmallIntegerField(default=INITIAL, choices=STATES)
+    sync = models.PositiveSmallIntegerField(default=TO_SYNC, choices=STATES)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 

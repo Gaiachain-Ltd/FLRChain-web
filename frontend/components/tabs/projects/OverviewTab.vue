@@ -1,6 +1,7 @@
 <template>
   <v-layout column>
     <FundraisingProgressCard
+    ref="progress"
       class="ma-3"
       :project="project"
     ></FundraisingProgressCard>
@@ -9,7 +10,7 @@
         <DetailsBlockchainCard :project="project"></DetailsBlockchainCard>
       </v-col>
       <v-col class="ma-0 pa-3" md="4" sm="12" v-if="!isFacililator">
-        <InputInvestmentCard :project="project"></InputInvestmentCard>
+        <InputInvestmentCard :project="project" @refresh="onRefresh"></InputInvestmentCard>
       </v-col>
       <v-col
         :class="['ma-0 pa-3', !isFacililator && isFundraising && 'order-md-2']"
@@ -86,6 +87,9 @@ export default {
     onProjectUpdate(project) {
       this.$emit("update:project", project);
     },
+    onRefresh() {
+      this.$refs.progress.$fetch();
+    }
   },
   mounted() {
     this.requestRefresh();

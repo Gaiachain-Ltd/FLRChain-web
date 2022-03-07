@@ -2,6 +2,7 @@
   <v-form ref="form">
     <v-layout column>
       <TextInput
+        v-if="investment"
         label="Coins for investment*"
         v-model="investment.amount"
         :rules="[...requiredRules, ...decimalRules, ...nonZeroDecimalRules]"
