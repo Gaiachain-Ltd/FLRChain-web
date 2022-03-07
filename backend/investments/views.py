@@ -18,6 +18,7 @@ from algorand.utils import get_transactions_info, get_transactions, application_
 import datetime
 from django.conf import settings
 import base64
+from algosdk import util
 
 
 class InvestmentView(CommonView):
@@ -67,38 +68,16 @@ class InvestmentView(CommonView):
             status=Project.FUNDRAISING,
             state__in=(Project.INITIALIZED, Project.POSTPONED)
         )
-        account = request.user.account
-        invest(
-            account.address,
-            account.private_key,
-            project.app_id,
-            int(request.data.get('amount'))
+
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        Investment.objects.create(
+            project=project,
+            investor=request.user,
+            amount = serializer.validated_data['amount']
         )
 
-        # with transaction.atomic():
-        #     serializer = self.serializer_class(data=request.data)
-        #     serializer.is_valid(raise_exception=True)
-
-        #     start = serializer.validated_data['start']
-        #     end = serializer.validated_data['end']
-
-        #     project = get_object_or_404(
-        #         Project,
-        #         pk=pk,
-        #         investment=None,
-        #         start__lte=start,
-        #         end__gte=end)
-
-        #     investment = Investment.objects.create(
-        #         project=project,
-        #         investor=request.user,
-        #         amount=serializer.validated_data['amount'],
-        #         start=start,
-        #         end=end)
-
-        #     SmartContract.generate(investment)
-
-        #     serializer = self.serializer_class(investment)
         return Response(status=status.HTTP_201_CREATED)
 
     @swagger_auto_schema(
@@ -114,20 +93,26 @@ class InvestmentView(CommonView):
             limit=1
         )['transactions']
 
+        registered_transaction = Investment.objects.filter(
+            project=project,
+            investor=request.user
+        ).first()
+
         if len(transactions) > 0 and len(transactions[0]['application-transaction']['application-args']) > 1:
             amount = base64.b64decode(transactions[0]['application-transaction']['application-args'][1])
             return Response(
                 {
-                    "status": True,
+                    "sync": Investment.SYNCED,
                     "txid": transactions[0]['id'],
-                    "amount": int.from_bytes(amount, "big")
+                    "amount": util.microalgos_to_algos(int.from_bytes(amount, "big"))
                 },
                 status=status.HTTP_200_OK
             )
         else:
             return Response(
                 {
-                    "status": False,
+                    "sync": registered_transaction.sync if registered_transaction else Investment.INITIAL,
+                    "amount": registered_transaction.amount if registered_transaction else 0,
                 },
                 status=status.HTTP_200_OK
             )

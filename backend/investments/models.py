@@ -6,51 +6,26 @@ from django.core.exceptions import ObjectDoesNotExist
 
 
 class Investment(models.Model):
+    INITIAL = 0
+    TO_SYNC = 1
+    SYNCED = 2
+    FAILED = 3
+
+    STATES = (
+        (INITIAL, "Initial"),
+        (TO_SYNC, "To sync"),
+        (SYNCED, "Synced"),
+        (FAILED, "Failed")
+    )
+
     investor = models.ForeignKey(
         'users.CustomUser', on_delete=models.SET_NULL, null=True)
     project = models.ForeignKey('projects.Project', on_delete=models.CASCADE)
-    created = models.DateTimeField(auto_now_add=True)
-    modified = models.DateTimeField(auto_now=True)
     amount = models.DecimalField(
         max_digits=26, decimal_places=6, default=0)
+    sync = models.PositiveSmallIntegerField(default=INITIAL, choices=STATES)
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
 
-    # def finish(self):
-    #     with transaction.atomic():
-    #         smart_contract = self.smartcontract
-
-    #         usdc_balance = smart_contract.account.usdc_balance()
-    #         tx1 = Transaction.transfer(
-    #             smart_contract.account,
-    #             self.investor.account,
-    #             0,
-    #             Transaction.USDC,
-    #             Transaction.RETURN_INVESTMENT,
-    #             self.investor.account,
-    #             self.project)
-
-    #         tx1.amount = usdc_balance
-    #         tx1.save()
-
-    #         tx2 = Transaction.transfer(
-    #             smart_contract.account,
-    #             self.investor.account,
-    #             0,
-    #             Transaction.ALGO,
-    #             Transaction.RETURN_INVESTMENT,
-    #             self.investor.account,
-    #             self.project)
-
-    #         self.status = Investment.FINISHED
-    #         self.save()
-
-    #         return [tx1.txid, tx2.txid]
-
-    # @property
-    # def confirmed(self):
-    #     try:
-    #         return Transaction.objects.filter(
-    #             to_account=self.smartcontract.account,
-    #             status=Transaction.CONFIRMED,
-    #             action=Transaction.INVESTMENT).exists()
-    #     except ObjectDoesNotExist:
-    #         return False
+    class Meta:
+        unique_together = ('investor', 'project')

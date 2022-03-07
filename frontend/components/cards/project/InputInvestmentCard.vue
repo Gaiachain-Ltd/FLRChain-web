@@ -18,6 +18,7 @@
         <v-flex>
           <BlockButton
             :disabled="project.sync == SYNCING"
+            :loading="investment && investment.sync == SYNCING"
             @clicked="
               () => {
                 if (status) {
@@ -41,11 +42,11 @@
 
 <script>
 import { SYNC } from "@/constants/project";
-import algosdk from "algosdk";
 import AlgoExplorerMixin from "@/mixins/AlgoExplorerMixin";
+import SyncMixin from "@/mixins/SyncMixin";
 
 export default {
-  mixins: [AlgoExplorerMixin],
+  mixins: [AlgoExplorerMixin, SyncMixin],
   props: {
     project: {},
   },
@@ -53,9 +54,7 @@ export default {
     return {
       errorPopupVisible: false,
       SYNCING: SYNC.TO_SYNC,
-      investment: {
-        amount: "0",
-      },
+      investment: null,
     };
   },
   computed: {
@@ -64,6 +63,12 @@ export default {
     },
     btnLabel() {
       return this.status ? "Details" : "Invest";
+    },
+    url() {
+      return `projects/${this.project.id}/investments/`;
+    },
+    isSyncing() {
+      return this.investment && this.investment.sync == this.SYNCING;
     },
   },
   components: {
@@ -79,20 +84,22 @@ export default {
         this.$axios
           .post(`projects/${this.project.id}/investments/`, this.investment)
           .then(() => {
-            this.invested = true;
-            this.$emit("refresh");
+            this.investment.sync = this.SYNCING;
+            this.requestRefresh();
           })
           .catch(() => (this.errorPopupVisible = true));
       }
     },
+    onUpdate(value) {
+      this.investment = value;
+      this.$emit("refresh");
+    },
   },
   async fetch() {
-    this.investment = await this.$axios
-      .get(`projects/${this.project.id}/investments/`)
-      .then((reply) => reply.data);
-    if (this.investment.status) {
-      this.investment.amount = algosdk.microalgosToAlgos(this.investment.amount)
-    }
+    await this.$axios.get(this.url).then((reply) => {
+      this.investment = reply.data;
+      this.requestRefresh();
+    });
   },
 };
 </script>
