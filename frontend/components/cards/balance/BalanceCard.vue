@@ -11,7 +11,7 @@
       size="20"
       style="margin-top: -12px"
       :color="$vuetify.theme.themes.light.quaternary"
-      >USDC</DefaultText
+      >{{ currency }}</DefaultText
     >
     <DefaultText
       class="text-no-wrap"
@@ -44,6 +44,10 @@ export default {
       type: String,
       default: "",
     },
+    currency: {
+      type: String,
+      default: "USDC"
+    }
   },
   components: {
     DefaultText: () => import("@/components/texts/DefaultText"),

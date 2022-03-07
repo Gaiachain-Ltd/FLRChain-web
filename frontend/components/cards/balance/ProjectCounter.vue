@@ -1,5 +1,5 @@
 <template>
-  <BalanceCard :value="projects" label="All projects created"></BalanceCard>
+  <BalanceCard :value="projects" label="Created" text="Your all projects" currency="Projects"></BalanceCard>
 </template>
 
 <script>
