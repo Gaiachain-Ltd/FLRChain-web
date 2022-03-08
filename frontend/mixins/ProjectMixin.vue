@@ -25,7 +25,7 @@ export default {
         )
       );
       t += parseFloat(this.project.fac_adm_funds);
-      return t;
+      return parseFloat(t.toFixed(6));
     },
     isSyncing() {
       return !this.project || this.project.sync == SYNC.TO_SYNC;
