@@ -9,6 +9,7 @@ from algorand import smartcontract
 from algorand.utils import *
 from django.conf import settings
 from django.db.models import F, Sum, Q
+from django.db import transaction
 
 
 logger = logging.getLogger(__name__)
@@ -51,7 +52,7 @@ def initialize_project():
             project.owner.account.address,
             project.owner.account.private_key,
             project.app_id,
-                        int(
+            int(
                 datetime.datetime.combine(
                     project.start,
                     datetime.time(0, 0, 0, 0)
@@ -69,6 +70,7 @@ def initialize_project():
         project.state = Project.INITIALIZED
         project.sync = Project.SYNCED
         project.save()
+
 
 @shared_task()
 def start_project():
@@ -95,83 +97,50 @@ def start_project():
 
 @shared_task()
 def update_project():
-    projects = Project.objects.filter(
-        Q(sync=Project.TO_SYNC) & 
-        (~Q(state__in=[Project.CREATED, Project.FINISHED, Project.DELETED]) | 
-        ~Q(status=Project.CLOSED))
+    projects = Project.objects.select_for_update().filter(
+        Q(sync=Project.TO_SYNC) &
+        ~Q(state__in=[Project.CREATED, Project.DELETED])
     ).order_by('-modified')
 
-    for project in projects:
-        smartcontract.update(
-            project.owner.account.address,
-            project.owner.account.private_key,
-            project.app_id,
-            int(
-                datetime.datetime.combine(
-                    project.start,
-                    datetime.time(0, 0, 0, 0)
-                ).timestamp()
-            ),
-            int(
-                datetime.datetime.combine(
-                    project.end,
-                    datetime.time(0, 0, 0, 0)
-                ).timestamp()
-            ),
-            project.fac_adm_funds,
-            project.status
-        )
-        project.state = Project.INITIALIZED
-        project.sync = Project.SYNCED
-        project.save()
+    with transaction.atomic():
+        for project in projects:
+            smartcontract.update(
+                project.owner.account.address,
+                project.owner.account.private_key,
+                project.app_id,
+                int(
+                    datetime.datetime.combine(
+                        project.start,
+                        datetime.time(0, 0, 0, 0)
+                    ).timestamp()
+                ),
+                int(
+                    datetime.datetime.combine(
+                        project.end,
+                        datetime.time(0, 0, 0, 0)
+                    ).timestamp()
+                ),
+                project.fac_adm_funds,
+                project.status
+            )
+            project.sync = Project.SYNCED
+            project.save()
 
 
 @shared_task()
 def finish_project():
-    projects = Project.objects.filter(
+    projects = Project.objects.select_for_update().filter(
         state=Project.STARTED,
         status=Project.ACTIVE,
         end__lte=datetime.datetime.now().date()
     )
 
-    for project in projects:
-        investors_data = INDEXER.accounts(
-            application_id=project.app_id)['accounts']
-        investor_address_list = list()
-        for investor_data in investors_data:
-            apps_local_state = investor_data['apps-local-state']
-            for app_local_state in apps_local_state:
-                if app_local_state['id'] == project.app_id:
-                    for key_value in app_local_state['key-value']:
-                        if base64.b64decode(key_value['key']).decode() == "role":
-                            investor_address_list.append(investor_data['address'])
-
-        keys = list()
-        txns = list()
-        print("ADDRESSES", investor_address_list)
-        for ial in investor_address_list:
-            account = Account.objects.get(address=ial)
-            txns.append(smartcontract.withdraw(
-                account.address, project.app_id))
-            keys.append(account.private_key)
-
-            txns.append(smartcontract.opt_out(account.address, project.app_id))
-            keys.append(account.private_key)
-
-            if len(txns) == 15:
-                txn = sign_send_atomic_trasfer(keys, txns)
-                wait_for_confirmation(txn)
-
-                keys = list()
-                txns = list()
-
-        if len(txns) > 0:
-            txn = sign_send_atomic_trasfer(keys, txns)
-            wait_for_confirmation(txn)
-
-        project.state = Project.FINISHED
-        project.status = Project.CLOSED
-        project.save()
+    with transaction.atomic():
+        for project in projects:
+            project.status = Project.CLOSED
+            project.state = Project.FINISHED
+            project.sync = Project.TO_SYNC
+            project.save()
 
 
 @shared_task()
@@ -182,29 +151,73 @@ def close_project():
     )
 
     for project in projects:
+        investors_data = INDEXER.accounts(
+            application_id=project.app_id)['accounts']
+        investor_address_list = defaultdict(list)
+        for investor_data in investors_data:
+            apps_local_state = investor_data['apps-local-state']
+            for app_local_state in apps_local_state:
+                if app_local_state['id'] == project.app_id:
+                    for key_value in app_local_state['key-value']:
+                        if base64.b64decode(key_value['key']).decode() == "role":
+                            investor_address_list[key_value['value']['uint']].append(
+                                investor_data['address'])
+
+        addresses = list()
+        for role in sorted(investor_address_list.keys(), reverse=True):
+            addresses.extend(investor_address_list[role])
+
+        keys = list()
+        txns = list()
+        for address in addresses:
+            account = Account.objects.get(address=address)
+            txns.append(smartcontract.opt_out(account.address, project.app_id))
+            keys.append(account.private_key)
+
+            if len(txns) == 15:
+                txn = sign_send_atomic_trasfer(keys, txns)
+                wait_for_confirmation(txn)
+
+                keys = list()
+                txns = list()
+
+        if len(txns) > 12:
+            txn = sign_send_atomic_trasfer(keys, txns)
+            wait_for_confirmation(txn)
+            keys = list()
+            txns = list()
+
         main = Account.get_main_account()
         account = project.account
 
-        txn1 = smartcontract.delete(account.address, project.app_id)
+        txns.append(
+            smartcontract.delete_application(account.address, project.app_id)
+        )
+        keys.append(account.private_key)
+
         txn2, _ = prepare_transfer_assets(
             account.address,
             main.address,
             0,
             close_assets_to=main.address
         )
+        txns.append(txn2)
+        keys.append(account.private_key)
+
         txn3, _ = prepare_transfer_algos(
             account.address,
             main.address,
             0,
             close_remainder_to=main.address
         )
+        txns.append(txn3)
+        keys.append(account.private_key)
 
-        txn = sign_send_atomic_trasfer(
-            account.private_key, [txn1, txn2, txn3]
-        )
+        txn = sign_send_atomic_trasfer(keys, txns)
         wait_for_confirmation(txn)
 
         project.state = Project.DELETED
+        project.status = Project.CLOSED
         project.save()
 
 

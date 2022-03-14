@@ -61,13 +61,7 @@ def approval_program():
     @Subroutine(TealType.none)
     def set_project_properties():
         return Seq([
-            Assert(
-                And(
-                    Btoi(Txn.application_args[1]) < Btoi(
-                        Txn.application_args[2]),
-                    Btoi(Txn.application_args[2]) > Global.latest_timestamp()
-                )
-            ),
+            Assert(Btoi(Txn.application_args[1]) <= Btoi(Txn.application_args[2])),
             App.globalPut(G_START_KEY, Btoi(Txn.application_args[1])),
             App.globalPut(G_END_KEY, Btoi(Txn.application_args[2])),
             App.globalPut(G_ADM_KEY, Btoi(Txn.application_args[3])),
@@ -92,6 +86,8 @@ def approval_program():
             ),
             project_balance
         )
+
+    tmp = ScratchVar(TealType.uint64)
 
     # OPT-IN USDC:
     on_init = Seq([
@@ -243,21 +239,14 @@ def approval_program():
         Approve()
     ])
 
-    app_balance = AssetHolding.balance(
-        Global.current_application_address(),
-        Txn.assets[0]
-    )
-
-    tmp = ScratchVar(TealType.uint64)
-
-    on_withdraw = Seq([
-        Assert(
-            Or(
-                is_facilitator,
-                is_investor
-            )
-        ),
-        If(And(is_facilitator, is_started)).
+    # Project update:
+    # Update project properties.
+    on_update = Seq([
+        Assert(is_facilitator),
+        Assert(Or(is_initialized, is_started)),
+        set_project_properties(),
+        App.globalPut(G_STATUS_KEY, Btoi(Txn.application_args[4])),
+        If(is_started). # Send ADM FEE
         Then(
             Seq([
                 tmp.store(facilitator_adm_fee_withdraw()),
@@ -274,39 +263,9 @@ def approval_program():
                     Txn.sender(), 
                     L_TOTAL_KEY, 
                     App.globalGet(G_ADM_KEY)
-                ),
-                Approve()
+                )
             ])
-        ).
-        ElseIf(And(is_investor, is_finished)).
-        Then(
-            Seq([
-                app_balance,
-                tmp.store(investor_withdraw(app_balance.value())),
-                Assert(App.localGet(Txn.sender(), L_COUNT_KEY) == Int(0)),
-                Assert(tmp.load() > Int(0)),
-                InnerTxnBuilder.Begin(),
-                InnerTxnBuilder.SetFields({
-                    TxnField.type_enum: TxnType.AssetTransfer,
-                    TxnField.xfer_asset: Txn.assets[0],
-                    TxnField.asset_receiver: Txn.sender(),
-                    TxnField.asset_amount: tmp.load(),
-                }),
-                InnerTxnBuilder.Submit(),
-                App.localPut(Txn.sender(), L_COUNT_KEY, Int(1))
-            ])
-        ).
-        Else(Reject()),
-        Approve()
-    ])
-
-    # Project update:
-    # Update project properties.
-    on_update = Seq([
-        Assert(is_facilitator),
-        Assert(Or(is_initialized, is_started)),
-        set_project_properties(),
-        App.globalPut(G_STATUS_KEY, Btoi(Txn.application_args[4])),
+        ),
         Approve()
     ])
 
@@ -331,7 +290,6 @@ def approval_program():
         [Txn.application_args[0] == Bytes("JOIN"), on_join],
         [Txn.application_args[0] == Bytes("WORK"), on_work],
         [Txn.application_args[0] == Bytes("VERIFY"), on_verify],
-        [Txn.application_args[0] == Bytes("WITHDRAW"), on_withdraw],
         [Txn.application_args[0] == Bytes("UPDATE"), on_update],
         [Txn.application_args[0] == Bytes("BATCH"), on_batch],
     )
@@ -373,10 +331,42 @@ def approval_program():
         Approve()
     ])
 
+    app_balance = AssetHolding.balance(
+        Global.current_application_address(),
+        Txn.assets[0]
+    )
+
+    handle_optout = Seq([
+        If(And(is_investor, is_finished)).
+        Then(
+            Seq([
+                app_balance,
+                tmp.store(investor_withdraw(app_balance.value())),
+                If(And(
+                    App.localGet(Txn.sender(), L_COUNT_KEY) == Int(1),
+                    tmp.load() > Int(0)
+                   ),
+                   Seq([
+                    InnerTxnBuilder.Begin(),
+                    InnerTxnBuilder.SetFields({
+                        TxnField.type_enum: TxnType.AssetTransfer,
+                        TxnField.xfer_asset: Txn.assets[0],
+                        TxnField.asset_receiver: Txn.sender(),
+                        TxnField.asset_amount: tmp.load(),
+                    }),
+                    InnerTxnBuilder.Submit(),
+                    App.localPut(Txn.sender(), L_COUNT_KEY, Int(0))
+                   ])
+                )
+            ])
+        ),
+        Approve()
+    ])
+
     program = Cond(
         [Txn.application_id() == Int(0), Approve()],
         [Txn.on_completion() == OnComplete.OptIn, handle_optin],
-        [Txn.on_completion() == OnComplete.CloseOut, Approve()],
+        [Txn.on_completion() == OnComplete.CloseOut, handle_optout],
         [Txn.on_completion() == OnComplete.UpdateApplication, handle_update],
         [Txn.on_completion() == OnComplete.DeleteApplication, handle_delete],
         [Txn.on_completion() == OnComplete.NoOp, handle_noop]
@@ -467,7 +457,11 @@ def opt_in(address, app_id, role):
 
 def opt_out(address, app_id):
     params = CLIENT.suggested_params()
-    txn = transaction.ApplicationCloseOutTxn(address, params, app_id)
+    txn = transaction.ApplicationCloseOutTxn(
+        address, 
+        params, 
+        app_id,
+        foreign_assets=[settings.ALGO_ASSET])
     return txn
 
 
@@ -502,6 +496,7 @@ def update(address, priv_key, app_id, start, end, fac_adm_funds, status):
         params,
         app_id,
         ["UPDATE", start, end, algos_to_microalgos(fac_adm_funds), status],
+        foreign_assets=[settings.ALGO_ASSET]
     )
 
     txn_signed = txn.sign(priv_key)
@@ -521,7 +516,7 @@ def withdraw(address, app_id):
     return txn
 
 
-def delete_(address, app_id):
+def delete_application(address, app_id):
     params = CLIENT.suggested_params()
     txn = transaction.ApplicationDeleteTxn(
         address,

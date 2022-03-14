@@ -29,11 +29,11 @@ class AccountView(CommonView):
             note_prefix="I|".encode(),
             txn_type="appl"
         )['transactions']
-        print("INVEST", invest_transactions)
+        # print("INVEST", invest_transactions)
 
         app_ids = dict()
         for invest_transaction in invest_transactions:
-            print("TRR", invest_transaction)
+            # print("TRR", invest_transaction)
             invest_details = invest_transaction['application-transaction']
             if len(invest_details['application-args']) > 1:
                 amount = base64.b64decode(
