@@ -62,6 +62,7 @@ class ProjectSerializer(serializers.ModelSerializer):
     budget = serializers.FileField(required=False, allow_null=True)
 
     status = serializers.IntegerField(read_only=True)
+    state = serializers.IntegerField(read_only=True)
     sync = serializers.IntegerField(read_only=True)
 
     start = serializers.DateField()
@@ -81,6 +82,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             'document',
             'budget',
             'status',
+            'state',
             'sync',
             'start',
             'end',

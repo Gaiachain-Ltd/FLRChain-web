@@ -26,17 +26,26 @@
           contain
         ></v-img>
       </v-layout>
+      <v-layout
+        v-if="project.state == 3"
+        align-center
+        class="fundraising-fail pt-2 pb-1 px-2 my-2"
+      >
+        <DefaultText :size="14" color="white">
+          Fundraising period is finished. Your goal hasn't been reached!
+        </DefaultText>
+        <v-spacer></v-spacer>
+        <DefaultSVGIcon
+          class="mb-1 mx-2"
+          :icon="require('@/assets/icons/exclamation-mark.svg')"
+          size="14"
+        ></DefaultSVGIcon>
+      </v-layout>
       <v-layout class="my-6">
         <DefaultText :size="14">{{ project.description }}</DefaultText>
       </v-layout>
       <v-layout>
         <v-spacer></v-spacer>
-        <ActionButton
-          label="My contribution"
-          color="white"
-          :border="`1px ${$vuetify.theme.themes.light.primary} solid !important`"
-          :textColor="`${$vuetify.theme.themes.light.primary} !important`"
-        ></ActionButton>
         <ActionButton
           class="ml-3"
           label="Details"
@@ -104,3 +113,10 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.fundraising-fail {
+  background-color: #ff9123;
+  border-radius: 5px;
+}
+</style>

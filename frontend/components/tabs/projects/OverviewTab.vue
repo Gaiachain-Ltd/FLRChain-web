@@ -22,7 +22,7 @@
       <v-col class="ma-0 pa-3" :md="!isFundraising ? 12 : 8" sm="12">
         <InputProjectCard
           :project.sync="project"
-          :readonly="!isFacililator || isSyncing"
+          :readonly="!isFacililator || project.status === CLOSED || isSyncing"
         ></InputProjectCard>
       </v-col>
     </v-layout>
@@ -46,6 +46,7 @@ export default {
   data() {
     return {
       FUNDRAISING: STATUS.FUNDRAISING,
+      CLOSED: STATUS.CLOSED
     };
   },
   computed: {
