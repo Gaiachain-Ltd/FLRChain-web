@@ -21,6 +21,8 @@
           :readonly="readonly"
           required
         ></TextInput>
+        <DataTypeTags></DataTypeTags>
+        <DataRequiredTags></DataRequiredTags>
         <TextAreaInput
           label="Instructions for steward"
           v-model="task.instructions"
@@ -105,6 +107,8 @@ export default {
     TextInput: () => import("@/components/inputs/TextInput"),
     TextAreaInput: () => import("@/components/inputs/TextAreaInput"),
     DefaultIconButton: () => import("@/components/buttons/DefaultIconButton"),
+    DataTypeTags: () => import("@/components/inputs/DataTypeTags"),
+    DataRequiredTags: () => import("@/components/inputs/DataRequiredTags"),
   },
   methods: {
     validate() {
