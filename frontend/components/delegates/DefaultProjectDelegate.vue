@@ -6,9 +6,9 @@
           project.title
         }}</DefaultText>
         <v-spacer></v-spacer>
-        <DefaultText :size="12" :color="$vuetify.theme.themes.light.quinary"
-          >Active</DefaultText
-        >
+        <DefaultText :size="12" :color="$vuetify.theme.themes.light.quinary">{{
+          indicatorTitle
+        }}</DefaultText>
         <StatusIndicator class="ml-1" :color="indicatorColor"></StatusIndicator>
       </v-layout>
       <v-layout align-center>
@@ -77,11 +77,21 @@ export default {
     indicatorColor() {
       switch (this.project.status) {
         case STATUS.FUNDRAISING:
-          return this.$vuetify.theme.themes.light.primary;
+          return "#ff9123";
         case STATUS.ACTIVE:
-          return this.$vuetify.theme.themes.light.success;
+          return "#00B854";
         case STATUS.CLOSED:
-          return this.$vuetify.theme.themes.light.error;
+          return "#0075DC";
+      }
+    },
+    indicatorTitle() {
+      switch (this.project.status) {
+        case STATUS.FUNDRAISING:
+          return "Fundraising";
+        case STATUS.ACTIVE:
+          return "Active";
+        case STATUS.CLOSED:
+          return "Closed";
       }
     },
     arrowIcon() {

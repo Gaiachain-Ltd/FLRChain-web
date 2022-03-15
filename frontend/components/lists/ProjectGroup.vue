@@ -1,12 +1,10 @@
 <template>
   <v-layout column shrink>
     <v-layout>
-      <DefaultText
-        class="mb-3"
-        size="20"
-        :color="$vuetify.theme.themes.light.primary"
-        >{{ title }}</DefaultText
-      >
+      <DefaultText class="mb-3" size="20">{{ title }}</DefaultText>
+      <div class="counter" :style="{ backgroundColor: counterColor }">
+        {{ projects.length }}
+      </div>
       <v-spacer></v-spacer>
       <v-btn
         small
@@ -15,11 +13,7 @@
         class="elevation-16"
         @click.prevent="onClicked"
       >
-        <v-img
-          max-width="16"
-          :src="collapseIcon"
-          contain
-        ></v-img>
+        <v-img max-width="16" :src="collapseIcon" contain></v-img>
       </v-btn>
     </v-layout>
     <v-expand-transition>
@@ -58,6 +52,18 @@ export default {
     collapseIcon() {
       return this.collapsed ? this.downIcon : this.upIcon;
     },
+    counterColor() {
+      switch (this.title) {
+        case "Fundraising":
+          return "#ff9123";
+        case "Active":
+          return "#00B854";
+        case "Closed":
+          return "#0075DC";
+        default:
+          return "";
+      }
+    },
   },
   components: {
     DefaultText: () => import("@/components/texts/DefaultText"),
@@ -71,3 +77,15 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.counter {
+  color: white;
+  border-radius: 10px;
+  max-height: 20px;
+  min-width: 20px;
+  text-align: center;
+  margin-top: 4px;
+  margin-left: 4px;
+}
+</style>

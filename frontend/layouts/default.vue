@@ -120,8 +120,8 @@ export default {
           ].filter((child) => child.visible),
         },
         {
-          iconOn: require("@/assets/side/investment_on.svg"),
-          iconOff: require("@/assets/side/investment_off.svg"),
+          iconOn: require("@/assets/side/wallet_on.svg"),
+          iconOff: require("@/assets/side/wallet_off.svg"),
           enabled: this.$route.name === "balance",
           label: "Wallet",
           route: "/balance",

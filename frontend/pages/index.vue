@@ -23,34 +23,23 @@
       </v-layout>
     </v-card>
     <v-layout column ma-6>
-      <v-layout ma-0 align-center shrink>
-        <DefaultText :size="24" :color="$vuetify.theme.themes.light.primary"
-          >Your impact</DefaultText
-        >
-        <v-spacer></v-spacer>
-        <ProjectsCounter
-          :fundraising="fundraisingVisible ? fundraisingProjects.length : -1"
-          :active="activeVisible ? activeProjects.length : -1"
-          :closed="closedVisible ? closedProjects.length : -1"
-        ></ProjectsCounter>
-      </v-layout>
       <v-layout column ma-0 shrink>
         <ProjectGroup
           v-if="fundraisingVisible"
           class="mt-6"
-          title="Fundraising projects"
+          title="Fundraising"
           :projects="fundraisingProjects"
         ></ProjectGroup>
         <ProjectGroup
           v-if="activeVisible"
           class="mt-6"
-          title="Active projects"
+          title="Active"
           :projects="activeProjects"
         ></ProjectGroup>
         <ProjectGroup
           v-if="closedVisible"
           class="mt-6"
-          title="Closed projects"
+          title="Closed"
           :projects="closedProjects"
         ></ProjectGroup>
         <v-spacer></v-spacer>
