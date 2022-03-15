@@ -81,6 +81,36 @@ class ProjectView(CommonView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+class DataTypeTagView(CommonView):
+    serializer_class = DataTypeTagSerializer
+
+    def create(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def destroy(self, _, pk=None):
+        tag = get_object_or_404(DataTypeTag, pk=pk)
+        tag.delete()
+        return Response(status=status.HTTP_200_OK)
+
+
+class DataTagView(CommonView):
+    serializer_class = DataTagSerializer
+    
+    def create(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def destroy(self, _, pk=None):
+        tag = get_object_or_404(DataTag, pk=pk)
+        tag.delete()
+        return Response(status=status.HTTP_200_OK)
+
+
 class AssignmentView(CommonView):
     serializer_class = AssignmentSerializer
     permission_classes = ()

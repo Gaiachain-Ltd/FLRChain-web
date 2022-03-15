@@ -16,4 +16,11 @@ const SYNC = {
     SYNCED: 2
 };
 
-export { STATUS, SYNC, APPROVAL };
+const TAG_TYPES = {
+    TEXT_TYPE: 0,
+    NUMBER_TYPE: 1,
+    AREA_TYPE: 2,
+    PHOTO_TYPE: 3
+};
+
+export { STATUS, SYNC, APPROVAL, TAG_TYPES };

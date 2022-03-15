@@ -1,23 +1,59 @@
 <template>
   <v-layout column class="mb-4">
-    <DefaultText class="mb-2" :size="12" :color="$vuetify.theme.themes.light.senary"
+    <DefaultText
+      class="mb-2"
+      :size="12"
+      :color="$vuetify.theme.themes.light.senary"
       >Type of data</DefaultText
     >
     <v-layout>
-        <TagButton>Base line</TagButton>
-      <TagButton creator>Add type</TagButton>
+      <TagButton
+        v-if="task.data_type_tag"
+        @click.prevent="showConfirmPopup = true"
+        >{{ task.data_type_tag.name }}</TagButton
+      >
+      <TagButton
+        creator
+        @click.prevent="showAddPopup = true"
+        :disabled="!!task.data_type_tag"
+        >+ Add type</TagButton
+      >
     </v-layout>
+    <DataTypeTagPopup
+      v-if="showAddPopup"
+      v-model="showAddPopup"
+      :task.sync="task"
+    ></DataTypeTagPopup>
+    <ConfirmPopup
+      v-model="showConfirmPopup"
+      text="Do you really want to remove this tag?"
+      @confirm="deleteTag"
+    ></ConfirmPopup>
   </v-layout>
 </template>
 
 <script>
 export default {
   props: {
-    project: {},
+    task: {},
+  },
+  data() {
+    return {
+      showAddPopup: false,
+      showConfirmPopup: false,
+    };
   },
   components: {
     TagButton: () => import("@/components/buttons/TagButton"),
     DefaultText: () => import("@/components/texts/DefaultText"),
+    ConfirmPopup: () => import("@/components/popups/ConfirmPopup"),
+    DataTypeTagPopup: () =>
+      import("@/components/popups/projects/DataTypeTagPopup"),
+  },
+  methods: {
+    deleteTag() {
+      this.$set(this.task, "data_type_tag", undefined);
+    },
   },
 };
 </script>

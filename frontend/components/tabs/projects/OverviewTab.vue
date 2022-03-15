@@ -28,7 +28,7 @@
     </v-layout>
     <ActionBarCard
       class="ma-3"
-      v-if="isFacililator"
+      v-if="isFacililator && project.status !== CLOSED"
       @save="update"
       hideCancel
       :loading="isSyncing"

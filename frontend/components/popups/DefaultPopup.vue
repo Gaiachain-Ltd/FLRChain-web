@@ -4,7 +4,7 @@
       <slot v-bind:attrs="attrs" v-bind:on="on"></slot>
     </template>
     <v-card ma-0>
-      <v-layout column ma-0 pa-6 align-center>
+      <v-layout column>
         <slot name="icon">
           <v-flex>
             <DefaultSVGIcon

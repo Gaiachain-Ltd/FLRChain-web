@@ -121,12 +121,40 @@ class Milestone(models.Model):
         return self.name
 
 
+class DataTypeTag(models.Model):
+    name = models.CharField(max_length=255)
+
+
+class DataTag(models.Model):
+    TEXT_TYPE = 0
+    NUMBER_TYPE = 1
+    AREA_TYPE = 2
+    PHOTO_TYPE = 3
+
+    TAG_TYPES = (
+        (TEXT_TYPE, "Text"),
+        (NUMBER_TYPE, "Number"),
+        (AREA_TYPE, "Area"),
+        (PHOTO_TYPE, "Photo")
+    )
+
+    name = models.CharField(max_length=255)
+    unit = models.CharField(
+        max_length=255, blank=True, null=True)
+    tag_type = models.PositiveSmallIntegerField(
+        default=TEXT_TYPE, choices=TAG_TYPES)
+
+
 class Task(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     deleted = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
+
+    data_type_tag = models.ForeignKey(
+        DataTypeTag, on_delete=models.CASCADE, null=True)
+    data_tags = models.ManyToManyField(DataTag)
 
     reward = models.DecimalField(
         max_digits=26, decimal_places=6, default=0)

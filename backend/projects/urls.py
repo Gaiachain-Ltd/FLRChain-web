@@ -6,4 +6,6 @@ urlpatterns = [
     path('projects/<int:pk>/', ProjectView.as_view({'get': 'retrieve', 'put': 'update'})),
     path('projects/<int:pk>/assignments/', AssignmentView.as_view({'get': 'list', 'post': 'create'})),
     path('projects/assignments/<int:pk>/', AssignmentView.as_view({'put': 'update'})),
+    path('projects/datatypetag/', DataTypeTagView.as_view({'post': 'create', 'delete': 'destroy'})),
+    path('projects/datatag/', DataTagView.as_view({'post': 'create', 'delete': 'destroy'})),
 ]

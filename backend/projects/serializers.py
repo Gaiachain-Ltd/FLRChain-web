@@ -2,9 +2,26 @@ from rest_framework import serializers
 from projects.models import *
 from django.db import transaction
 from users.serializers import CustomUserSerializer
-from investments.serializers import InvestmentSerializer
 from decimal import *
-import datetime
+
+
+class DataTypeTagSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(required=False)
+
+    class Meta:
+        model = DataTypeTag
+        fields = ('id', 'name')
+        read_only_fields = ('id',)
+
+
+class DataTagSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(required=False)
+    unit = serializers.CharField(required=False, allow_blank=True, allow_null=True)
+
+    class Meta:
+        model = DataTag
+        fields = ('id', 'name', 'tag_type', 'unit')
+        read_only_fields = ('id',)
 
 
 class TaskListSerializer(serializers.ListSerializer):
@@ -15,12 +32,14 @@ class TaskListSerializer(serializers.ListSerializer):
 
 class TaskSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(required=False)
+    data_type_tag = DataTypeTagSerializer(required=False, allow_null=True)
+    data_tags = DataTagSerializer(many=True)
 
     class Meta:
         list_serializer_class = TaskListSerializer
         model = Task
         fields = ('id', 'reward', 'deleted', 'batch', 'count',
-                  'name')
+                  'name', 'data_type_tag', 'data_tags')
         read_only_fields = ('id',)
 
     def to_representation(self, instance):
@@ -217,7 +236,6 @@ class ProjectSerializer(serializers.ModelSerializer):
                             task_obj.reward = task['reward']
                             task_obj.batch = task['batch']
                             task_obj.count = task['count']
-                            task_obj.save()
                             del tasks_dict[task_obj.id]
                         else:
                             task_obj = Task.objects.create(
@@ -228,9 +246,24 @@ class ProjectSerializer(serializers.ModelSerializer):
                                 count=task['count']
                             )
                             milestone_obj.tasks.add(task_obj)
-            # for task in tasks_dict.values():
-            #     task.deleted = True
-            #     task.save()
+
+                        if task.get('data_type_tag', None):
+                            dtt = task['data_type_tag']
+                            dtt_obj = DataTypeTag.objects.get(
+                                id=dtt['id']
+                            )
+                            task_obj.data_type_tag = dtt_obj
+                        else:
+                            task_obj.data_type_tag = None
+
+                        task_obj.data_tags.clear()
+                        for tag in task['data_tags']:
+                            tag_obj = DataTag.objects.get(
+                                id=tag['id']
+                            )
+                            task_obj.data_tags.add(tag_obj)
+                        
+                        task_obj.save()
 
             instance.save()
             return instance
