@@ -38,6 +38,7 @@
             @click="showMenu = !showMenu"
           >
             <DefaultSVGIcon
+              :class="readonly && 'readonly-icon'"
               :icon="require('@/assets/icons/calendar.svg')"
             ></DefaultSVGIcon>
           </v-layout>
@@ -101,5 +102,8 @@ export default {
 <style scoped>
 .text-field-style {
   border-radius: 7px !important;
+}
+.readonly-icon {
+  margin-top: 8px !important;
 }
 </style>

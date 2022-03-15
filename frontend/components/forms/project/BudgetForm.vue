@@ -7,6 +7,7 @@
       label="Facilitator administration funds"
       v-model="project.fac_adm_funds"
       :readonly="readonly"
+      :icon="icon"
     ></TextInput>
   </v-layout>
 </template>
@@ -18,6 +19,11 @@ export default {
     readonly: {
       type: Boolean,
       default: false
+    }
+  },
+  data() {
+    return {
+      icon: require("@/assets/icons/currency.svg"),
     }
   },
   components: {

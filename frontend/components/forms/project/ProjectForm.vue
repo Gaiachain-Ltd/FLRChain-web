@@ -42,7 +42,7 @@
         </v-flex>
       </v-layout>
       <TextAreaInput
-        label="Description"
+        label="Summarize the project. What problem are you trying to solve and how?"
         placeholder="Please enter project description..."
         v-model="project.description"
         :readonly="readonly"

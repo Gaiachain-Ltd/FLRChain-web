@@ -26,7 +26,10 @@
       @blur="validate"
     >
       <v-layout v-if="icon" column pr-2 mb-1 align-center slot="prepend-inner">
-        <DefaultSVGIcon :icon="icon"></DefaultSVGIcon>
+        <DefaultSVGIcon
+          :class="readonly && 'readonly-icon'"
+          :icon="icon"
+        ></DefaultSVGIcon>
       </v-layout>
     </v-text-field>
   </v-layout>
@@ -126,6 +129,9 @@ export default {
 <style scoped lang="scss">
 .text-field-style {
   border-radius: 7px !important;
+}
+.readonly-icon {
+  margin-top: 8px !important;
 }
 </style>
 
