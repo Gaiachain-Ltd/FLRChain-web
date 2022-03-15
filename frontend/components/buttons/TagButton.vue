@@ -9,9 +9,15 @@
     ]"
   >
     <v-layout align-center>
+      <DefaultSVGIcon
+        v-if="icon || highlightIcon"
+        :icon="highlight ? highlightIcon : icon"
+        size="15"
+        class="mb-1 mr-2"
+      ></DefaultSVGIcon>
       <slot></slot>
       <DefaultSVGIcon
-        v-if="!creator"
+        v-if="showDeleteIcon"
         :icon="require('@/assets/icons/delete.svg')"
         size="15"
         class="mb-1 ml-2"
@@ -31,6 +37,18 @@ export default {
       type: Boolean,
       default: false,
     },
+    showDeleteIcon: {
+      type: Boolean,
+      default: false,
+    },
+    icon: {
+      type: String,
+      default: ""
+    },
+    highlightIcon: {
+      type: String,
+      default: ""
+    }
   },
   components: {
     DefaultSVGIcon: () => import("@/components/icons/DefaultSVGIcon"),

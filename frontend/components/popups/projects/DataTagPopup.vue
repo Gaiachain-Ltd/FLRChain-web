@@ -11,6 +11,8 @@
             v-for="tag in tags"
             :key="tag.tagType"
             :highlight="selectedTagType == tag.tagType"
+            :icon="tag.icon"
+            :highlightIcon="tag.highlightIcon"
             @click.prevent="selectedTagType = tag.tagType"
             >{{ tag.name }}</TagButton
           >
@@ -80,22 +82,26 @@ export default {
       selectedTagType: TAG_TYPES.TEXT_TYPE,
       tags: [
         {
-          icon: "",
+          icon: require("@/assets/icons/edit.svg"),
+          highlightIcon: require("@/assets/icons/edit-white.svg"),
           name: "Text",
           tagType: TAG_TYPES.TEXT_TYPE,
         },
         {
-          icon: "",
+          icon: require("@/assets/icons/hashtag.svg"),
+          highlightIcon: require("@/assets/icons/hashtag-white.svg"),
           name: "Number",
           tagType: TAG_TYPES.NUMBER_TYPE,
         },
         {
-          icon: "",
+          icon: require("@/assets/icons/area.svg"),
+          highlightIcon: require("@/assets/icons/area-white.svg"),
           name: "Area",
           tagType: TAG_TYPES.AREA_TYPE,
         },
         {
-          icon: "",
+          icon: require("@/assets/icons/upload.svg"),
+          highlightIcon: require("@/assets/icons/upload-white.svg"),
           name: "Photo",
           tagType: TAG_TYPES.PHOTO_TYPE,
         },

@@ -10,6 +10,7 @@
       <TagButton
         v-if="task.data_type_tag"
         @click.prevent="showConfirmPopup = true"
+        showDeleteIcon
         >{{ task.data_type_tag.name }}</TagButton
       >
       <TagButton

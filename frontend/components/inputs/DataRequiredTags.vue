@@ -11,6 +11,7 @@
         v-for="tag in task.data_tags"
         :key="tag.id"
         @click.prevent="() => handleConfirm(tag.id)"
+        showDeleteIcon
         >{{ tag.name }}</TagButton
       >
       <TagButton creator @click.prevent="showAddPopup = true"
