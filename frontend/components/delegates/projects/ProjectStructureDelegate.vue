@@ -1,14 +1,11 @@
 <template>
   <v-layout align-center style="width: 100%">
-    <DefaultText
-      v-if="index"
-      class="mr-3"
-      :color="kind == 'milestone' ? '#00868A' : '#06BCC1'"
-      >{{ index }}</DefaultText
-    >
-    <div :class="['decorator mr-3 mb-1', kind]"></div>
+    <DefaultText v-if="index" class="mr-1" :color="color" size="12">{{
+      index
+    }}</DefaultText>
+    <div :class="['decorator mr-2 mb-1', kind]"></div>
     <v-layout>
-      <DefaultText>{{ internalName }}</DefaultText>
+      <DefaultText size="12" :color="color">{{ internalName }}</DefaultText>
     </v-layout>
   </v-layout>
 </template>
@@ -32,6 +29,16 @@ export default {
     internalName() {
       return this.name ? this.name : "Untitled";
     },
+    color() {
+      switch (this.kind) {
+        case "action":
+          return "#02595b";
+        case "milestone":
+          return "#00868a";
+        case "task":
+          return "#06bcc1";
+      }
+    },
   },
   components: {
     DefaultText: () => import("@/components/texts/DefaultText"),
@@ -43,13 +50,13 @@ export default {
 .decorator {
   border-style: solid;
   border-width: 2px;
-  width: 12px;
-  height: 12px;
-  min-width: 12px;
-  min-height: 12px;
-  max-height: 12px;
-  max-width: 12px;
-  border-radius: 4px;
+  width: 10px;
+  height: 10px;
+  min-width: 10px;
+  min-height: 10px;
+  max-height: 10px;
+  max-width: 10px;
+  border-radius: 3px;
   rotate: 45deg;
 }
 .action {

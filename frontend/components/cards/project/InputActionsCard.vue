@@ -7,8 +7,8 @@
     >
       <v-layout column mb-6 class="border-wrapper pa-6">
         <v-layout ma-0 mb-3 justify-center>
-          <DefaultText :color="$vuetify.theme.themes.light.primary">{{
-            `Action ${actionIndex + 1}`
+          <DefaultText color="#02595b" size="24" bold>{{
+            `FLR Action ${actionIndex + 1}`
           }}</DefaultText>
           <v-spacer></v-spacer>
           <DefaultIconButton
@@ -28,8 +28,8 @@
         >
           <v-layout column mb-6 class="border-wrapper pa-6">
             <v-layout ma-0 mb-3 justify-center>
-              <DefaultText :color="$vuetify.theme.themes.light.primary">{{
-                `Milesone ${milestoneIndex + 1}`
+              <DefaultText color="#00868a" size="20" bold>{{
+                `Milesone ${actionIndex + 1}.${milestoneIndex + 1}`
               }}</DefaultText>
               <v-spacer></v-spacer>
               <DefaultIconButton
@@ -52,6 +52,7 @@
                   <TaskForm
                     v-model="milestone.tasks[taskIndex]"
                     :index="taskIndex"
+                    :actionIndex="actionIndex + 1"
                     :milestoneIndex="milestoneIndex + 1"
                     :showDeleteBtn="milestone.tasks.length > 1"
                     :readonly="readonly"

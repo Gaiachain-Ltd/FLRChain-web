@@ -8,7 +8,7 @@
       ></ProjectForm>
       <DefaultText>{{ `Milestones & Tasks` }}</DefaultText>
       <v-layout wrap>
-        <v-flex xs2>
+        <v-flex xs3>
           <v-layout column class="mr-6">
             <ProjectStructure :project="project"></ProjectStructure>
             <ProjectFundDistribution

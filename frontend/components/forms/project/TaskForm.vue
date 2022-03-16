@@ -2,8 +2,8 @@
   <v-form ref="form">
     <v-layout column ma-0>
       <v-layout ma-0 mb-3>
-        <DefaultText :color="$vuetify.theme.themes.light.primary">{{
-          `Task ${milestoneIndex}.${index + 1}`
+        <DefaultText color="#06bcc1" bold size="18">{{
+          `Task ${actionIndex}.${milestoneIndex}.${index + 1}`
         }}</DefaultText>
         <v-spacer></v-spacer>
         <DefaultIconButton
@@ -64,6 +64,10 @@ export default {
   props: {
     value: {},
     index: {
+      type: Number,
+      default: 1,
+    },
+    actionIndex: {
       type: Number,
       default: 1,
     },

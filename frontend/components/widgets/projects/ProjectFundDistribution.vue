@@ -108,7 +108,7 @@ export default {
 
 <style scoped>
 .share {
-  height: 18px;
+  height: 14px;
 }
 .chart {
   border-radius: 10px;
