@@ -4,7 +4,7 @@
       label
     }}</DefaultText>
     <v-text-field
-      class="text-field-style"
+      :class="['text-field-style', readonly && 'mt-0 pt-0']"
       :placeholder="placeholder"
       :solo="!readonly"
       :readonly="readonly"
@@ -30,6 +30,9 @@
           :class="readonly && 'readonly-icon'"
           :icon="icon"
         ></DefaultSVGIcon>
+      </v-layout>
+      <v-layout slot="append">
+        <slot name="append"></slot>
       </v-layout>
     </v-text-field>
   </v-layout>

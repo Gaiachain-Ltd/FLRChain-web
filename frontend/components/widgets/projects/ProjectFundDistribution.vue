@@ -3,19 +3,19 @@
     <ProjectFundDistributionDelegate
       name="Tasks"
       :color="$vuetify.theme.themes.light.success"
-      :value="rewards"
+      :value="totalRewards"
       :share="rewardsShare"
     ></ProjectFundDistributionDelegate>
     <ProjectFundDistributionDelegate
       name="Batch"
       color="blue"
-      :value="batches"
+      :value="totalBatch"
       :share="batchesShare"
     ></ProjectFundDistributionDelegate>
     <ProjectFundDistributionDelegate
       name="Facilitator"
       :color="$vuetify.theme.themes.light.primary"
-      :value="facAdmFunds"
+      :value="totalFacAdmFunds"
       :share="facAdmFundsShare"
     ></ProjectFundDistributionDelegate>
     <v-layout class="chart mt-1">
@@ -45,59 +45,12 @@
 </template>
 
 <script>
+import ProjectMixin from "@/mixins/ProjectMixin";
+
 export default {
+  mixins: [ProjectMixin],
   props: {
     project: {},
-  },
-  computed: {
-    rewards() {
-      let rewards = 0;
-      this.project.actions.forEach((action) =>
-        action.milestones.forEach((milestone) => {
-          milestone.tasks.forEach((task) => {
-            rewards += parseFloat(task.reward) * parseInt(task.count);
-          });
-        })
-      );
-      return rewards;
-    },
-    batches() {
-      let batches = 0;
-      this.project.actions.forEach((action) =>
-        action.milestones.forEach((milestone) => {
-          milestone.tasks.forEach((task) => {
-            batches += parseFloat(task.batch);
-          });
-        })
-      );
-      return batches;
-    },
-    facAdmFunds() {
-      return this.project.fac_adm_funds
-        ? parseFloat(this.project.fac_adm_funds)
-        : 0;
-    },
-    sum() {
-      return this.rewards + this.batches + this.facAdmFunds;
-    },
-    rewardsShare() {
-      if (!this.rewards) {
-        return 0;
-      }
-      return ((this.rewards * 100) / this.sum).toFixed(2);
-    },
-    batchesShare() {
-      if (!this.batches) {
-        return 0;
-      }
-      return ((this.batches * 100) / this.sum).toFixed(2);
-    },
-    facAdmFundsShare() {
-      if (!this.facAdmFunds) {
-        return 0;
-      }
-      return ((this.facAdmFunds * 100) / this.sum).toFixed(2);
-    },
   },
   components: {
     ProjectFundDistributionDelegate: () =>

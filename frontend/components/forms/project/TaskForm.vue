@@ -1,7 +1,7 @@
 <template>
   <v-form ref="form">
     <v-layout column ma-0>
-      <v-layout ma-0 mb-3>
+      <v-layout ma-0>
         <DefaultText color="#06bcc1" bold size="18">{{
           `Task ${actionIndex}.${milestoneIndex}.${index + 1}`
         }}</DefaultText>
@@ -12,6 +12,9 @@
           @clicked="$emit('delete')"
         ></DefaultIconButton>
       </v-layout>
+      <DefaultText class="mb-2 mt-1" color="#06bcc1" size="14"
+        >Task Description</DefaultText
+      >
       <v-layout column>
         <TextInput
           label="Task name*"
@@ -28,6 +31,9 @@
           v-model="task.instructions"
           :readonly="readonly"
         ></TextAreaInput>
+        <DefaultText class="mb-2 mt-1" color="#06bcc1" size="14"
+          >Task Rewards</DefaultText
+        >
         <TextInput
           label="Batch"
           v-model="task.batch"
@@ -49,6 +55,13 @@
           v-model="task.count"
           :rules="requiredRules"
           :readonly="readonly"
+          required
+        ></TextInput>
+        <TextInput
+          label="Task total"
+          v-model="total"
+          :icon="icon"
+          readonly
           required
         ></TextInput>
       </v-layout>
@@ -105,6 +118,9 @@ export default {
         this.$emit("input", value);
       },
     },
+    total() {
+      return parseFloat((parseFloat(this.task.batch) + (parseFloat(this.task.reward) * parseFloat(this.task.count))).toFixed(6));
+    }
   },
   components: {
     DefaultText: () => import("@/components/texts/DefaultText"),
