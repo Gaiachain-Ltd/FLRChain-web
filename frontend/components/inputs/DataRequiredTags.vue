@@ -10,9 +10,11 @@
       <TagButton
         v-for="tag in task.data_tags"
         :key="tag.id"
+        :tagType="tag.tag_type"
         @click.prevent="() => handleConfirm(tag.id)"
         showDeleteIcon
-        >{{ tag.name }}</TagButton
+        showPrepIcon
+        >{{ tag.tag_type == 1 ? `${tag.name} (${tag.unit})` : tag.name }}</TagButton
       >
       <TagButton creator @click.prevent="showAddPopup = true"
         >+ Add tag</TagButton

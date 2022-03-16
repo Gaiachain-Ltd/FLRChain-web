@@ -11,9 +11,9 @@
             v-for="tag in tags"
             :key="tag.tagType"
             :highlight="selectedTagType == tag.tagType"
-            :icon="tag.icon"
-            :highlightIcon="tag.highlightIcon"
+            :tagType="tag.tagType"
             @click.prevent="selectedTagType = tag.tagType"
+            showPrepIcon
             >{{ tag.name }}</TagButton
           >
         </v-layout>

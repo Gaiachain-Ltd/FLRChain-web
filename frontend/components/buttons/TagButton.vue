@@ -10,8 +10,8 @@
   >
     <v-layout align-center>
       <DefaultSVGIcon
-        v-if="icon || highlightIcon"
-        :icon="highlight ? highlightIcon : icon"
+        v-if="showPrepIcon"
+        :icon="highlight ? icons[tagType].highlightIcon : icons[tagType].icon"
         size="15"
         class="mb-1 mr-2"
       ></DefaultSVGIcon>
@@ -41,18 +41,40 @@ export default {
       type: Boolean,
       default: false,
     },
-    icon: {
-      type: String,
-      default: ""
+    showPrepIcon: {
+      type: Boolean,
+      default: false
     },
-    highlightIcon: {
-      type: String,
-      default: ""
+    tagType: {
+      type: Number,
+      default: 0
+    },
+  },
+  data() {
+    return {
+      icons: {
+        0: { //TEXT
+          icon: require("@/assets/icons/edit.svg"),
+          highlightIcon: require("@/assets/icons/edit-white.svg"),
+        },
+        1: { //NUMBER
+          icon: require("@/assets/icons/hashtag.svg"),
+          highlightIcon: require("@/assets/icons/hashtag-white.svg"),
+        },
+        2: { //AREA
+          icon: require("@/assets/icons/area.svg"),
+          highlightIcon: require("@/assets/icons/area-white.svg"),
+        },
+        3: { //PHOTO
+          icon: require("@/assets/icons/upload.svg"),
+          highlightIcon: require("@/assets/icons/upload-white.svg"),
+        },
+      }
     }
   },
   components: {
     DefaultSVGIcon: () => import("@/components/icons/DefaultSVGIcon"),
-  },
+  }
 };
 </script>
 
