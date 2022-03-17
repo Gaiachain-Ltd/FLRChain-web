@@ -278,7 +278,7 @@ def approval_program():
             TxnField.type_enum: TxnType.AssetTransfer,
             TxnField.xfer_asset: Txn.assets[0],
             TxnField.asset_receiver: Txn.accounts[1],
-            TxnField.asset_amount: Btoi(Txn.application_args[2]),
+            TxnField.asset_amount: Btoi(Txn.application_args[1]),
         }),
         InnerTxnBuilder.Submit(),
         Approve()
@@ -596,3 +596,17 @@ def verify(address, priv_key, beneficiary_address, activity_id, amount, value, a
     txn_signed = txn.sign(priv_key)
     txn_id = CLIENT.send_transactions([txn_signed])
     wait_for_confirmation(txn_id)
+
+
+def batch(address, beneficiary_address, task_id, amount, app_id):
+    params = CLIENT.suggested_params()
+    txn = transaction.ApplicationNoOpTxn(
+        address,
+        params,
+        app_id,
+        ["BATCH", amount],
+        note=f"W|B|{task_id}",
+        foreign_assets=[settings.ALGO_ASSET],
+        accounts=[beneficiary_address]
+    )
+    return txn

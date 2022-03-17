@@ -1,15 +1,16 @@
 import logging
 import datetime
 import base64
-from projects.models import Project, Assignment
+from projects.models import *
 from accounts.models import Account
 from users.models import CustomUser
 from celery import shared_task
 from algorand import smartcontract
 from algorand.utils import *
 from django.conf import settings
-from django.db.models import F, Sum, Q
+from django.db.models import F, Sum, Q, Count
 from django.db import transaction
+from activities.models import Activity
 
 
 logger = logging.getLogger(__name__)
@@ -86,6 +87,7 @@ def start_project():
     )
 
     for project in projects:
+        print("USDC: ", usdc_balance(application_address(project.app_id)), project.total)
         if usdc_balance(application_address(project.app_id)) < project.total:
             project.state = Project.POSTPONED
         else:
@@ -255,3 +257,50 @@ def beneficiary_approval():
         )
         assignment.sync = Assignment.SYNCED
         assignment.save()
+
+
+@shared_task()
+def payout_batch():
+    tasks = Task.objects.filter(
+        activity__status=Activity.ACCEPTED,
+        project__status=Project.ACTIVE,
+        batch_paid=False,
+        finished=True,
+        batch__gte=0
+    )
+    for task in tasks:
+        beneficiaries = Assignment.objects.filter(
+            project=task.project,
+            status=Assignment.ACCEPTED
+        )
+
+        amount = task.batch / beneficiaries.count()
+        print("BATCH PER STEWARD: ", amount)
+        txns = list()
+        for beneficiary in beneficiaries:
+            txns.append(
+                smartcontract.batch(
+                    task.project.owner.account.address,
+                    beneficiary.beneficiary.account.address,
+                    task.id,
+                    int(amount * 1000000),
+                    task.project.app_id
+                )
+            )
+
+            if len(txns) == 15:
+                txn = sign_send_atomic_trasfer(
+                    task.project.owner.account.private_key,
+                    txns
+                )
+                wait_for_confirmation(txn)
+                txns = list()
+
+        txn = sign_send_atomic_trasfer(
+            task.project.owner.account.private_key,
+            txns
+        )
+        wait_for_confirmation(txn)
+
+        task.batch_paid = True
+        task.save()

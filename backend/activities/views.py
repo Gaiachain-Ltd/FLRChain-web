@@ -54,6 +54,8 @@ class ActivityView(CommonView):
             elif activity_status == "V":
                 value = base64.b64decode(transaction['application-transaction']['application-args'][2])
                 activity_status = int.from_bytes(value, "big")
+            else:
+                continue
 
             activity_id = notes[2]
             data[activity_id] = {
@@ -74,11 +76,6 @@ class ActivityView(CommonView):
             })
         
         return Response(data.values(), status=status.HTTP_200_OK)
-        # if request.user.type == CustomUser.BENEFICIARY:
-        #     activities = Activity.objects.filter(project=pk, user=request.user)
-        # else:
-        #     activities = Activity.objects.filter(project=pk)
-        # return self.paginated_response(activities, request)
 
     @swagger_auto_schema(
         operation_summary="Create new activity",

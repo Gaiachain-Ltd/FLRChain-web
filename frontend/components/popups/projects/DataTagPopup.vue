@@ -128,7 +128,12 @@ export default {
               : undefined,
         })
         .then((reply) => {
-          let tags = [reply.data, ...this.task.data_tags];
+          let tags = [];
+          if (this.task.data_tags && this.task.data_tags.length > 0) {
+            tags = [reply.data, ...this.task.data_tags];
+          } else {
+            tags = [reply.data];
+          }
           this.$set(this.task, "data_tags", tags);
           this.show = false;
         });

@@ -55,7 +55,7 @@
                     :actionIndex="actionIndex + 1"
                     :milestoneIndex="milestoneIndex + 1"
                     :showDeleteBtn="milestone.tasks.length > 1"
-                    :readonly="readonly"
+                    :readonly="readonly || task.finished"
                     @delete="() => onDeleteTask(milestone, taskIndex)"
                   ></TaskForm>
                   <v-divider class="mb-4"></v-divider>

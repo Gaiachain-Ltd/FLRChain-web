@@ -2,6 +2,8 @@ import logging
 from algorand import smartcontract
 from celery import shared_task
 from activities.models import Activity
+from django.db import transaction
+from projects.models import Task
 
 
 logger = logging.getLogger(__name__)
@@ -32,14 +34,25 @@ def verify_activity():
     )
 
     for activity in activities:
-        smartcontract.verify(
-            activity.project.owner.account.address,
-            activity.project.owner.account.private_key,
-            activity.user.account.address,
-            activity.id,
-            int(activity.reward * 1000000),
-            activity.status,
-            activity.project.app_id
-        )
-        activity.sync = Activity.SYNCED
-        activity.save()
+        activity.select_for_update()
+        with transaction.atomic():
+            smartcontract.verify(
+                activity.project.owner.account.address,
+                activity.project.owner.account.private_key,
+                activity.user.account.address,
+                activity.id,
+                int(activity.reward * 1000000),
+                activity.status,
+                activity.project.app_id
+            )
+            activity.sync = Activity.SYNCED
+            activity.save()
+            
+            accepted_activity_count = Activity.objects.filter(
+                task=activity.task, 
+                status=Activity.ACCEPTED).count()
+            task = Task.objects.get(id=activity.task.id)
+
+            if accepted_activity_count == task.count:
+                task.finished = True
+                task.save()

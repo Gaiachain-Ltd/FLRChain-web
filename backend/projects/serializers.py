@@ -39,7 +39,7 @@ class TaskSerializer(serializers.ModelSerializer):
         list_serializer_class = TaskListSerializer
         model = Task
         fields = ('id', 'reward', 'deleted', 'batch', 'count',
-                  'name', 'data_type_tag', 'data_tags')
+                  'name', 'data_type_tag', 'data_tags', 'finished')
         read_only_fields = ('id',)
 
     def to_representation(self, instance):

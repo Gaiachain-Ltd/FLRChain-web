@@ -7,7 +7,7 @@
         }}</DefaultText>
         <v-spacer></v-spacer>
         <DefaultIconButton
-          v-if="showDeleteBtn"
+          v-if="showDeleteBtn && !readonly"
           :config="deleteBtnConf"
           @clicked="$emit('delete')"
         ></DefaultIconButton>

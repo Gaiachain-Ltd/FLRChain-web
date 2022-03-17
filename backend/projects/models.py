@@ -96,6 +96,10 @@ class Project(models.Model):
                 old_instance.end != self.end
             ):
                 self.sync = Project.TO_SYNC
+
+                if self.state == Project.POSTPONED:
+                    self.state = Project.INITIALIZED
+
         return super().save(*args, **kwargs)
 
     def __str__(self) -> str:
@@ -161,6 +165,9 @@ class Task(models.Model):
     batch = models.DecimalField(
         max_digits=26, decimal_places=6, default=0)
     count = models.PositiveIntegerField(default=0)
+
+    finished = models.BooleanField(default=False)
+    batch_paid = models.BooleanField(default=False)
 
     def __str__(self) -> str:
         return self.name
