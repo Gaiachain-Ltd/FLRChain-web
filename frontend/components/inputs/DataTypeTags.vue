@@ -9,11 +9,13 @@
     <v-layout>
       <TagButton
         v-if="task.data_type_tag"
+        :showDeleteIcon="!readonly"
+        :class="readonly && 'no-events'"
         @click.prevent="showConfirmPopup = true"
-        showDeleteIcon
         >{{ task.data_type_tag.name }}</TagButton
       >
       <TagButton
+        v-if="!readonly"
         creator
         @click.prevent="showAddPopup = true"
         :disabled="!!task.data_type_tag"
@@ -37,6 +39,10 @@
 export default {
   props: {
     task: {},
+    readonly: {
+      type: Boolean,
+      default: false
+    }
   },
   data() {
     return {
@@ -58,3 +64,9 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.no-events {
+  pointer-events: none;
+}
+</style>

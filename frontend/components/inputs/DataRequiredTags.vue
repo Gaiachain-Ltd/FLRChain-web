@@ -11,16 +11,23 @@
         v-for="tag in task.data_tags"
         :key="tag.id"
         :tagType="tag.tag_type"
+        :showDeleteIcon="!readonly"
+        :class="readonly && 'no-events'"
         @click.prevent="() => handleConfirm(tag.id)"
-        showDeleteIcon
         showPrepIcon
-        >{{ tag.tag_type == 1 ? `${tag.name} (${tag.unit})` : tag.name }}</TagButton
+        >{{
+          tag.tag_type == 1 ? `${tag.name} (${tag.unit})` : tag.name
+        }}</TagButton
       >
-      <TagButton creator @click.prevent="showAddPopup = true"
+      <TagButton v-if="!readonly" creator @click.prevent="showAddPopup = true"
         >+ Add tag</TagButton
       >
     </v-layout>
-    <DataTagPopup v-if="showAddPopup" v-model="showAddPopup" :task.sync="task"></DataTagPopup>
+    <DataTagPopup
+      v-if="showAddPopup"
+      v-model="showAddPopup"
+      :task.sync="task"
+    ></DataTagPopup>
     <ConfirmPopup
       v-model="showConfirmPopup"
       text="Do you really want to remove this tag?"
@@ -35,6 +42,10 @@ import _ from "lodash";
 export default {
   props: {
     task: {},
+    readonly: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -65,3 +76,9 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.no-events {
+  pointer-events: none;
+}
+</style>

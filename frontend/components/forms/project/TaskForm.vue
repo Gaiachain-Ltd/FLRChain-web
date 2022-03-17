@@ -24,8 +24,8 @@
           :readonly="readonly"
           required
         ></TextInput>
-        <DataTypeTags :task.sync="task"></DataTypeTags>
-        <DataRequiredTags :task.sync="task"></DataRequiredTags>
+        <DataTypeTags :task.sync="task" :readonly="readonly"></DataTypeTags>
+        <DataRequiredTags :task.sync="task" :readonly="readonly"></DataRequiredTags>
         <TextAreaInput
           label="Instructions for steward"
           v-model="task.instructions"

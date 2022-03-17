@@ -62,6 +62,7 @@
                 </v-layout>
                 <v-layout justify-center class="mt-2">
                   <DefaultIconButton
+                    v-if="!readonly"
                     :config="addTaskBtnConfig"
                     @clicked="() => onAddTask(milestone)"
                   ></DefaultIconButton>
@@ -70,14 +71,16 @@
             </v-layout>
             <v-layout justify-center class="mt-6">
               <DefaultIconButton
+                v-if="!readonly"
                 :config="addMilestoneBtnConfig"
                 @clicked="() => onAddMilestone(action)"
               ></DefaultIconButton>
             </v-layout>
           </v-layout>
         </v-layout>
-        <v-layout justify-center class="">
+        <v-layout justify-center>
           <DefaultIconButton
+            v-if="!readonly"
             :config="addActionBtnConfig"
             @clicked="() => onAddAction()"
           ></DefaultIconButton>
