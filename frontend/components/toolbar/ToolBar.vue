@@ -5,7 +5,11 @@
         @click="toggleDrawer"
         class="hidden-lg-and-up"
       ></v-app-bar-nav-icon>
-      <v-flex shrink @click.prevent="() => $router.back()">
+      <v-flex
+        shrink
+        style="cursor: pointer"
+        @click.prevent="() => $router.back()"
+      >
         <DefaultSVGIcon
           v-if="showBackBtn"
           class="mb-1 mr-2"
