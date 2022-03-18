@@ -16,12 +16,22 @@
         :value="showOverlay"
         color="white"
         opacity="0.8"
+        z-index="4"
       >
-        <v-progress-circular
-          indeterminate
-          size="64"
-          :color="$vuetify.theme.themes.light.primary"
-        ></v-progress-circular>
+        <v-layout align-center justify-center>
+          <v-progress-circular
+            indeterminate
+            size="30"
+            :color="$vuetify.theme.themes.light.primary"
+            class="mb-1"
+          ></v-progress-circular>
+          <DefaultText
+            class="mx-3"
+            :color="$vuetify.theme.themes.light.primary"
+            size="30"
+            >Synchronizing with blockchain</DefaultText
+          >
+        </v-layout>
       </v-overlay>
     </v-card>
   </v-layout>

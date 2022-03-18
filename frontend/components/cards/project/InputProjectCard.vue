@@ -1,5 +1,5 @@
 <template>
-  <DefaultCard>
+  <DefaultCard :showOverlay="isSyncing">
     <v-layout column>
       <ProjectForm
         ref="projectForm"
@@ -34,12 +34,19 @@
 </template>
 
 <script>
+import { SYNC, STATUS } from "@/constants/project";
+
 export default {
   props: {
     project: {},
     readonly: {
       type: Boolean,
       default: false,
+    },
+  },
+  computed: {
+    isSyncing() {
+      return this.project.sync == SYNC.TO_SYNC;
     },
   },
   components: {

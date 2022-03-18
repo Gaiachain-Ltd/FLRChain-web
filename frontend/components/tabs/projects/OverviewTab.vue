@@ -105,3 +105,12 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.snackbar-style ::v-deep .v-snack__wrapper {
+  max-width: 100% !important;
+  width: 100% !important;
+  height: 120px !important;
+  border: 0.5px lightgray solid !important;
+}
+</style>
