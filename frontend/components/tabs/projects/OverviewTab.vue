@@ -38,21 +38,29 @@
 
 <script>
 import ProjectMixin from "@/mixins/ProjectMixin";
+import SyncMixin from "@/mixins/SyncMixin";
 import { SYNC, STATUS } from "@/constants/project";
 import { mapGetters } from "vuex";
 
+const newLocal="@/components/cards/project/FundraisingProgressCard";
 export default {
-  mixins: [ProjectMixin],
+  mixins: [ProjectMixin, SyncMixin],
   data() {
     return {
       FUNDRAISING: STATUS.FUNDRAISING,
-      CLOSED: STATUS.CLOSED
+      CLOSED: STATUS.CLOSED,
     };
   },
   computed: {
     ...mapGetters(["isFacililator"]),
     isFundraising() {
       return this.project.status == this.FUNDRAISING;
+    },
+    isSyncing() {
+      return !this.project || this.project.sync == SYNC.TO_SYNC;
+    },
+    url() {
+      return `projects/${this.project.id}/`;
     },
   },
   components: {
@@ -62,7 +70,7 @@ export default {
     DetailsStewardsCard: () =>
       import("@/components/cards/project/DetailsStewardsCard"),
     FundraisingProgressCard: () =>
-      import("@/components/cards/project/FundraisingProgressCard"),
+      import(newLocal),
     InputProjectCard: () =>
       import("@/components/cards/project/InputProjectCard"),
     InputInvestmentCard: () =>
@@ -72,14 +80,14 @@ export default {
     update() {
       this.project.sync = SYNC.TO_SYNC;
       this.$axios
-        .put(`projects/${this.project.id}/`, this.project)
+        .put(this.url, this.project)
         .then((reply) => {
           this.requestRefresh();
           this.onProjectUpdate(reply.data);
         });
     },
     fetch() {
-      this.$axios.get(`projects/${this.project.id}/`).then((reply) => {
+      this.$axios.get(this.url).then((reply) => {
         if (!this.requestRefresh()) {
           this.onProjectUpdate(reply.data);
         }

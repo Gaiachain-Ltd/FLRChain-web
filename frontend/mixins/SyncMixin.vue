@@ -10,7 +10,6 @@ export default {
   },
   methods: {
     refresh() {
-      console.log("REFRESH");
       this.$axios.get(this.url).then((reply) => {
         this.requestRefresh();
         this.onUpdate(reply.data);
