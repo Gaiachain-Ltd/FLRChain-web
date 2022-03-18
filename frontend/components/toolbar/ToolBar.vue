@@ -5,6 +5,13 @@
         @click="toggleDrawer"
         class="hidden-lg-and-up"
       ></v-app-bar-nav-icon>
+      <v-flex shrink @click.prevent="() => $router.back()">
+        <DefaultSVGIcon
+          v-if="showBackBtn"
+          class="mb-1 mr-2"
+          :icon="require('@/assets/toolbar/logout.svg')"
+        ></DefaultSVGIcon>
+      </v-flex>
       <DefaultTitle>{{ title }}</DefaultTitle>
       <v-spacer></v-spacer>
       <v-flex shrink>
@@ -21,10 +28,15 @@ export default {
     title: {
       type: String,
     },
+    showBackBtn: {
+      type: Boolean,
+      default: false,
+    },
   },
   components: {
     LogoutButton: () => import("@/components/buttons/LogoutButton"),
     DefaultTitle: () => import("@/components/texts/DefaultTitle"),
+    DefaultSVGIcon: () => import("@/components/icons/DefaultSVGIcon"),
   },
   computed: {
     ...mapGetters(["getDrawerState"]),

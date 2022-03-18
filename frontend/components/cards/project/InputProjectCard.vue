@@ -34,7 +34,7 @@
 </template>
 
 <script>
-import { SYNC, STATUS } from "@/constants/project";
+import { SYNC } from "@/constants/project";
 
 export default {
   props: {

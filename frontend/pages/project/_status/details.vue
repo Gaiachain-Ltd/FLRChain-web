@@ -1,6 +1,6 @@
 <template>
   <v-layout column>
-    <ToolBar title="Project details"></ToolBar>
+    <ToolBar title="Project details" showBackBtn></ToolBar>
     <v-layout column shrink>
       <v-card elevation-16 tile style="z-index: 1">
         <v-tabs
