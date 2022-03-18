@@ -53,6 +53,7 @@ module.exports = {
     axios: {
       baseURL: process.env.BASE_URL + 'api/v1/'
     },
+    baseUrl: process.env.BASE_URL
   },
   router: {
     middleware: ['auth']

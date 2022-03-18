@@ -11,10 +11,12 @@ from django_filters import rest_framework as filters
 from users.permissions import *
 from algorand.utils import *
 from algorand import smartcontract
-
+from rest_framework import parsers
+import json
 
 class ProjectView(CommonView):
     serializer_class = ProjectSerializer
+    parser_classes = (parsers.MultiPartParser, parsers.JSONParser)
     filterset_fields = ('status',)
     search_fields = ('title',)
 
@@ -79,6 +81,17 @@ class ProjectView(CommonView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def image(self, request, pk=None):
+        project = get_object_or_404(Project, pk=pk)
+        serializer = ProjectImageSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        project.image = serializer.validated_data['image']
+        project.save()
+
+        return Response(
+            ProjectSerializer(project).data, status=status.HTTP_200_OK)
 
 
 class DataTypeTagView(CommonView):

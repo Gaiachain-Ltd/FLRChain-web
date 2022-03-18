@@ -79,7 +79,18 @@ export default {
       if (this.$refs.inputProject.validate()) {
         this.$axios
           .post("projects/", this.project)
-          .then(() => this.$router.push("/"))
+          .then((reply) => {
+            if (this.project.fileToUpload) {
+              let formData = new FormData();
+              formData.append("image", this.project.fileToUpload);
+              this.$axios
+                .put(`projects/${reply.data.id}/image/`, formData)
+                .then(() => this.$router.push("/"))
+                .catch(() => (this.errorPopupVisible = true));
+            } else {
+              this.$router.push("/");
+            }
+          })
           .catch(() => (this.errorPopupVisible = true));
       }
     },

@@ -21,9 +21,9 @@
       </v-layout>
       <v-layout>
         <v-img
-          :src="require('@/assets/images/placeholder.png')"
+          :src="source"
           class="mt-6"
-          contain
+          max-height="300"
         ></v-img>
       </v-layout>
       <v-layout
@@ -108,6 +108,13 @@ export default {
       const end = moment(this.project.end).format("MMMM DD, YYYY");
       return `${start} - ${end}`;
     },
+    source() {
+      if (this.project.image) {
+        return `${this.$config.baseUrl}/${this.project.image}`;
+      } else {
+        return require('@/assets/images/placeholder.png');
+      }
+    }
   },
   methods: {
     ...mapActions(["updateDetailsProjectId"]),

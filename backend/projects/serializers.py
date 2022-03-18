@@ -71,14 +71,16 @@ class ActionSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'milestones')
 
 
+class ProjectImageSerializer(serializers.Serializer):
+    image = serializers.FileField()
+
+
 class ProjectSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(read_only=True)
 
     description = serializers.CharField(required=False, allow_blank=True)
 
-    image = serializers.FileField(required=False, allow_null=True)
-    document = serializers.FileField(required=False, allow_null=True)
-    budget = serializers.FileField(required=False, allow_null=True)
+    image = serializers.FileField(read_only=True, required=False, allow_null=True)
 
     status = serializers.IntegerField(read_only=True)
     state = serializers.IntegerField(read_only=True)
@@ -98,8 +100,6 @@ class ProjectSerializer(serializers.ModelSerializer):
             'title',
             'description',
             'image',
-            'document',
-            'budget',
             'status',
             'state',
             'sync',

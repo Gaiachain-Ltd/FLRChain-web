@@ -37,7 +37,10 @@
         </v-flex>
         <v-flex md7>
           <v-layout justify-center>
-            <UploadButton></UploadButton>
+            <UploadButton
+              :project.sync="project"
+              :readonly="readonly"
+            ></UploadButton>
           </v-layout>
         </v-flex>
       </v-layout>
@@ -61,8 +64,8 @@ export default {
     project: {},
     readonly: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
   data() {
     return {
