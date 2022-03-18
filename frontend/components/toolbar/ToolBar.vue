@@ -9,7 +9,7 @@
         <DefaultSVGIcon
           v-if="showBackBtn"
           class="mb-1 mr-2"
-          :icon="require('@/assets/toolbar/logout.svg')"
+          :icon="require('@/assets/toolbar/arrow-back.svg')"
         ></DefaultSVGIcon>
       </v-flex>
       <DefaultTitle>{{ title }}</DefaultTitle>
