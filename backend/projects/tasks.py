@@ -101,7 +101,7 @@ def start_project():
 def update_project():
     projects = Project.objects.select_for_update().filter(
         Q(sync=Project.TO_SYNC) &
-        ~Q(state__in=[Project.CREATED, Project.DELETED])
+        ~Q(state__in=[Project.INITIAL, Project.CREATED, Project.DELETED])
     ).order_by('-modified')
 
     with transaction.atomic():

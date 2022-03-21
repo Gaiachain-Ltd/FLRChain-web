@@ -168,7 +168,7 @@ def approval_program():
 
     on_work = Seq([
         Assert(is_beneficiary),
-        Assert(Or(is_initialized, is_started)),
+        Assert(is_started),
         Assert(is_accepted(Txn.sender())),
         App.localPut(
             Txn.sender(),
@@ -191,7 +191,7 @@ def approval_program():
 
     on_verify = Seq([
         Assert(is_facilitator),
-        Assert(Or(is_initialized, is_started)),
+        Assert(is_started),
         Assert(is_accepted(Txn.accounts[1])),
         Assert(
             Or(

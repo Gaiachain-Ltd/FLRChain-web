@@ -1,7 +1,7 @@
 <template>
   <v-layout column>
     <FundraisingProgressCard
-    ref="progress"
+      ref="progress"
       class="ma-3"
       :project="project"
     ></FundraisingProgressCard>
@@ -10,7 +10,10 @@
         <DetailsBlockchainCard :project="project"></DetailsBlockchainCard>
       </v-col>
       <v-col class="ma-0 pa-3" md="4" sm="12" v-if="!isFacililator">
-        <InputInvestmentCard :project="project" @refresh="onRefresh"></InputInvestmentCard>
+        <InputInvestmentCard
+          :project="project"
+          @refresh="onRefresh"
+        ></InputInvestmentCard>
       </v-col>
       <v-col
         :class="['ma-0 pa-3', !isFacililator && isFundraising && 'order-md-2']"
@@ -42,7 +45,7 @@ import SyncMixin from "@/mixins/SyncMixin";
 import { SYNC, STATUS } from "@/constants/project";
 import { mapGetters } from "vuex";
 
-const newLocal="@/components/cards/project/FundraisingProgressCard";
+const newLocal = "@/components/cards/project/FundraisingProgressCard";
 export default {
   mixins: [ProjectMixin, SyncMixin],
   data() {
@@ -69,8 +72,7 @@ export default {
       import("@/components/cards/project/DetailsBlockchainCard"),
     DetailsStewardsCard: () =>
       import("@/components/cards/project/DetailsStewardsCard"),
-    FundraisingProgressCard: () =>
-      import(newLocal),
+    FundraisingProgressCard: () => import("@/components/cards/project/FundraisingProgressCard"),
     InputProjectCard: () =>
       import("@/components/cards/project/InputProjectCard"),
     InputInvestmentCard: () =>
@@ -79,12 +81,10 @@ export default {
   methods: {
     update() {
       this.project.sync = SYNC.TO_SYNC;
-      this.$axios
-        .put(this.url, this.project)
-        .then((reply) => {
-          this.requestRefresh();
-          this.onProjectUpdate(reply.data);
-        });
+      this.$axios.put(this.url, this.project).then((reply) => {
+        this.requestRefresh();
+        this.onProjectUpdate(reply.data);
+      });
     },
     fetch() {
       this.$axios.get(this.url).then((reply) => {
@@ -98,7 +98,7 @@ export default {
     },
     onRefresh() {
       this.$refs.progress.$fetch();
-    }
+    },
   },
   mounted() {
     this.requestRefresh();

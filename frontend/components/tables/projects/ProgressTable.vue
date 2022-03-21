@@ -11,12 +11,18 @@
         <a>See more</a>
       </v-layout>
     </template>
+    <template v-slot:item.photos="{ item }">
+      <v-layout shrink style="cursor: pointer">
+        <DefaultSVGIcon :icon="item.photos > 0 ? photosIcon : noPhotosIcon"></DefaultSVGIcon>
+      </v-layout>
+    </template>
   </v-data-table>
 </template>
 
 <script>
 import algosdk from "algosdk";
 import AlgoExplorerMixin from "@/mixins/AlgoExplorerMixin";
+import { APPROVAL } from "@/constants/project";
 
 export default {
   mixins: [AlgoExplorerMixin],
@@ -26,18 +32,36 @@ export default {
   data() {
     return {
       activities: [],
+      photosIcon: require("@/assets/icons/photos.svg"),
+      noPhotosIcon: require("@/assets/icons/no-photos.svg"),
       headers: [
         {
           text: "Steward",
           value: "name",
         },
         {
-          text: "Task ID",
-          value: "task_id",
+          text: "Task",
+          value: "task_name",
         },
         {
           text: "Amount",
           value: "amount",
+        },
+        {
+          text: "Text",
+          value: "text",
+        },
+        {
+          text: "Photos",
+          value: "photos",
+        },
+        {
+          text: "Area",
+          value: "area",
+        },
+        {
+          text: "Number",
+          value: "number",
         },
         {
           text: "Date",
@@ -50,6 +74,9 @@ export default {
       ],
     };
   },
+  components: {
+    DefaultSVGIcon: () => import("@/components/icons/DefaultSVGIcon"),
+  },
   methods: {
     amount(item) {
       return `${algosdk.microalgosToAlgos(item.amount)} USDC`;
@@ -60,8 +87,8 @@ export default {
   },
   async fetch() {
     this.activities = await this.$axios
-      .get(`projects/${this.project.id}/activities/`)
-      .then((reply) => reply.data.filter(activity => activity.status == 1));
+      .get(`projects/${this.project.id}/activities/?status=${APPROVAL.ACCEPTED}`)
+      .then((reply) => reply.data);
   },
 };
 </script>   

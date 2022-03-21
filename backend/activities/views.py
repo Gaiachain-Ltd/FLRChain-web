@@ -41,6 +41,8 @@ class ActivityView(CommonView):
             note_prefix="W|".encode()
         )['transactions']
 
+        status_filter = request.GET.get("status", None)
+        print("FILTER", status_filter)
         data = dict()
         for transaction in transactions:
             notes = base64.b64decode(transaction['note']).decode().split('|')
@@ -50,11 +52,14 @@ class ActivityView(CommonView):
             amount = base64.b64decode(transaction['application-transaction']['application-args'][1])
             activity_status = notes[1]
             if activity_status == "W":
-                activity_status = 0
+                activity_status = Activity.WAITING
             elif activity_status == "V":
                 value = base64.b64decode(transaction['application-transaction']['application-args'][2])
                 activity_status = int.from_bytes(value, "big")
             else:
+                continue
+
+            if status_filter is not None and int(status_filter) != activity_status:
                 continue
 
             activity_id = notes[2]
@@ -71,8 +76,13 @@ class ActivityView(CommonView):
             data[str(activity.id)].update({
                 "name": f"{activity.user.first_name} {activity.user.last_name}",
                 "task_id": activity.task.id,
+                "task_name": activity.task.name,
                 "status": activity.status,
-                "sync": activity.sync
+                "sync": activity.sync,
+                "photos": activity.photos.count(),
+                "text": activity.text,
+                "area": activity.area,
+                "number": activity.number
             })
         
         return Response(data.values(), status=status.HTTP_200_OK)

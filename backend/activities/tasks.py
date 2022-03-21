@@ -34,8 +34,9 @@ def verify_activity():
     )
 
     for activity in activities:
-        activity.select_for_update()
         with transaction.atomic():
+            # TODO: optimization
+            activity = Activity.objects.select_for_update().get(pk=activity.pk)
             smartcontract.verify(
                 activity.project.owner.account.address,
                 activity.project.owner.account.private_key,

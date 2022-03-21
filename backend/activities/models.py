@@ -38,10 +38,10 @@ class Activity(models.Model):
     status = models.PositiveSmallIntegerField(default=WAITING, choices=STATUS)
     sync = models.PositiveSmallIntegerField(default=INITIAL, choices=STATES)
 
-    photos = models.ManyToManyField(Photo)
+    photos = models.ManyToManyField(Photo, null=True, blank=True)
     text = models.TextField(blank=True, null=True)
-    area = models.IntegerField(null=True)
-    number = models.IntegerField(null=True)
+    area = models.IntegerField(null=True, blank=True)
+    number = models.IntegerField(null=True, blank=True)
 
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
