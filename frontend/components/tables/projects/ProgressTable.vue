@@ -1,22 +1,35 @@
 <template>
-  <v-data-table :headers="headers" :items="activities" hide-default-footer>
-    <template v-slot:item.amount="{ item }">
-      {{ amount(item) }}
-    </template>
-    <template v-slot:item.datetime="{ item }">
-      {{ datetime(item) }}
-    </template>
-    <template v-slot:item.details="{ item }">
-      <v-layout @click.prevent="() => openExplorerTransactionLink(item.txid)">
-        <a>See more</a>
-      </v-layout>
-    </template>
-    <template v-slot:item.photos="{ item }">
-      <v-layout shrink style="cursor: pointer">
-        <DefaultSVGIcon :icon="item.photos > 0 ? photosIcon : noPhotosIcon"></DefaultSVGIcon>
-      </v-layout>
-    </template>
-  </v-data-table>
+  <div>
+    <v-data-table :headers="headers" :items="activities" hide-default-footer>
+      <template v-slot:item.amount="{ item }">
+        {{ amount(item) }}
+      </template>
+      <template v-slot:item.datetime="{ item }">
+        {{ datetime(item) }}
+      </template>
+      <template v-slot:item.details="{ item }">
+        <v-layout @click.prevent="() => openExplorerTransactionLink(item.txid)">
+          <a>See more</a>
+        </v-layout>
+      </template>
+      <template v-slot:item.photos="{ item }">
+        <v-layout
+          shrink
+          style="cursor: pointer"
+          @click.prevent="() => onShowPopup(item)"
+        >
+          <DefaultSVGIcon
+            :icon="item.photos > 0 ? photosIcon : noPhotosIcon"
+          ></DefaultSVGIcon>
+        </v-layout>
+      </template>
+    </v-data-table>
+    <PhotoGalleryPopup
+      v-if="showPopup"
+      v-model="showPopup"
+      :activity="activityToShow"
+    ></PhotoGalleryPopup>
+  </div>
 </template>
 
 <script>
@@ -31,6 +44,8 @@ export default {
   },
   data() {
     return {
+      showPopup: false,
+      activityToShow: null,
       activities: [],
       photosIcon: require("@/assets/icons/photos.svg"),
       noPhotosIcon: require("@/assets/icons/no-photos.svg"),
@@ -76,6 +91,8 @@ export default {
   },
   components: {
     DefaultSVGIcon: () => import("@/components/icons/DefaultSVGIcon"),
+    PhotoGalleryPopup: () =>
+      import("@/components/popups/projects/PhotoGalleryPopup"),
   },
   methods: {
     amount(item) {
@@ -84,10 +101,16 @@ export default {
     datetime(item) {
       return this.$moment.unix(item["round-time"]).format("YYYY-MM-DD HH:mm");
     },
+    onShowPopup(activity) {
+      this.activityToShow = activity;
+      this.showPopup = true;
+    },
   },
   async fetch() {
     this.activities = await this.$axios
-      .get(`projects/${this.project.id}/activities/?status=${APPROVAL.ACCEPTED}`)
+      .get(
+        `projects/${this.project.id}/activities/?status=${APPROVAL.ACCEPTED}`
+      )
       .then((reply) => reply.data);
   },
 };
