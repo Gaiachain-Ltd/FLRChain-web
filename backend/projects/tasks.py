@@ -220,6 +220,7 @@ def close_project():
 
         project.state = Project.DELETED
         project.status = Project.CLOSED
+        project.sync = Project.SYNCED
         project.save()
 
 
@@ -275,7 +276,7 @@ def payout_batch():
         )
 
         amount = task.batch / beneficiaries.count()
-        print("BATCH PER STEWARD: ", amount)
+        
         txns = list()
         for beneficiary in beneficiaries:
             txns.append(

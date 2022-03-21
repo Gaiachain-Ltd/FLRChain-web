@@ -114,4 +114,4 @@ export default {
       .then((reply) => reply.data);
   },
 };
-</script>   
+</script>
