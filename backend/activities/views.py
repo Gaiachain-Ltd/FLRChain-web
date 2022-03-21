@@ -19,7 +19,7 @@ from decimal import *
 
 
 class ActivityView(CommonView):
-    # serializer_class = ActivitySerializer
+    serializer_class = ActivitySerializer
     # parser_classes = (MultiPartParser,)
 
     # def get_permissions(self):
@@ -95,11 +95,6 @@ class ActivityView(CommonView):
                 pk=task_pk
             )
 
-            # # Check if smartcontract got sufficient balance to pay reward:
-            # if not project.smartcontract.check_if_sufficient_balance(task.reward):
-            #     return Response(
-            #         { "reward": "Insufficient balance." }, status=status.HTTP_400_BAD_REQUEST)
-
             serializer = self.serializer_class(data=request.data)
             serializer.is_valid(raise_exception=True)
             activity = serializer.save(
@@ -108,23 +103,6 @@ class ActivityView(CommonView):
                 task=task
             )
 
-            # # Check balance before transfer to determine if after reward investment should be closed:
-            # balance_check = project.smartcontract.check_if_sufficient_balance(extra=task.reward)
-
-            # transfer = Transaction.transfer(
-            #     project.smartcontract.account,
-            #     request.user.account,
-            #     task.reward,
-            #     Transaction.USDC,
-            #     Transaction.REWARD,
-            #     project=project)
-
-            # activity.transaction = transfer
-            # activity.save()
-
-            # if not balance_check:
-            #     project.investment.finish()
-
             serializer = self.serializer_class(activity)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
@@ -132,20 +110,21 @@ class ActivityView(CommonView):
         serializer = ActivityVerificationSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        project = get_object_or_404(
-            Project, 
-            pk=project_pk, 
-            owner=request.user
-        )
-        activity = get_object_or_404(
-            Activity, 
-            pk=activity_pk,
-            project=project
-        )
-        
-        activity.status = serializer.validated_data['status']
-        activity.sync = Activity.TO_SYNC
-        activity.save()
+        with transaction.atomic():
+            project = get_object_or_404(
+                Project, 
+                pk=project_pk, 
+                owner=request.user
+            )
+            activity = get_object_or_404(
+                Activity.objects.select_for_update(), 
+                pk=activity_pk,
+                project=project
+            )
+            
+            activity.status = serializer.validated_data['status']
+            activity.sync = Activity.TO_SYNC
+            activity.save()
 
         return Response(status=status.HTTP_200_OK)
 
@@ -162,17 +141,35 @@ class ActivityView(CommonView):
             sum += int.from_bytes(amount, "big")
 
         return Response({"sum": sum}, status=status.HTTP_200_OK)
-        #     data[activity_id] = {
-        #         "id": activity_id,
-        #         "txid": transaction['id'],
-        #         "amount": int.from_bytes(amount, "big"),
-        #         "status": activity_status,
-        #         "round-time": transaction['round-time']
-        #     }
-        
-        # activities = Activity.objects.filter(id__in=data.keys())
-        # for activity in activities:
-        #     data[str(activity.id)]['name'] = f"{activity.user.first_name} {activity.user.last_name}"
-        #     data[str(activity.id)]['task_id'] = activity.task.id
 
 
+class PhotoView(CommonView):
+    serializer_class = ActivityPhotoSerializer
+    parser_classes = (MultiPartParser,)
+
+    def list(self, _, activity_pk=None):
+        activity = get_object_or_404(
+            Activity,
+            pk=activity_pk
+        )
+        serializer = ActivityPhotoSerializer(activity.photos.all(), many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @swagger_auto_schema(
+        operation_summary="Add photo to activity",
+        request_body=ActivityPhotoSerializer,
+        tags=['beneficiary'])
+    def create(self, request, activity_pk=None):
+        with transaction.atomic():
+            activity = get_object_or_404(
+                Activity.objects.select_for_update(),
+                pk=activity_pk
+            )
+
+            serializer = self.serializer_class(data=request.data)
+            serializer.is_valid(raise_exception=True)
+
+            photo = serializer.save()
+            activity.photos.add(photo)
+            
+            return Response(status=status.HTTP_201_CREATED)
