@@ -27,7 +27,7 @@ export default {
     max() {
       return {
         label: "Budget",
-        value: this.total,
+        value: this.totalRewards + this.totalBatch,
         share: 100,
       };
     },

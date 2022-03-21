@@ -9,6 +9,8 @@
 </template>
 
 <script>
+import { APPROVAL } from "@/constants/project";
+
 export default {
   props: {
     project: {},
@@ -26,7 +28,9 @@ export default {
   async fetch() {
     this.beneficiaries = await this.$axios
       .get(`projects/${this.project.id}/assignments/`)
-      .then((reply) => reply.data);
+      .then((reply) =>
+        reply.data.filter((bene) => bene.status == APPROVAL.ACCEPTED)
+      );
   },
 };
 </script>

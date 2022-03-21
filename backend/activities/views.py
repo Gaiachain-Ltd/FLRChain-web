@@ -42,7 +42,7 @@ class ActivityView(CommonView):
         )['transactions']
 
         status_filter = request.GET.get("status", None)
-        print("FILTER", status_filter)
+        
         data = dict()
         for transaction in transactions:
             notes = base64.b64decode(transaction['note']).decode().split('|')
