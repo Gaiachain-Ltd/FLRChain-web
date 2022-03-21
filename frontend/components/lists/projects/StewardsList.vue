@@ -4,6 +4,7 @@
       <StewardDelegate class="my-3" :steward="ben"></StewardDelegate>
       <v-divider></v-divider>
     </v-layout>
+    <DefaultText v-if="beneficiaries.length == 0">No stewards</DefaultText>
   </v-layout>
 </template>
 
@@ -18,6 +19,7 @@ export default {
     };
   },
   components: {
+    DefaultText: () => import("@/components/texts/DefaultText"),
     StewardDelegate: () =>
       import("@/components/delegates/projects/StewardDelegate"),
   },

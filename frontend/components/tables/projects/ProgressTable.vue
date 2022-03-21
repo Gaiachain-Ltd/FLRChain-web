@@ -1,6 +1,11 @@
 <template>
   <div>
-    <v-data-table :headers="headers" :items="activities" hide-default-footer>
+    <v-data-table
+      :headers="headers"
+      :items="activities"
+      no-data-text="No progress"
+      hide-default-footer
+    >
       <template v-slot:item.amount="{ item }">
         {{ amount(item) }}
       </template>

@@ -1,5 +1,10 @@
 <template>
-  <v-data-table :headers="headers" :items="investors" hide-default-footer>
+  <v-data-table
+    :headers="headers"
+    :items="investors"
+    hide-default-footer
+    no-data-text="No investors"
+  >
     <template v-slot:item.amount="{ item }">
       {{ amount(item) }}
     </template>

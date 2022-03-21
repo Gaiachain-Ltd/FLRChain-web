@@ -45,7 +45,6 @@ import SyncMixin from "@/mixins/SyncMixin";
 import { SYNC, STATUS } from "@/constants/project";
 import { mapGetters } from "vuex";
 
-const newLocal = "@/components/cards/project/FundraisingProgressCard";
 export default {
   mixins: [ProjectMixin, SyncMixin],
   data() {
@@ -83,17 +82,17 @@ export default {
       this.project.sync = SYNC.TO_SYNC;
       this.$axios.put(this.url, this.project).then((reply) => {
         this.requestRefresh();
-        this.onProjectUpdate(reply.data);
+        this.onUpdate(reply.data);
       });
     },
     fetch() {
       this.$axios.get(this.url).then((reply) => {
         if (!this.requestRefresh()) {
-          this.onProjectUpdate(reply.data);
+          this.onUpdate(reply.data);
         }
       });
     },
-    onProjectUpdate(project) {
+    onUpdate(project) {
       this.$emit("update:project", project);
     },
     onRefresh() {

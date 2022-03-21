@@ -4,6 +4,7 @@
     :items="beneficiaries"
     :options.sync="options"
     hide-default-footer
+    no-data-text="No stewards"
   >
     <template v-slot:item.datetime="{ item }">
       {{ datetime(item) }}
