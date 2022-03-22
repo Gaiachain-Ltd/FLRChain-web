@@ -44,6 +44,7 @@ class ActivityView(CommonView):
         status_filter = request.GET.get("status", None)
         
         data = dict()
+        batches = dict()
         for transaction in transactions:
             notes = base64.b64decode(transaction['note']).decode().split('|')
             if len(notes) != 3:
@@ -56,6 +57,8 @@ class ActivityView(CommonView):
             elif activity_status == "V":
                 value = base64.b64decode(transaction['application-transaction']['application-args'][2])
                 activity_status = int.from_bytes(value, "big")
+            elif activity_status == "B" and status_filter is None:
+                activity_status = Activity.ACCEPTED
             else:
                 continue
 
@@ -82,7 +85,8 @@ class ActivityView(CommonView):
                 "photos": activity.photos.count(),
                 "text": activity.text,
                 "area": activity.area,
-                "number": activity.number
+                "number": activity.number,
+                "activity_type": activity.activity_type
             })
         
         return Response(data.values(), status=status.HTTP_200_OK)
@@ -142,11 +146,18 @@ class ActivityView(CommonView):
         project = get_object_or_404(Project, pk=project_pk)
         transactions = utils.get_transactions(
             application_id=project.app_id,
-            note_prefix="W|V|".encode()
+            note_prefix="W|".encode()
         )['transactions']
 
         sum = 0
         for transaction in transactions:
+            notes = base64.b64decode(transaction['note']).decode().split('|')
+            if len(notes) != 3:
+                continue
+
+            if notes[1] not in ["V", "B"]:
+                continue
+
             amount = base64.b64decode(transaction['application-transaction']['application-args'][1])
             sum += int.from_bytes(amount, "big")
 

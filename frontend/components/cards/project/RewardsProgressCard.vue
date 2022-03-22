@@ -17,17 +17,20 @@ export default {
     };
   },
   computed: {
+    totalShare() {
+      return this.totalRewards + this.totalBatch;
+    },
     min() {
       return {
         label: "Distributed",
         value: this.distributed,
-        share: parseFloat((this.distributed / this.total) * 100).toFixed(2),
+        share: parseFloat((this.distributed / this.totalShare) * 100).toFixed(2),
       };
     },
     max() {
       return {
         label: "Budget",
-        value: this.totalRewards + this.totalBatch,
+        value: this.totalShare,
         share: 100,
       };
     },

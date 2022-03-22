@@ -29,6 +29,14 @@ class Activity(models.Model):
         (SYNCED, "Synced")
     )
 
+    WORK = 0
+    BATCH = 1
+
+    ACTIVITY_TYPES = (
+        (WORK, "Work"),
+        (BATCH, "Batch")
+    )
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey('users.CustomUser', on_delete=models.SET_NULL, null=True)
     task = models.ForeignKey('projects.Task', on_delete=models.CASCADE)
@@ -37,6 +45,7 @@ class Activity(models.Model):
         max_digits=26, decimal_places=6, default=0)
     status = models.PositiveSmallIntegerField(default=WAITING, choices=STATUS)
     sync = models.PositiveSmallIntegerField(default=INITIAL, choices=STATES)
+    activity_type = models.PositiveSmallIntegerField(default=WORK, choices=ACTIVITY_TYPES)
 
     photos = models.ManyToManyField(Photo, null=True, blank=True)
     text = models.TextField(blank=True, null=True)

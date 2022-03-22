@@ -5,6 +5,9 @@
     no-data-text="No rewards"
     hide-default-footer
   >
+    <template v-slot:item.task_name="{ item }">
+      {{ item.activity_type == 0 ? `${item.task_name}` : `${item.task_name} (BATCH)`}}
+    </template>
     <template v-slot:item.amount="{ item }">
       {{ amount(item) }}
     </template>
@@ -76,8 +79,8 @@ export default {
           value: "name",
         },
         {
-          text: "Task ID",
-          value: "task_id",
+          text: "Task name",
+          value: "task_name",
         },
         {
           text: "Amount",

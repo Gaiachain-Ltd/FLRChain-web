@@ -279,11 +279,21 @@ def payout_batch():
         
         txns = list()
         for beneficiary in beneficiaries:
+            batch_activity = Activity.objects.create(
+                user=beneficiary.beneficiary,
+                task=task,
+                project=task.project,
+                reward=amount,
+                activity_type=Activity.BATCH,
+                sync=Activity.TO_SYNC,
+                status=Activity.ACCEPTED
+            )
+
             txns.append(
                 smartcontract.batch(
                     task.project.owner.account.address,
                     beneficiary.beneficiary.account.address,
-                    task.id,
+                    batch_activity.id,
                     int(amount * 1000000),
                     task.project.app_id
                 )
@@ -303,5 +313,13 @@ def payout_batch():
         )
         wait_for_confirmation(txn)
 
+        Activity.objects.filter(
+            task=task, 
+            activity_type=Activity.BATCH, 
+            sync=Activity.TO_SYNC
+        ).update(
+            sync=Activity.SYNCED
+        )
+        
         task.batch_paid = True
         task.save()

@@ -13,6 +13,7 @@ logger = logging.getLogger(__name__)
 def create_activity():
     activities = Activity.objects.filter(
         sync=Activity.INITIAL,
+        activity_type=Activity.WORK
     )
 
     for activity in activities:
@@ -30,13 +31,17 @@ def create_activity():
 @shared_task()
 def verify_activity():
     activities = Activity.objects.filter(
-        sync=Activity.TO_SYNC
+        sync=Activity.TO_SYNC,
+        activity_type=Activity.WORK
     )
 
     for activity in activities:
         with transaction.atomic():
             # TODO: optimization
-            activity = Activity.objects.select_for_update().get(pk=activity.pk)
+            activity = Activity.objects.select_for_update().get(
+                pk=activity.pk,
+                activity_type=Activity.WORK
+            )
             smartcontract.verify(
                 activity.project.owner.account.address,
                 activity.project.owner.account.private_key,
@@ -50,8 +55,11 @@ def verify_activity():
             activity.save()
             
             accepted_activity_count = Activity.objects.filter(
-                task=activity.task, 
-                status=Activity.ACCEPTED).count()
+                task=activity.task,
+                activity_type=Activity.WORK, 
+                status=Activity.ACCEPTED
+            ).count()
+            
             task = Task.objects.get(id=activity.task.id)
 
             if accepted_activity_count == task.count:
