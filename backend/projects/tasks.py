@@ -24,13 +24,15 @@ def create_project():
     )
 
     for project in projects:
-        if not hasattr(project, "account"):
-            account = Account.generate(
-                project,
-                Account.PROJECT_ACCOUNT,
-                settings.ALGO_APP_CREATE_AMOUNT,
-                sync=True
-            )
+        if hasattr(project, "account"):
+            continue
+
+        account = Account.generate(
+            project,
+            Account.PROJECT_ACCOUNT,
+            settings.ALGO_APP_CREATE_AMOUNT,
+            sync=True
+        )
         account = project.account
 
         app_id = smartcontract.create(account.address, account.private_key)
