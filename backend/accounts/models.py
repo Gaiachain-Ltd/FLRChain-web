@@ -30,6 +30,7 @@ class Account(models.Model):
     address = models.CharField(max_length=58)
     type = models.PositiveSmallIntegerField(
         default=NORMAL_ACCOUNT, choices=ACCOUNT_TYPES)
+    opted_in = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
