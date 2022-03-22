@@ -18,7 +18,7 @@ export default {
   },
   computed: {
     totalShare() {
-      return this.totalRewards + this.totalBatch;
+      return parseFloat((this.totalRewards + this.totalBatch).toFixed(2));
     },
     min() {
       return {
