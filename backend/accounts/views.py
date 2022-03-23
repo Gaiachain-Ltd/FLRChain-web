@@ -1,6 +1,6 @@
 import logging
 import base64
-from common.views import CommonView
+from common.views import CommonView, NoGetQueryParametersSchema
 from rest_framework.response import Response
 from rest_framework import status
 from drf_yasg import openapi
@@ -13,6 +13,7 @@ from decimal import *
 from algorand.utils import get_transactions
 from activities.models import Activity
 from algosdk import util
+from rest_framework import status
 
 
 logger = logging.getLogger(__name__)
@@ -20,16 +21,42 @@ logger = logging.getLogger(__name__)
 
 class AccountView(CommonView):
     @swagger_auto_schema(
-        operation_summary="Balance",
-        tags=['accounts', 'facililator', 'beneficiary', 'investor'])
-    def list(self, request):
+        auto_schema=NoGetQueryParametersSchema,
+        operation_summary="User balance",
+        operation_description=("User's account balance in USDC"),
+        tags=['accounts', 'facililator', 'beneficiary', 'investor'],
+        responses={
+            status.HTTP_200_OK: openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'balance': openapi.Schema(
+                        type=openapi.TYPE_INTEGER
+                    )
+                }
+            )
+        }
+    )
+    def balance(self, request):
+        return Response(
+            {
+                'balance': request.user.account.usdc_balance()
+            },
+            status=status.HTTP_200_OK
+        )
+
+    @swagger_auto_schema(
+        auto_schema=NoGetQueryParametersSchema,
+        operation_summary="User balance",
+        operation_description=(""),
+        tags=['accounts', 'facililator', 'investor'],
+    )
+    def details(self, request):
         invest_transactions = get_transactions(
             address=request.user.account.address,
             address_role="sender",
             note_prefix="I|".encode(),
             txn_type="appl"
         )['transactions']
-        # print("INVEST", invest_transactions)
 
         app_ids = dict()
         for invest_transaction in invest_transactions:
@@ -59,7 +86,8 @@ class AccountView(CommonView):
             {
                 'allocated': util.microalgos_to_algos(allocated),
                 'distributed': distributed,
-                'balance': request.user.account.usdc_balance()
+                'balance': request.user.account.usdc_balance(),
+                "address": request.user.account.address
             },
             status=status.HTTP_200_OK)
 
@@ -90,9 +118,4 @@ class AccountView(CommonView):
             'balance': balance,
             'spent': spent if spent else 0,
             'facililator_fee': facililator_fee
-        }, status=status.HTTP_200_OK)
-
-    def details(self, request):
-        return Response({
-            "address": request.user.account.address
         }, status=status.HTTP_200_OK)

@@ -22,7 +22,7 @@ class TransactionView(CommonView):
 
     @swagger_auto_schema(
         operation_summary="Full transaction list",
-        tags=['transactions', 'facililator', 'beneficiary', 'investor'])
+        tags=['transactions', 'facililator', 'investor'])
     def list(self, request):
         requestor_address = request.user.account.address
 

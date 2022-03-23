@@ -33,7 +33,7 @@ class ActivityView(CommonView):
 
     @swagger_auto_schema(
         operation_summary="History activity",
-        tags=['activities', 'beneficiary', 'investor', 'facililator'])
+        tags=['activities', 'investor', 'facililator'])
     def list(self, request, pk=None):
         project = get_object_or_404(Project, pk=pk)
         transactions = utils.get_transactions(
@@ -93,7 +93,10 @@ class ActivityView(CommonView):
 
     @swagger_auto_schema(
         operation_summary="Create new activity",
-        request_body=ActivitySerializer,
+        request_body=CreateActivitySerializer,
+        responses={
+            status.HTTP_201_CREATED: ActivitySerializer
+        },
         tags=['activities', 'beneficiary'])
     def create(self, request, project_pk=None, task_pk=None):
         with transaction.atomic():
@@ -109,7 +112,7 @@ class ActivityView(CommonView):
                 pk=task_pk
             )
 
-            serializer = self.serializer_class(data=request.data)
+            serializer = CreateActivitySerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
             activity = serializer.save(
                 user=request.user,
@@ -179,7 +182,11 @@ class PhotoView(CommonView):
     @swagger_auto_schema(
         operation_summary="Add photo to activity",
         request_body=ActivityPhotoSerializer,
-        tags=['beneficiary'])
+        responses={
+            status.HTTP_201_CREATED: ActivitySerializer
+        },
+        tags=['activities', 'beneficiary']
+    )
     def create(self, request, activity_pk=None):
         with transaction.atomic():
             activity = get_object_or_404(
@@ -193,4 +200,7 @@ class PhotoView(CommonView):
             photo = serializer.save()
             activity.photos.add(photo)
             
-            return Response(status=status.HTTP_201_CREATED)
+            return Response(
+                ActivitySerializer(activity), 
+                status=status.HTTP_201_CREATED
+            )

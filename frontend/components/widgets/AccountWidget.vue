@@ -67,7 +67,7 @@ export default {
   },
   async fetch() {
     const balanceInfo = await this.$axios
-      .get("accounts/")
+      .get("accounts/details/")
       .then((reply) => reply.data);
     this.allocated = balanceInfo.allocated;
     this.balance = balanceInfo.balance;

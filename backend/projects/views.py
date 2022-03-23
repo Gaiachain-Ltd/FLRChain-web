@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.response import Response
-from common.views import CommonView
+from common.views import CommonView, NoGetQueryParametersSchema
 from projects.models import Project, Assignment
 from projects.serializers import *
 from drf_yasg import openapi
@@ -12,7 +12,6 @@ from users.permissions import *
 from algorand.utils import *
 from algorand import smartcontract
 from rest_framework import parsers
-import json
 
 class ProjectView(CommonView):
     serializer_class = ProjectSerializer
@@ -30,8 +29,13 @@ class ProjectView(CommonView):
         return [permission() for permission in self.permission_classes]
 
     @swagger_auto_schema(
-        operation_summary="Full project list",
-        tags=['projects', 'facililator', 'beneficiary', 'investor'])
+        auto_schema=NoGetQueryParametersSchema,
+        operation_summary="Project list",
+        responses={
+            status.HTTP_200_OK: ProjectSerializer(many=True)
+        },
+        tags=['projects', 'facililator', 'beneficiary', 'investor'],
+    )
     def list(self, request):
         if request.user.type == CustomUser.BENEFICIARY:
             projects = Project.objects.with_beneficiary_assignment_status(
@@ -58,6 +62,9 @@ class ProjectView(CommonView):
 
     @swagger_auto_schema(
         operation_summary="Project details",
+        responses={
+            status.HTTP_200_OK: ProjectSerializer()
+        },
         tags=['projects', 'facililator', 'beneficiary', 'investor'])
     def retrieve(self, request, pk=None):
         if request.user.type == CustomUser.BENEFICIARY:
@@ -172,7 +179,10 @@ class AssignmentView(CommonView):
 
     @swagger_auto_schema(
         operation_summary="Join to project",
-        operation_description="Beneficiary sends join request to specified project",
+        operation_description="Beneficiary sends EMPTY POST request to join to specified project",
+        responses={
+            status.HTTP_201_CREATED: AssignmentSerializer
+        },
         tags=['assignment', 'beneficiary'])
     def create(self, request, pk=None):
         project = get_object_or_404(Project, pk=pk)

@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from projects.models import *
 from django.db import transaction
-from users.serializers import CustomUserSerializer
+from users.serializers import UserInfoSerializer
 from decimal import *
 
 
@@ -82,9 +82,9 @@ class ProjectSerializer(serializers.ModelSerializer):
 
     image = serializers.FileField(read_only=True, required=False, allow_null=True)
 
-    status = serializers.IntegerField(read_only=True)
-    state = serializers.IntegerField(read_only=True)
-    sync = serializers.IntegerField(read_only=True)
+    status = serializers.ChoiceField(read_only=True, choices=Project.STATUSES)
+    state = serializers.ChoiceField(read_only=True, choices=Project.STATES)
+    sync = serializers.ChoiceField(read_only=True, choices=Project.SYNC_STATES)
 
     start = serializers.DateField()
     end = serializers.DateField()
@@ -92,6 +92,8 @@ class ProjectSerializer(serializers.ModelSerializer):
     actions = ActionSerializer(many=True)
 
     created = serializers.DateTimeField(read_only=True)
+
+    assignment_status = serializers.SerializerMethodField(required=False, read_only=True)
 
     class Meta:
         model = Project
@@ -108,7 +110,8 @@ class ProjectSerializer(serializers.ModelSerializer):
             'actions',
             'fac_adm_funds',
             'created',
-            'app_id'
+            'app_id',
+            'assignment_status'
         )
 
     def to_representation(self, instance):
@@ -119,6 +122,9 @@ class ProjectSerializer(serializers.ModelSerializer):
             }
         )
         return data
+
+    def get_assignment_status(self, obj):
+        return getattr(obj, 'assignment_status', None)
 
     def get_facilitator(self, obj):
         return f"{obj.owner.first_name} {obj.owner.last_name}"
@@ -270,7 +276,7 @@ class ProjectSerializer(serializers.ModelSerializer):
 
 
 class AssignmentSerializer(serializers.ModelSerializer):
-    beneficiary = CustomUserSerializer(required=False, read_only=True)
+    beneficiary = UserInfoSerializer(required=False, read_only=True)
 
     class Meta:
         model = Assignment

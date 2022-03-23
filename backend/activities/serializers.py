@@ -8,6 +8,11 @@ class ActivityProjectSerializer(serializers.Serializer):
     title = serializers.CharField()
 
 
+class ActivityTaskSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    name = serializers.CharField()
+
+
 class ActivityBeneficiarySerializer(serializers.Serializer):
     id = serializers.IntegerField()
     first_name = serializers.CharField()
@@ -22,7 +27,7 @@ class ActivityPhotoSerializer(serializers.ModelSerializer):
 
 class ActivitySerializer(serializers.ModelSerializer):
     project = ActivityProjectSerializer(required=False, read_only=True)
-    task = TaskSerializer(required=False, read_only=True)
+    task = ActivityTaskSerializer(required=False, read_only=True)
     beneficiary = ActivityBeneficiarySerializer(source="user", read_only=True)
     txid = serializers.CharField(source="transaction.txid", required=False)
     photos = ActivityPhotoSerializer(read_only=True, many=True)
@@ -38,6 +43,14 @@ class ActivitySerializer(serializers.ModelSerializer):
         read_only_fields = ('id', 'project', 'task', 'beneficiary',
                             'txid', 'sync')
 
+class CreateActivitySerializer(serializers.ModelSerializer):
+    text = serializers.CharField(required=False)
+    area = serializers.IntegerField(required=False)
+    number = serializers.IntegerField(required=False)
+
+    class Meta:
+        model = Activity
+        fields = ('text', 'area', 'number')
 
 class ActivityVerificationSerializer(serializers.Serializer):
     status = serializers.IntegerField()

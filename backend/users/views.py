@@ -1,7 +1,7 @@
 from rest_framework import status
 from rest_framework.response import Response
 from users.models import Organization
-from users.serializers import CustomUserSerializer, OrganizationSerializer
+from users.serializers import *
 from django.db import transaction
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
@@ -13,13 +13,14 @@ from common.views import CommonView
 @swagger_auto_schema(
     operation_summary="Register user",
     method='POST',
-    request_body=CustomUserSerializer,
-    tags=['users', 'facililator', 'beneficiary', 'investor'])
+    request_body=UserSerializer,
+    tags=['users', 'facililator', 'beneficiary', 'investor']
+)
 @api_view(['POST'])
 @permission_classes([])
 def user_register(request):
     with transaction.atomic():
-        serializer = CustomUserSerializer(data=request.data)
+        serializer = UserSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
 
@@ -27,14 +28,19 @@ def user_register(request):
 
         return Response(status=status.HTTP_201_CREATED)
 
+
 @swagger_auto_schema(
     operation_summary="User info",
     method='GET',
-    tags=['users', 'facililator', 'beneficiary', 'investor'])
+    responses={
+        status.HTTP_200_OK: UserInfoSerializer
+    },
+    tags=['users', 'facililator', 'beneficiary', 'investor']
+)
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def user_info(request):
-    serializer = CustomUserSerializer(request.user)
+    serializer = UserInfoSerializer(request.user)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 

@@ -1,5 +1,3 @@
-from investments.models import Investment
-from users.serializers import CustomUserSerializer
 from rest_framework import serializers
 from decimal import *
 
