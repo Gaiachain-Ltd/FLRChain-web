@@ -56,9 +56,16 @@ class TransactionView(CommonView):
         )['transactions']
         data = list()
         for transaction in transactions:
-            # TODO: Handle inner transactions:
+            if transaction.get('inner-txns', None):
+                inner_transactions = transaction['inner-txns']
+                if len(inner_transactions) > 0:
+                    txid = transaction['id']
+                    transaction = inner_transactions[0]
+                    transaction['id'] = txid
+
             if transaction.get('asset-transfer-transaction', None) is None:
                 continue
+                    
             asset_transaction_details = transaction['asset-transfer-transaction']
             received = requestor_address == asset_transaction_details['receiver']
             data.append({
