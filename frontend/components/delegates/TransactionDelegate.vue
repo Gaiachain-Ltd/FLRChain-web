@@ -39,7 +39,7 @@
           :icon="require('@/assets/icons/calendar.svg')"
         ></DefaultSVGIcon>
         <DefaultText :color="$vuetify.theme.themes.light.octonary">{{
-          formatedDateTime
+          transaction["created"]
         }}</DefaultText>
       </v-layout>
     </v-col>
@@ -59,7 +59,6 @@
 
 <script>
 import AlgoExplorerMixin from "@/mixins/AlgoExplorerMixin";
-import algosdk from "algosdk";
 import { mapGetters } from "vuex";
 
 export default {
@@ -110,14 +109,7 @@ export default {
     },
     formattedValue() {
       let sign = this.isReceived ? "+" : "-";
-      return `${sign}${algosdk.microalgosToAlgos(
-        this.transaction.amount
-      )} USDC`;
-    },
-    formatedDateTime() {
-      return this.$moment
-        .unix(this.transaction["round-time"])
-        .format("YYYY-MM-DD HH:mm");
+      return `${sign}${ this.transaction.amount } USDC`;
     },
   },
 };

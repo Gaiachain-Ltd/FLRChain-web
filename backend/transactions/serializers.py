@@ -2,11 +2,14 @@ from transactions.models import Transaction
 from rest_framework import serializers
 
 
-class TransactionSerializer(serializers.ModelSerializer):
+class TransactionSerializer(serializers.Serializer):
     id = serializers.CharField()
-    project_name = serializers.CharField(source='project.title', required=False)
-    
-    class Meta:
-        model = Transaction
-        fields = ('id', 'txid', 'action', 'created', 'amount', 
-                  'project_name', 'status')
+    amount = serializers.CharField()
+    action = serializers.ChoiceField(choices=(
+            (1, "Received"), 
+            (2, "Sent")
+        )
+    )
+    created = serializers.DateTimeField()
+    project_id = serializers.IntegerField(required=False)
+    project_title = serializers.CharField(required=False)

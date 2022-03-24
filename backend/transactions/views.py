@@ -1,7 +1,7 @@
 import logging
 import datetime
 from decimal import *
-from common.views import CommonView
+from common.views import CommonView, NoGetQueryParametersSchema
 from transactions.models import Transaction
 from django.db.models import Q
 from transactions.serializers import TransactionSerializer
@@ -21,8 +21,12 @@ class TransactionView(CommonView):
     serializer_class = TransactionSerializer
 
     @swagger_auto_schema(
-        operation_summary="Full transaction list",
-        tags=['transactions', 'facililator', 'investor'])
+        auto_schema=NoGetQueryParametersSchema,
+        operation_summary="Transaction list",
+        responses={
+            status.HTTP_200_OK: TransactionSerializer
+        },
+        tags=['transactions', 'beneficiary', 'facililator', 'investor'])
     def list(self, request):
         requestor_address = request.user.account.address
 
@@ -54,6 +58,7 @@ class TransactionView(CommonView):
             min_amount=1,
             txn_type="axfer"
         )['transactions']
+
         data = list()
         for transaction in transactions:
             if transaction.get('inner-txns', None):
@@ -71,7 +76,7 @@ class TransactionView(CommonView):
             data.append({
                 "id": transaction['id'],
                 "action": 1 if received else 2,
-                "round-time": datetime.datetime.utcfromtimestamp(
+                "created": datetime.datetime.utcfromtimestamp(
                     transaction['round-time']
                 ).strftime('%Y-%m-%d %H:%M:%S'),
                 "amount": util.microalgos_to_algos(
@@ -82,4 +87,7 @@ class TransactionView(CommonView):
                     {}
                 )
             })
-        return Response(data, status=status.HTTP_200_OK)
+        return Response(
+            TransactionSerializer(data, many=True).data, 
+            status=status.HTTP_200_OK
+        )

@@ -53,12 +53,12 @@ export default {
       for (let index = 0; index < transactions.length; index++) {
         const element = transactions[index];
         let addSeparatorWithDate = false;
-        
-        const dt = this.$moment.unix(element['round-time']).format("YYYY-MM-DD HH:mm")
+        const dt = this.$moment(element['created'], "YYYY-MM-DD")
+
         if (!date) {
           date = dt;
           addSeparatorWithDate = true;
-        } else if (this.$moment(date).diff(dt, "days") != 0) {
+        } else if (date.diff(dt, "days") != 0) {
           date = dt;
           addSeparatorWithDate = true;
         }
@@ -67,7 +67,7 @@ export default {
           id: date + index,
           separator: true,
           date: addSeparatorWithDate
-            ? this.$moment(date).format("YYYY-MM-DD")
+            ? date.format("YYYY-MM-DD")
             : undefined,
         });
         processedTransactions.push(element);
