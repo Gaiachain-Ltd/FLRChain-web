@@ -12,6 +12,7 @@ export default {
         case "fundraising":
           return STATUS.FUNDRAISING;
         case "active":
+        case "investments":
           return STATUS.ACTIVE;
         case "closed":
           return STATUS.CLOSED;

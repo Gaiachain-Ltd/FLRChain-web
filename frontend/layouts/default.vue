@@ -93,11 +93,18 @@ export default {
               visible: true,
             },
             {
+              enabled: this.$route.path.includes("/project/investments"),
+              label: "Investments",
+              route: "/project/investments",
+              fontSize: 13,
+              visible: !this.isFacililator,
+            },
+            {
               enabled: this.$route.path.includes("/project/active"),
               label: "Active",
               route: "/project/active",
               fontSize: 13,
-              visible: true,
+              visible: this.isFacililator,
             },
             {
               enabled: this.$route.path.includes("/project/closed"),

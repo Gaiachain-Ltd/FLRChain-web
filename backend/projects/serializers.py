@@ -94,6 +94,7 @@ class ProjectSerializer(serializers.ModelSerializer):
     created = serializers.DateTimeField(read_only=True)
 
     assignment_status = serializers.SerializerMethodField(required=False, read_only=True)
+    invested = serializers.SerializerMethodField(required=False, read_only=True)
 
     class Meta:
         model = Project
@@ -111,7 +112,8 @@ class ProjectSerializer(serializers.ModelSerializer):
             'fac_adm_funds',
             'created',
             'app_id',
-            'assignment_status'
+            'assignment_status',
+            'invested'
         )
 
     def to_representation(self, instance):
@@ -128,6 +130,9 @@ class ProjectSerializer(serializers.ModelSerializer):
 
     def get_facilitator(self, obj):
         return f"{obj.owner.first_name} {obj.owner.last_name}"
+
+    def get_invested(self, obj):
+        return getattr(obj, 'invested', False)
 
     def validate(self, data):
         """

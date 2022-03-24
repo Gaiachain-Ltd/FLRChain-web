@@ -16,7 +16,7 @@ from rest_framework import parsers
 class ProjectView(CommonView):
     serializer_class = ProjectSerializer
     parser_classes = (parsers.MultiPartParser, parsers.JSONParser)
-    filterset_fields = ('status',)
+    filterset_fields = ('status', )
     search_fields = ('title',)
 
     def get_permissions(self):
@@ -41,11 +41,9 @@ class ProjectView(CommonView):
             projects = Project.objects.with_beneficiary_assignment_status(
                 request.user)
         elif request.user.type == CustomUser.FACILITATOR:
-            projects = Project.objects.filter(
-                owner=request.user).with_sum_spent_transactions()
+            projects = Project.objects.filter(owner=request.user)
         else:
-            projects = Project.objects.for_investor(
-                request.user).with_sum_spent_transactions()
+            projects = Project.objects.for_investor(request.user)
 
         return self.paginated_response(projects, request)
 
@@ -133,7 +131,6 @@ class DataTagView(CommonView):
 
 class AssignmentView(CommonView):
     serializer_class = AssignmentSerializer
-    permission_classes = ()
 
     # def get_permissions(self):
     #     """

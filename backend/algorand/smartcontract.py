@@ -14,10 +14,10 @@ from django.conf import settings
 def approval_program():
     G_STATUS_KEY = Bytes("status")
     G_TOTAL_KEY = Bytes("total")
-    G_COUNT_KEY = Bytes("count")
     G_START_KEY = Bytes("start")
     G_END_KEY = Bytes("end")
     G_ADM_KEY = Bytes("adm")
+    G_REFUND_KEY = Bytes("refund")
 
     L_TOTAL_KEY = Bytes("total")
     L_ROLE_KEY = Bytes("role")
@@ -77,12 +77,9 @@ def approval_program():
     @Subroutine(TealType.uint64)
     def investor_withdraw(project_balance):
         return Mul(
-            Div(
+            Div( # SHARE
                 App.localGet(Txn.sender(), L_TOTAL_KEY),
-                Minus(
-                    App.globalGet(G_TOTAL_KEY),
-                    App.globalGet(G_ADM_KEY)
-                )
+                App.globalGet(G_TOTAL_KEY)
             ),
             project_balance
         )
@@ -117,16 +114,6 @@ def approval_program():
                 Gtxn[2].type_enum() == TxnType.AssetTransfer,
                 Gtxn[2].xfer_asset() == Txn.assets[0],
                 Gtxn[2].asset_receiver() == Global.current_application_address()
-            )
-        ),
-        If(App.localGet(Txn.sender(), L_TOTAL_KEY) == Int(0)).
-        Then(
-            App.globalPut(
-                G_COUNT_KEY,
-                Add(
-                    App.globalGet(G_COUNT_KEY),
-                    Int(1)
-                )
             )
         ),
         App.localPut(

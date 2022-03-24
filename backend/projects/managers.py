@@ -25,5 +25,16 @@ class ProjectManager(models.Manager):
             assignment_status=models.Subquery(assignments.values('status')[:1]))
 
     def for_investor(self, investor):
+        from investments.models import Investment
+        investments = Investment.objects.filter(
+            investor=investor,
+            project=models.OuterRef('pk')
+        )
         return self.filter(
-            models.Q(investment__isnull=True) | models.Q(investment__investor=investor))
+            ~(models.Q(status__in=[
+                    projects.models.Project.ACTIVE,
+                    projects.models.Project.CLOSED
+                ]) & ~models.Q(investment__investor=investor))
+        ).annotate(
+            invested=models.Exists(investments)
+        )

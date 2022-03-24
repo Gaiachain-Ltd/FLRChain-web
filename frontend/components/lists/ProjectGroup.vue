@@ -57,8 +57,10 @@ export default {
         case "Fundraising":
           return "#ff9123";
         case "Active":
+        case "Investments":
           return "#00B854";
         case "Closed":
+        case "Finished":
           return "#0075DC";
         default:
           return "";

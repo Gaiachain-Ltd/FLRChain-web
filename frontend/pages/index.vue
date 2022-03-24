@@ -33,7 +33,7 @@
         <ProjectGroup
           v-if="activeVisible"
           class="mt-6"
-          title="Active"
+          :title="isFacililator ? 'Active' : 'Investments'"
           :projects="activeProjects"
         ></ProjectGroup>
         <ProjectGroup
@@ -52,6 +52,7 @@
 <script>
 import _ from "lodash";
 import { STATUS } from "@/constants/project";
+import { mapGetters } from "vuex";
 
 export default {
   props: {
@@ -72,6 +73,7 @@ export default {
     },
   },
   computed: {
+    ...mapGetters(["isFacililator"]),
     fundraisingProjects() {
       return _.filter(this.projects, ["status", STATUS.FUNDRAISING]);
     },

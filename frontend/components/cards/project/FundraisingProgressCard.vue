@@ -47,6 +47,7 @@ export default {
             this.invested += amount;
           })
       );
+    this.invested = parseFloat(this.invested.toFixed(6));
   },
 };
 </script>
