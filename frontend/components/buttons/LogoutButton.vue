@@ -30,30 +30,25 @@
         </v-flex>
       </v-layout>
     </template>
-    <v-flex slot="icon">
-      <DefaultSVGIcon
-        :icon="require('@/assets/popup/logout.svg')"
-        :size="70"
-      ></DefaultSVGIcon>
-    </v-flex>
-    <v-flex slot="content" my-6>
-      <DefaultText
-        class="text-center"
-        :size="22"
-        color="#253F50"
-        family="open-sans"
+    <v-flex slot="icon"> </v-flex>
+    <v-flex slot="content" ma-6>
+      <DefaultText :size="22" color="#253F50" family="open-sans"
         >Are you sure you want to log out?</DefaultText
       >
     </v-flex>
-    <v-layout slot="buttons" column ma-0 style="width: 100%">
-      <v-flex mb-3>
-        <BlockButton color="error" @clicked="logOut">Log out</BlockButton>
-      </v-flex>
-      <v-flex>
-        <BlockButton class="cancel-style" color="white" @clicked="cancel"
-          >Cancel</BlockButton
-        >
-      </v-flex>
+    <v-layout slot="buttons" mb-6 mx-6>
+      <v-spacer></v-spacer>
+      <ActionButton
+        class="mr-3"
+        color="white"
+        :border="`1px ${$vuetify.theme.themes.light.primary} solid !important`"
+        :textColor="`${$vuetify.theme.themes.light.primary} !important`"
+        @click.prevent="logOut"
+        >Log out</ActionButton
+      >
+      <ActionButton color="primary" @click.prevent="cancel"
+        >Cancel</ActionButton
+      >
     </v-layout>
   </DefaultPopup>
 </template>
@@ -70,8 +65,9 @@ export default {
   components: {
     DefaultText: () => import("@/components/texts/DefaultText"),
     DefaultSVGIcon: () => import("@/components/icons/DefaultSVGIcon"),
+    ActionButton: () => import("@/components/buttons/ActionButton"),
+
     DefaultPopup: () => import("@/components/popups/DefaultPopup"),
-    BlockButton: () => import("@/components/buttons/BlockButton"),
   },
   computed: {
     ...mapGetters(["isFacililator"]),
