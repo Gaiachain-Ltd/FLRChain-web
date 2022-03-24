@@ -33,12 +33,14 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class UserInfoSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(read_only=True)
+    email = serializers.CharField(read_only=True)
+    opted_in = serializers.SerializerMethodField(read_only=True)
     first_name = serializers.CharField(required=False)
     last_name = serializers.CharField(required=False)
     phone = serializers.CharField(required=False, allow_blank=True)
     village = serializers.CharField(required=False, allow_blank=True)
-    opted_in = serializers.SerializerMethodField(read_only=True)
-    type = serializers.ChoiceField(choices=CustomUser.USER_TYPES)
+    type = serializers.ChoiceField(choices=CustomUser.USER_TYPES, read_only=True)
 
     class Meta:
         model = CustomUser
