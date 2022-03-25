@@ -39,7 +39,7 @@ export default {
   data() {
     return {
       allocated: 0,
-      spent: 0,
+      distributed: 0,
       balance: 0,
     };
   },

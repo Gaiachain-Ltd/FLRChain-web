@@ -1,12 +1,8 @@
 <template>
   <DefaultPopup :show.sync="show">
     <v-layout slot="icon">
-      <DefaultSVGIcon
-        :icon="require('@/assets/balance/received.svg')"
-        :size="70"
-      ></DefaultSVGIcon>
     </v-layout>
-    <v-layout column slot="content" class="mt-3">
+    <v-layout column slot="content" ma-6>
       <v-form v-model="isValid">
         <TextInput
           :label="`Amount (max ${this.convertedMaxAmount})*`"
@@ -177,7 +173,7 @@ export default {
     }
     this.algodClient = new algosdk.Algodv2(
       "",
-      "https://api.testnet.algoexplorer.io",
+      "https://node.testnet.algoexplorerapi.io",
       ""
     );
 
