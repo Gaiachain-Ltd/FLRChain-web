@@ -17,7 +17,6 @@ def approval_program():
     G_START_KEY = Bytes("start")
     G_END_KEY = Bytes("end")
     G_ADM_KEY = Bytes("adm")
-    G_REFUND_KEY = Bytes("refund")
 
     L_TOTAL_KEY = Bytes("total")
     L_ROLE_KEY = Bytes("role")
@@ -73,18 +72,6 @@ def approval_program():
             App.globalGet(G_ADM_KEY),
             App.localGet(Txn.sender(), L_TOTAL_KEY)
         )
-
-    @Subroutine(TealType.uint64)
-    def investor_withdraw(project_balance):
-        return Mul(
-            Div( # SHARE
-                App.localGet(Txn.sender(), L_TOTAL_KEY),
-                App.globalGet(G_TOTAL_KEY)
-            ),
-            project_balance
-        )
-
-    tmp = ScratchVar(TealType.uint64)
 
     # OPT-IN USDC:
     on_init = Seq([
@@ -318,33 +305,22 @@ def approval_program():
         Approve()
     ])
 
-    app_balance = AssetHolding.balance(
-        Global.current_application_address(),
-        Txn.assets[0]
-    )
-
     handle_optout = Seq([
-        If(And(is_investor, is_finished)).
-        Then(
+        If(
+            And(
+                And(is_investor, is_finished), 
+                App.localGet(Txn.sender(), L_COUNT_KEY) == Int(1)
+            ),
             Seq([
-                app_balance,
-                tmp.store(investor_withdraw(app_balance.value())),
-                If(And(
-                    App.localGet(Txn.sender(), L_COUNT_KEY) == Int(1),
-                    tmp.load() > Int(0)
-                   ),
-                   Seq([
-                    InnerTxnBuilder.Begin(),
-                    InnerTxnBuilder.SetFields({
-                        TxnField.type_enum: TxnType.AssetTransfer,
-                        TxnField.xfer_asset: Txn.assets[0],
-                        TxnField.asset_receiver: Txn.sender(),
-                        TxnField.asset_amount: tmp.load(),
-                    }),
-                    InnerTxnBuilder.Submit(),
-                    App.localPut(Txn.sender(), L_COUNT_KEY, Int(0))
-                   ])
-                )
+                InnerTxnBuilder.Begin(),
+                InnerTxnBuilder.SetFields({
+                    TxnField.type_enum: TxnType.AssetTransfer,
+                    TxnField.xfer_asset: Txn.assets[0],
+                    TxnField.asset_receiver: Txn.sender(),
+                    TxnField.asset_amount: Btoi(Txn.application_args[0]),
+                }),
+                InnerTxnBuilder.Submit(),
+                App.localPut(Txn.sender(), L_COUNT_KEY, Int(0))
             ])
         ),
         Approve()
@@ -375,7 +351,7 @@ def create(creator_address, creator_pk):
 
     local_ints = 5
     local_bytes = 0
-    global_ints = 6
+    global_ints = 5
     global_bytes = 0
     global_schema = transaction.StateSchema(global_ints, global_bytes)
     local_schema = transaction.StateSchema(local_ints, local_bytes)
@@ -442,12 +418,13 @@ def opt_in(address, app_id, role):
     return txn
 
 
-def opt_out(address, app_id):
+def opt_out(address, app_id, amount):
     params = CLIENT.suggested_params()
     txn = transaction.ApplicationCloseOutTxn(
         address, 
         params, 
         app_id,
+        [int(amount * 1000000)],
         foreign_assets=[settings.ALGO_ASSET])
     return txn
 

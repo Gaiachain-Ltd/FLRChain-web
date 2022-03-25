@@ -11,6 +11,7 @@ from django.conf import settings
 from django.db.models import F, Sum, Q, Count
 from django.db import transaction
 from activities.models import Activity
+from investments.models import Investment
 
 
 logger = logging.getLogger(__name__)
@@ -101,7 +102,7 @@ def start_project():
 
 @shared_task()
 def update_project():
-    projects = Project.objects.select_for_update().filter(
+    projects = Project.objects.filter(
         Q(sync=Project.TO_SYNC) &
         ~Q(state__in=[Project.INITIAL, Project.CREATED, Project.DELETED])
     ).order_by('-modified')
@@ -171,11 +172,49 @@ def close_project():
         for role in sorted(investor_address_list.keys(), reverse=True):
             addresses.extend(investor_address_list[role])
 
+        invested = Investment.objects.filter(
+            project=project,
+            sync=Investment.SYNCED
+        ).aggregate(invested=Sum('amount'))['invested']
+        if not invested:
+            invested = 0
+
+        distributed = Activity.objects.filter(
+            project=project,
+            status=Activity.ACCEPTED
+        ).aggregate(distributed=Sum('reward'))['distributed']
+
+        if not distributed:
+            distributed = 0
+
+        total = invested - distributed - project.fac_adm_funds
+
         keys = list()
         txns = list()
         for address in addresses:
             account = Account.objects.get(address=address)
-            txns.append(smartcontract.opt_out(account.address, project.app_id))
+            if invested > 0 and account.user.type == CustomUser.INVESTOR:
+                investment = Investment.objects.get(
+                    investor=account.user,
+                    project=project,
+                    sync=Investment.SYNCED
+                ).amount
+                withdraw = (investment / invested) * total
+                txns.append(
+                    smartcontract.opt_out(
+                        account.address, 
+                        project.app_id,
+                        withdraw
+                    )
+                )
+            else:
+                txns.append(
+                    smartcontract.opt_out(
+                        account.address, 
+                        project.app_id,
+                        0
+                    )
+                )
             keys.append(account.private_key)
 
             if len(txns) == 15:
