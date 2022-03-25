@@ -97,8 +97,8 @@ class Project(models.Model):
             ):
                 self.sync = Project.TO_SYNC
 
-            if self.state == Project.POSTPONED:
-                self.state = Project.INITIALIZED
+                if self.state == Project.POSTPONED:
+                    self.state = Project.INITIALIZED
 
         return super().save(*args, **kwargs)
 

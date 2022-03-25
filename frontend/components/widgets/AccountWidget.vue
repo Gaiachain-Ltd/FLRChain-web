@@ -71,7 +71,7 @@ export default {
       .then((reply) => reply.data);
     this.allocated = balanceInfo.allocated;
     this.balance = balanceInfo.balance;
-    this.total = this.allocated + this.balance;
+    this.total = parseFloat((this.allocated + this.balance).toFixed(6));
 
     if (this.isFacililator) {
       this.projectCount = await this.$axios

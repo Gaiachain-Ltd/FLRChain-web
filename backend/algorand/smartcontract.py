@@ -73,6 +73,8 @@ def approval_program():
             App.localGet(Txn.sender(), L_TOTAL_KEY)
         )
 
+    tmp = ScratchVar(TealType.uint64)
+
     # OPT-IN USDC:
     on_init = Seq([
         Assert(is_facilitator),

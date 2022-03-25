@@ -54,7 +54,7 @@ export default {
       .get("accounts/details/")
       .then((reply) => reply.data);
     this.allocated = balanceInfo.allocated;
-    this.distributed = balanceInfo.distributed;
+    this.distributed = balanceInfo.distributed ? balanceInfo.distributed : 0;
     this.balance = balanceInfo.balance;
   },
 };

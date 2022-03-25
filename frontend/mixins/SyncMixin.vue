@@ -8,6 +8,13 @@ export default {
       return false;
     },
   },
+  watch: {
+    isSyncing() {
+      if (this.isSyncing) {
+        this.$timer.start("refresh");
+      }
+    }
+  },
   methods: {
     refresh() {
       this.$axios.get(this.url).then((reply) => {

@@ -27,7 +27,7 @@
         ></v-img>
       </v-layout>
       <v-layout
-        v-if="project.state == 3"
+        v-if="project.state == 3 && isFacililator"
         align-center
         class="fundraising-fail pt-2 pb-1 px-2 my-2"
       >
@@ -57,7 +57,7 @@
 </template>
 
 <script>
-import { mapActions } from "vuex";
+import { mapGetters, mapActions } from "vuex";
 import moment from "moment";
 import { STATUS } from "@/constants/project";
 
@@ -74,6 +74,7 @@ export default {
     ActionButton: () => import("@/components/buttons/ActionButton"),
   },
   computed: {
+    ...mapGetters(["isFacililator"]),
     indicatorColor() {
       switch (this.project.status) {
         case STATUS.FUNDRAISING:
