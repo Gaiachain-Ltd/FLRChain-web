@@ -2,9 +2,7 @@
   <v-layout column shrink>
     <v-layout>
       <DefaultText class="mb-3" size="20">{{ title }}</DefaultText>
-      <div class="counter" :style="{ backgroundColor: counterColor }">
-        {{ projects.length }}
-      </div>
+      <v-badge class="badge" inline :content="projects.length" :color="counterColor"></v-badge>
       <v-spacer></v-spacer>
       <v-btn
         small
@@ -89,5 +87,8 @@ export default {
   text-align: center;
   margin-top: 4px;
   margin-left: 4px;
+}
+.badge {
+  margin-top: 3px;
 }
 </style>
