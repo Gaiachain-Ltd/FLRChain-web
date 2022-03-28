@@ -11,3 +11,4 @@ pyteal==0.9.*
 celery==5.0.*
 redis==3.5.*
 django-celery-beat==2.2.*
+qrcode==7.3.*

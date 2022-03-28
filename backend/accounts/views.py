@@ -14,6 +14,7 @@ from algorand.utils import get_transactions
 from activities.models import Activity
 from algosdk import util
 from rest_framework import status
+from django.http import HttpResponse
 
 
 logger = logging.getLogger(__name__)
@@ -90,6 +91,16 @@ class AccountView(CommonView):
                 "address": request.user.account.address
             },
             status=status.HTTP_200_OK)
+
+    @swagger_auto_schema(
+        auto_schema=NoGetQueryParametersSchema,
+        operation_summary="User's wallet QR code",
+        tags=['accounts', 'beneficiary'],
+    )
+    def qr_code(self, request):
+        response = HttpResponse(request.user.account.qr_code, content_type='image/svg+xml')
+        response['Content-Disposition'] = 'attachment; filename="code.svg"'
+        return response
 
     @swagger_auto_schema(
         operation_summary="Project balance",

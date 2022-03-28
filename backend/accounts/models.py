@@ -1,13 +1,18 @@
 import logging
+import qrcode
+import qrcode.image.svg
 from django.db import models, transaction
 from algorand import utils
 from django.conf import settings
 from transactions.models import Transaction
 from users.models import CustomUser
 from algorand.utils import wait_for_confirmation
+from django.core.files.base import ContentFile
 
 logger = logging.getLogger(__name__)
 
+def upload_qr_code(instance, filename):
+    return f"accounts/{instance.address}/{filename}"
 
 class Account(models.Model):
     NORMAL_ACCOUNT = 0
@@ -33,12 +38,20 @@ class Account(models.Model):
     opted_in = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
+    qr_code = models.ImageField(
+        null=True, blank=True, upload_to=upload_qr_code)
 
     def __str__(self):
         if self.user:
             return f"User: {self.user.name}"
         else:
             return f"Project: {self.project}"
+
+    def save(self, *args, **kwargs):
+        if self.pk is None:
+            self.generate_qr_code()
+
+        return super().save(*args, **kwargs)
 
     @staticmethod
     def get_main_account():
@@ -97,6 +110,12 @@ class Account(models.Model):
             chain,
             initial_amount=initial_amount
         )
+
+    def generate_qr_code(self):
+        img = qrcode.make(f"algorand://{self.address}", image_factory=qrcode.image.svg.SvgImage)
+        cp = ContentFile(b'')
+        img.save(cp)
+        self.qr_code.save('qr_code.svg', cp, save=False)
 
     def usdc_balance(self):
         return utils.usdc_balance(self.address)
