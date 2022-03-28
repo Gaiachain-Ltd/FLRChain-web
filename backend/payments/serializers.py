@@ -27,7 +27,7 @@ class MakePaymentSerializer(serializers.Serializer):
     encryptedData = serializers.CharField()
 
 
-class MakePayoutSerializer(serializers.Serializer):
+class MTNPayoutSerializer(serializers.Serializer):
     amount = serializers.DecimalField(max_digits=26, decimal_places=6)
     phone = serializers.CharField()
 
@@ -47,5 +47,6 @@ class FacililatorPayoutSerializer(serializers.Serializer):
     amount = serializers.DecimalField(max_digits=26, decimal_places=6)
 
 
-class TransactionIdSerializer(serializers.Serializer):
-    txid = serializers.CharField()
+class PayoutResultSerializer(serializers.Serializer):
+    txid = serializers.CharField(required=False)
+    success = serializers.BooleanField()

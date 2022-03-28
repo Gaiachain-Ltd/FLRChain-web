@@ -142,10 +142,19 @@ class CirclePaymentView(CommonView):
 
 class MTNPayoutView(CommonView):
     permission_classes = (IsAuthenticated, isBeneficiary)
-    serializer_class = MakePayoutSerializer
+    serializer_class = MTNPayoutSerializer
 
+    @swagger_auto_schema(
+        auto_schema=NoGetQueryParametersSchema,
+        operation_summary="MTN payout (Mobile Money)",
+        request_body=MTNPayoutSerializer,
+        responses={
+            status.HTTP_200_OK: PayoutResultSerializer
+        },
+        tags=['payments', 'beneficiary'],
+    )
     def payout(self, request):
-        serializer = MakePayoutSerializer(data=request.data)
+        serializer = MTNPayoutSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         amount = serializer.validated_data['amount']
@@ -159,7 +168,8 @@ class MTNPayoutView(CommonView):
             )
             success = True
 
-        return Response({"success": success}, status=status.HTTP_200_OK)
+        serializer = PayoutResultSerializer({'success': success})
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class FacilitatorPayoutView(CommonView):
@@ -188,7 +198,7 @@ class FacilitatorPayoutView(CommonView):
         operation_summary="Facililator payout",
         request_body=FacililatorPayoutSerializer,
         responses={
-            status.HTTP_200_OK: TransactionIdSerializer
+            status.HTTP_200_OK: PayoutResultSerializer
         },
         tags=['payments', 'beneficiary'],
     )
@@ -207,9 +217,15 @@ class FacilitatorPayoutView(CommonView):
                 facililator_account,
                 serializer.validated_data['amount']
             )
+            success = True
         except Exception as e:
             logger.error(f"[Facililator Payout Error]: {e}")
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-        
-        serializer = TransactionIdSerializer({'txid': txn})
+            success = False
+
+        serializer = PayoutResultSerializer(
+            {
+                'txid': txn,
+                'success': success
+            }
+        )
         return Response(serializer.data, status=status.HTTP_200_OK)
