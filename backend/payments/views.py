@@ -1,6 +1,6 @@
 import logging
 import hashlib
-from common.views import CommonView
+from common.views import CommonView, NoGetQueryParametersSchema
 from rest_framework.permissions import IsAuthenticated
 from users.permissions import isInvestor, isBeneficiary
 from payments.circle import CircleAPI
@@ -13,6 +13,10 @@ from decimal import *
 from payments.models import CirclePayment, MTNPayout
 from django.db import transaction
 from payments.mtn import MTNAPI
+from projects.models import Project, Assignment
+from algorand.utils import transfer_assets
+from django.shortcuts import get_object_or_404
+from accounts.models import Account
 
 
 logger = logging.getLogger(__name__)
@@ -156,3 +160,56 @@ class MTNPayoutView(CommonView):
             success = True
 
         return Response({"success": success}, status=status.HTTP_200_OK)
+
+
+class FacilitatorPayoutView(CommonView):
+    permission_classes = (IsAuthenticated, isBeneficiary)
+
+    @swagger_auto_schema(
+        auto_schema=NoGetQueryParametersSchema,
+        operation_summary="Facililator list",
+        responses={
+            status.HTTP_200_OK: FacililatorSerializer(many=True)
+        },
+        tags=['payments', 'beneficiary'],
+    )
+    def list(self, request):
+        beneficiary = request.user
+        projects = Project.objects.filter(
+            assignment__beneficiary=beneficiary,
+            assignment__status=Assignment.ACCEPTED
+        ).only('owner').order_by('owner').distinct('owner')
+
+        serializer = FacililatorSerializer(projects, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @swagger_auto_schema(
+        auto_schema=NoGetQueryParametersSchema,
+        operation_summary="Facililator payout",
+        request_body=FacililatorPayoutSerializer,
+        responses={
+            status.HTTP_200_OK: TransactionIdSerializer
+        },
+        tags=['payments', 'beneficiary'],
+    )
+    def payout(self, request):
+        serializer = FacililatorPayoutSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        facililator_account = get_object_or_404(
+            Account,
+            id=serializer.validated_data['id']
+        )
+
+        try:
+            txn, _ = transfer_assets(
+                request.user.account,
+                facililator_account,
+                serializer.validated_data['amount']
+            )
+        except Exception as e:
+            logger.error(f"[Facililator Payout Error]: {e}")
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        
+        serializer = TransactionIdSerializer({'txid': txn})
+        return Response(serializer.data, status=status.HTTP_200_OK)

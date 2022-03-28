@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
-from algorand.utils import get_transactions, application_address
+from algorand.utils import get_transactions, application_address, INDEXER
 from django.conf import settings
 from projects.models import Project
 from algosdk import util
@@ -89,5 +89,24 @@ class TransactionView(CommonView):
             })
         return Response(
             TransactionSerializer(data, many=True).data, 
+            status=status.HTTP_200_OK
+        )
+
+    @swagger_auto_schema(
+        auto_schema=NoGetQueryParametersSchema,
+        operation_summary="Transaction info",
+        operation_description=("Returns null if transaction is not confirmed yet."
+         " Otherwise, returns a transaction details."
+        ),
+        tags=['transactions', 'beneficiary', 'facililator', 'investor']
+    )
+    def retrieve(self, _, id=None):
+        try:
+            reply = INDEXER.transaction(id)
+        except:
+            reply = None
+
+        return Response(
+            {'details': reply},
             status=status.HTTP_200_OK
         )
