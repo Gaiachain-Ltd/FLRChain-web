@@ -86,15 +86,15 @@ export default {
   async fetch() {
     await this.$axios
       .get("accounts/details/")
-      .then((reply) => (this.address = reply.data.addres));
-
-    // if (!this.$auth.user.opted_in) {
-    //   this.$auth.fetchUser().then(() => {
-    //     if (!this.$auth.user.opted_in) {
-    //       this.infoPopupVisible = true;
-    //     }
-    //   });
-    // }
+      .then((reply) => (this.address = reply.data.address));
+      
+    if (!this.$auth.user.opted_in) {
+      this.$auth.fetchUser().then(() => {
+        if (!this.$auth.user.opted_in) {
+          this.infoPopupVisible = true;
+        }
+      });
+    }
   },
 };
 </script>

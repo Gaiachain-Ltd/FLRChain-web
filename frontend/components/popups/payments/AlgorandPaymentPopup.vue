@@ -70,6 +70,7 @@ export default {
   data() {
     return {
       algodClient: null,
+      indexer: null,
       params: null,
       info: null,
       amount: "0",
@@ -177,6 +178,12 @@ export default {
       ""
     );
 
+    this.indexer = new algosdk.Indexer(
+      "",
+      "https://algoindexer.testnet.algoexplorerapi.io",
+      ""
+    )
+
     try {
       this.params = await this.algodClient.getTransactionParams().do();
     } finally {
@@ -187,14 +194,14 @@ export default {
     }
 
     try {
-      this.info = await this.algodClient.accountInformation(this.address).do();
+      this.info = await this.indexer.lookupAccountAssets(this.address).assetId(USDC).do();
     } finally {
       if (!this.info) {
         this.onError("Unable to fetch wallet info. Please try again later.");
         return;
       }
     }
-
+    
     for (let index = 0; index < this.info.assets.length; index++) {
       const asset = this.info.assets[index];
       if (asset["asset-id"] == USDC) {

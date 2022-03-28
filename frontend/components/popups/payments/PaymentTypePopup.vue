@@ -91,7 +91,7 @@
             :icon="require('@/assets/payments/algorand_wallet.svg')"
             :size="19"
           ></DefaultSVGIcon
-          ><span>Algorand Wallet</span>
+          ><span>Pera or Algorand Wallet</span>
         </v-layout></BlockButton
       >
       <ActionButton
