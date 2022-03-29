@@ -19,14 +19,14 @@ class ProjectView(CommonView):
     filterset_fields = ('status', )
     search_fields = ('title',)
 
-    def get_permissions(self):
-        """
-        Only facililator can make and update projects.
-        """
-        if self.request.method in ["POST", "PUT"]:
-            return [permission() for permission in [
-                *self.permission_classes, isFacilitator, isOptedIn]]
-        return [permission() for permission in self.permission_classes]
+    # def get_permissions(self):
+    #     """
+    #     Only facililator can make and update projects.
+    #     """
+    #     if self.request.method in ["POST", "PUT"]:
+    #         return [permission() for permission in [
+    #             *self.permission_classes, isFacilitator, isOptedIn]]
+    #     return [permission() for permission in self.permission_classes]
 
     @swagger_auto_schema(
         auto_schema=NoGetQueryParametersSchema,
@@ -97,6 +97,34 @@ class ProjectView(CommonView):
 
         return Response(
             ProjectSerializer(project).data, status=status.HTTP_200_OK)
+
+    @swagger_auto_schema(
+        operation_summary="My tasks",
+        operation_description="Returns list of active projects tasks from given ids in request",
+        request_body=MyTasksRequestSerializer,
+        responses={
+            status.HTTP_200_OK: TaskSerializer
+        },
+        tags=['projects', 'beneficiary']
+    )
+    def my_tasks(self, request):
+        serializer = MyTasksRequestSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        projects = Project.objects.with_beneficiary_assignment_status(
+            request.user
+        ).filter(
+            status=Project.ACTIVE,
+            assignment_status=Assignment.ACCEPTED
+        ).values_list('id', flat=True)
+
+        tasks = Task.objects.filter(
+            id__in=serializer.validated_data['ids'],
+            project__id__in=projects
+        )
+
+        serializer = TaskSerializer(tasks, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class DataTypeTagView(CommonView):

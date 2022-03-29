@@ -32,6 +32,8 @@ class TaskListSerializer(serializers.ListSerializer):
 
 class TaskSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(required=False)
+    project_id = serializers.IntegerField(source="project.id", read_only=True)
+    project_name = serializers.CharField(source="project.title", read_only=True)
     data_type_tag = DataTypeTagSerializer(required=False, allow_null=True)
     data_tags = DataTagSerializer(many=True)
 
@@ -39,8 +41,9 @@ class TaskSerializer(serializers.ModelSerializer):
         list_serializer_class = TaskListSerializer
         model = Task
         fields = ('id', 'reward', 'deleted', 'batch', 'count',
-                  'name', 'data_type_tag', 'data_tags', 'finished')
-        read_only_fields = ('id',)
+                  'name', 'data_type_tag', 'data_tags', 'finished',
+                  'project_id', 'project_name')
+        read_only_fields = ('id', 'project_id', 'project_name')
 
     def to_representation(self, instance):
         data = super(TaskSerializer, self).to_representation(instance)
@@ -287,3 +290,7 @@ class AssignmentSerializer(serializers.ModelSerializer):
         model = Assignment
         fields = ('id', 'beneficiary', 'status', 'sync')
         read_only_fields = ('beneficiary', )
+
+
+class MyTasksRequestSerializer(serializers.Serializer):
+    ids = serializers.ListField(child=serializers.IntegerField())
