@@ -13,7 +13,7 @@ export default {
         action.milestones.forEach((milestone) =>
           milestone.tasks.forEach(
             (task) =>
-              (t =
+              (t +=
                 parseFloat(task.batch) +
                 parseFloat(task.reward) * parseFloat(task.count))
           )
