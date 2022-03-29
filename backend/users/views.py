@@ -10,9 +10,8 @@ from common.views import CommonView, NoGetQueryParametersSchema
 from django_rest_passwordreset.signals import reset_password_token_created
 from django.core.mail import EmailMultiAlternatives
 from django.dispatch import receiver
-from django.template.loader import render_to_string
-from django.urls import reverse
 from django.conf import settings
+from rest_framework.permissions import IsAuthenticated
 
 
 @receiver(reset_password_token_created)
@@ -27,7 +26,6 @@ def password_reset_token_created(sender, instance, reset_password_token, *args, 
     :param kwargs:
     :return:
     """
-    print("HERE RESET", settings.EMAIL_HOST_USER, reset_password_token.user.email)
     url = f"{settings.FRONTEND_URL}/reset/?token={reset_password_token.key}"
     subject = "[FLRChain] Password reset"
     text_content = f"Please visit the following URL to reset your password:\n {url}"
@@ -40,6 +38,31 @@ def password_reset_token_created(sender, instance, reset_password_token, *args, 
     )
     msg.attach_alternative(html_content, "text/html")
     msg.send()
+
+
+@swagger_auto_schema(
+    operation_summary="Change password",
+    method='POST',
+    request_body=PasswordChangeSerializer,
+    operation_description="Returns 'OK' string on success",
+    responses={
+        status.HTTP_200_OK: PasswordReplySerializer
+    },
+    tags=['users', 'facililator', 'beneficiary', 'investor']
+)
+@api_view(['POST'])
+@permission_classes([IsAuthenticated,])
+def change_password(request):
+    serializer = PasswordChangeSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    user = request.user
+
+    if user.check_password(serializer.validated_data['old_password']):
+        user.set_password(serializer.validated_data['new_password'])
+        user.save()
+        return Response({"status": "OK"}, status=status.HTTP_200_OK)
+    else:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 @swagger_auto_schema(

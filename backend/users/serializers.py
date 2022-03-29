@@ -58,5 +58,10 @@ class OrganizationSerializer(serializers.ModelSerializer):
                   'statement', 'principal', 'email', 'phone')
 
 
-class PasswordResetReplySerializer(serializers.Serializer):
+class PasswordReplySerializer(serializers.Serializer):
     status = serializers.CharField()
+
+
+class PasswordChangeSerializer(serializers.Serializer):
+    old_password = serializers.CharField()
+    new_password = serializers.CharField()
