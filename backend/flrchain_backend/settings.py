@@ -68,6 +68,7 @@ INSTALLED_APPS = [
     'payments',
     'django_filters',
     'django_celery_beat',
+    'django_rest_passwordreset',
 ]
 
 MIDDLEWARE = [
@@ -298,3 +299,15 @@ MTN_CALLBACK_HOST = os.getenv('MTN_CALLBACK_HOST', '')
 MTN_API_KEY = os.getenv('MTN_API_KEY', '')
 MTN_USER_ID = os.getenv('MTN_USER_ID', '')
 MTN_URL = os.getenv('MTN_URL', '')
+
+# Email
+DEFAULT_FROM_EMAIL = os.environ.get('EMAIL_DEFAULT_FROM', '')
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST_USER = os.environ.get('EMAIL_USER', '')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASSWORD', '')
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
+# Frontend
+FRONTEND_URL = os.environ.get('FRONTEND_URL', 'http://localhost:8080')

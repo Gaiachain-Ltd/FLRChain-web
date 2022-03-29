@@ -56,3 +56,7 @@ class OrganizationSerializer(serializers.ModelSerializer):
         model = Organization
         fields = ('name', 'organization_type', 'website',
                   'statement', 'principal', 'email', 'phone')
+
+
+class PasswordResetReplySerializer(serializers.Serializer):
+    status = serializers.CharField()
