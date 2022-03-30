@@ -75,7 +75,7 @@ export default {
   async fetch() {
     // TODO: Handle error!
     this.projects = await this.$axios
-      .get("projects/", { params: this.query })
+      .get("projects/", { params: this.query, nodetails: true })
       .then((reply) => reply.data.results);
   },
 };

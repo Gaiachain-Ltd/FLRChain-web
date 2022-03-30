@@ -75,11 +75,11 @@ export default {
 
     if (this.isFacililator) {
       this.projectCount = await this.$axios
-        .get("projects/")
+        .get("projects/?nodetails=true")
         .then((reply) => reply.data.count);
 
       this.projectActiveCount = await this.$axios
-        .get("projects/", { investment__isnull: false })
+        .get("projects/", { investment__isnull: false, nodetails: true })
         .then((reply) => reply.data.count);
     }
   },

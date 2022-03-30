@@ -79,7 +79,7 @@ class ProjectImageSerializer(serializers.Serializer):
     image = serializers.FileField()
 
 
-class ProjectSerializer(serializers.ModelSerializer):
+class ProjectNoDetailsSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(read_only=True)
 
     description = serializers.CharField(required=False, allow_blank=True)
@@ -92,8 +92,6 @@ class ProjectSerializer(serializers.ModelSerializer):
 
     start = serializers.DateField()
     end = serializers.DateField()
-
-    actions = ActionSerializer(many=True)
 
     created = serializers.DateTimeField(read_only=True)
 
@@ -112,7 +110,6 @@ class ProjectSerializer(serializers.ModelSerializer):
             'sync',
             'start',
             'end',
-            'actions',
             'fac_adm_funds',
             'created',
             'app_id',
@@ -121,7 +118,7 @@ class ProjectSerializer(serializers.ModelSerializer):
         )
 
     def to_representation(self, instance):
-        data = super(ProjectSerializer, self).to_representation(instance)
+        data = super(ProjectNoDetailsSerializer, self).to_representation(instance)
         data.update(
             {
                 "fac_adm_funds": Decimal(instance.fac_adm_funds).normalize()
@@ -146,6 +143,30 @@ class ProjectSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 {"end": "end must occur after start"})
         return data
+
+
+class ProjectSerializer(ProjectNoDetailsSerializer):
+    actions = ActionSerializer(many=True)
+
+    class Meta:
+        model = Project
+        fields = (
+            'id',
+            'title',
+            'description',
+            'image',
+            'status',
+            'state',
+            'sync',
+            'start',
+            'end',
+            'actions',
+            'fac_adm_funds',
+            'created',
+            'app_id',
+            'assignment_status',
+            'invested'
+        )
 
     def create(self, validated_data):
         with transaction.atomic():

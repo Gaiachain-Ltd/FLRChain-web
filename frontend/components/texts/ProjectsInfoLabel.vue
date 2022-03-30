@@ -35,6 +35,7 @@ export default {
       .get("projects/", {
         params: {
           investment__isnull: true,
+          nodetails: true
         },
       })
       .then((reply) => reply.data.count);

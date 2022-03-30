@@ -14,7 +14,7 @@ export default {
   },
   async fetch() {
     this.projects = await this.$axios
-      .get("projects/")
+      .get("projects/?nodetails=true")
       .then((reply) => reply.data.count);
   },
 };

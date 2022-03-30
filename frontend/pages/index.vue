@@ -109,6 +109,7 @@ export default {
         params: {
           status: this.status !== -1 ? this.status : undefined,
           search: !!this.search ? this.search : undefined,
+          nodetails: true
         },
       })
       .then((reply) => reply.data.results);

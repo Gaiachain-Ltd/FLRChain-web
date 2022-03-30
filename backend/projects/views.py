@@ -45,6 +45,9 @@ class ProjectView(CommonView):
         else:
             projects = Project.objects.for_investor(request.user)
 
+        if request.GET.get('nodetails', None):
+            self.serializer_class = ProjectNoDetailsSerializer
+
         return self.paginated_response(projects, request)
 
     @swagger_auto_schema(
