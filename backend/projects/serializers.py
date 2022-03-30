@@ -36,13 +36,14 @@ class TaskSerializer(serializers.ModelSerializer):
     project_name = serializers.CharField(source="project.title", read_only=True)
     data_type_tag = DataTypeTagSerializer(required=False, allow_null=True)
     data_tags = DataTagSerializer(many=True)
+    instructions = serializers.CharField(allow_null=True, allow_blank=True)
 
     class Meta:
         list_serializer_class = TaskListSerializer
         model = Task
         fields = ('id', 'reward', 'deleted', 'batch', 'count',
                   'name', 'data_type_tag', 'data_tags', 'finished',
-                  'project_id', 'project_name')
+                  'project_id', 'project_name', 'instructions')
         read_only_fields = ('id', 'project_id', 'project_name')
 
     def to_representation(self, instance):
@@ -177,7 +178,8 @@ class ProjectSerializer(serializers.ModelSerializer):
                             project=project_obj,
                             reward=task['reward'],
                             batch=task['batch'],
-                            count=task['count']
+                            count=task['count'],
+                            instructions=task['instructions']
                         )
                         milestone_obj.tasks.add(task_obj)
 
@@ -192,7 +194,6 @@ class ProjectSerializer(serializers.ModelSerializer):
             ):
                 instance.sync = Project.TO_SYNC
 
-            print("DDD", instance.fac_adm_funds != validated_data['fac_adm_funds'])
             instance.title = validated_data['title']
             instance.description = validated_data['description']
             instance.start = validated_data['start']
@@ -257,7 +258,8 @@ class ProjectSerializer(serializers.ModelSerializer):
                                 name=task['name'],
                                 reward=task['reward'],
                                 batch=task['batch'],
-                                count=task['count']
+                                count=task['count'],
+                                instructions=task['instructions']
                             )
                             milestone_obj.tasks.add(task_obj)
 

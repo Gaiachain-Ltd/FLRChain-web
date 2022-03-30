@@ -96,9 +96,9 @@ class Project(models.Model):
                 old_instance.end != self.end
             ):
                 self.sync = Project.TO_SYNC
-
-                if self.state == Project.POSTPONED:
-                    self.state = Project.INITIALIZED
+                
+            if old_instance.state == Project.POSTPONED and self.state == Project.POSTPONED:
+                self.state = Project.INITIALIZED
 
         return super().save(*args, **kwargs)
 
@@ -152,6 +152,7 @@ class DataTag(models.Model):
 class Task(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
+    instructions = models.TextField(blank=True, null=True)
     deleted = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
