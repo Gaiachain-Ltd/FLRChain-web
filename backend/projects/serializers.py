@@ -82,7 +82,8 @@ class ProjectImageSerializer(serializers.Serializer):
 class ProjectNoDetailsSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(read_only=True)
 
-    description = serializers.CharField(required=False, allow_blank=True)
+    description = serializers.CharField(required=False, allow_blank=True, allow_null=True)
+    description = serializers.CharField(required=False, allow_blank=True, allow_null=True)
 
     image = serializers.FileField(read_only=True, required=False, allow_null=True)
 
@@ -114,7 +115,8 @@ class ProjectNoDetailsSerializer(serializers.ModelSerializer):
             'created',
             'app_id',
             'assignment_status',
-            'invested'
+            'invested',
+            'maplink'
         )
 
     def to_representation(self, instance):
@@ -165,7 +167,8 @@ class ProjectSerializer(ProjectNoDetailsSerializer):
             'created',
             'app_id',
             'assignment_status',
-            'invested'
+            'invested',
+            'maplink'
         )
 
     def create(self, validated_data):
@@ -176,7 +179,8 @@ class ProjectSerializer(ProjectNoDetailsSerializer):
                 description=validated_data['description'],
                 start=validated_data['start'],
                 end=validated_data['end'],
-                fac_adm_funds=validated_data['fac_adm_funds']
+                fac_adm_funds=validated_data['fac_adm_funds'],
+                maplink=validated_data['maplink']
             )
 
             for action in validated_data['actions']:
@@ -220,6 +224,7 @@ class ProjectSerializer(ProjectNoDetailsSerializer):
             instance.start = validated_data['start']
             instance.end = validated_data['end']
             instance.fac_adm_funds = validated_data['fac_adm_funds']
+            instance.maplink = validated_data['maplink']
 
             actions_dict = {
                 action.id: action for action in instance.actions.all()

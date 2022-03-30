@@ -33,6 +33,16 @@
                 ></DateInput>
               </v-flex>
             </v-layout>
+            <TextInput
+              v-if="!readonly"
+              label="Map link"
+              placeholder="Please paste map link..."
+              v-model="project.maplink"
+            ></TextInput>
+            <MapButton
+              v-else-if="project.maplink"
+              :link="project.maplink"
+            ></MapButton>
           </v-layout>
         </v-flex>
         <v-flex md7>
@@ -104,6 +114,7 @@ export default {
     DateInput: () => import("@/components/inputs/DateInput"),
     UploadButton: () => import("@/components/buttons/UploadButton"),
     Combobox: () => import("@/components/inputs/Combobox"),
+    MapButton: () => import("@/components/buttons/MapButton"),
   },
   methods: {
     validate() {

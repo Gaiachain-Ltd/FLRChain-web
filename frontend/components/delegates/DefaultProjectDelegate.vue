@@ -20,11 +20,7 @@
         <DefaultText :size="12">{{ timePeriod }}</DefaultText>
       </v-layout>
       <v-layout>
-        <v-img
-          :src="source"
-          class="mt-6"
-          max-height="300"
-        ></v-img>
+        <v-img :src="source" class="mt-6" max-height="300"></v-img>
       </v-layout>
       <v-layout
         v-if="project.state == 3 && isFacililator"
@@ -41,7 +37,8 @@
           size="14"
         ></DefaultSVGIcon>
       </v-layout>
-      <v-layout class="my-6">
+      <v-layout column class="my-6">
+        <MapButton v-if="project.maplink" :link="project.maplink" class="mb-3"></MapButton>
         <DefaultText :size="14">{{ project.description }}</DefaultText>
       </v-layout>
       <v-layout>
@@ -72,6 +69,7 @@ export default {
     DefaultSVGIcon: () => import("@/components/icons/DefaultSVGIcon"),
     LabeledTextWithIcon: () => import("@/components/texts/LabeledTextWithIcon"),
     ActionButton: () => import("@/components/buttons/ActionButton"),
+    MapButton: () => import("@/components/buttons/MapButton"),
   },
   computed: {
     ...mapGetters(["isFacililator"]),
@@ -113,9 +111,9 @@ export default {
       if (this.project.image) {
         return `${this.$config.baseUrl}/${this.project.image}`;
       } else {
-        return require('@/assets/images/placeholder.png');
+        return require("@/assets/images/placeholder.png");
       }
-    }
+    },
   },
   methods: {
     ...mapActions(["updateDetailsProjectId"]),

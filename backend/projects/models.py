@@ -53,6 +53,7 @@ class Project(models.Model):
 
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
+    maplink = models.TextField(blank=True, null=True)
 
     image = models.FileField(
         upload_to=upload_project_image, null=True, blank=True)
