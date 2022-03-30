@@ -9,12 +9,27 @@
       :loading="loading"
       @cancel="$router.go(-1)"
       @save="handleEdit"
-    ></ActionBarCard>
+    >
+      <ActionButton
+        slot="extra"
+        color="white"
+        :border="`1px ${$vuetify.theme.themes.light.success} solid !important`"
+        :textColor="`${$vuetify.theme.themes.light.success} !important`"
+        @click.prevent="showChangePasswordPopup = true"
+        >Change password</ActionButton
+      >
+    </ActionBarCard>
     <SnackBar
       :visible.sync="snackBarVisible"
       :message="message"
       :positive="snackBarPositive"
     ></SnackBar>
+    <ChangePasswordPopup
+      v-if="showChangePasswordPopup"
+      v-model="showChangePasswordPopup"
+      @success="onSuccess"
+      @error="onError"
+    ></ChangePasswordPopup>
   </v-layout>
 </template>
 
@@ -26,10 +41,12 @@ export default {
   data() {
     return {
       organization: {},
+      showChangePasswordPopup: false,
       loading: false,
     };
   },
   components: {
+    ActionButton: () => import("@/components/buttons/ActionButton"),
     ToolBar: () => import("@/components/toolbar/ToolBar"),
     InputOrganizationCard: () =>
       import("@/components/cards/profile/InputOrganizationCard"),
@@ -37,6 +54,8 @@ export default {
     SuccessPopup: () => import("@/components/popups/SuccessPopup"),
     ErrorPopup: () => import("@/components/popups/ErrorPopup"),
     SnackBar: () => import("@/components/popups/SnackBar"),
+    ChangePasswordPopup: () =>
+      import("@/components/popups/profile/ChangePasswordPopup"),
   },
   methods: {
     handleEdit() {

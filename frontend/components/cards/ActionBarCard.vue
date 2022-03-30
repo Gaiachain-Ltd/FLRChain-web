@@ -2,6 +2,7 @@
   <v-card>
     <v-layout ma-0 pa-6 justify-center>
       <slot>
+        <slot name="extra"></slot>
         <v-spacer></v-spacer>
         <ActionButton
           v-if="!hideCancel"
