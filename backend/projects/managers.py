@@ -30,11 +30,6 @@ class ProjectManager(models.Manager):
             investor=investor,
             project=models.OuterRef('pk')
         )
-        return self.filter(
-            ~(models.Q(status__in=[
-                    projects.models.Project.ACTIVE,
-                    projects.models.Project.CLOSED
-                ]) & ~models.Q(investment__investor=investor))
-        ).annotate(
+        return self.annotate(
             invested=models.Exists(investments)
         )

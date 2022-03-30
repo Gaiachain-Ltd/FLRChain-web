@@ -16,7 +16,6 @@ from rest_framework import parsers
 class ProjectView(CommonView):
     serializer_class = ProjectSerializer
     parser_classes = (parsers.MultiPartParser, parsers.JSONParser)
-    filterset_fields = ('status', )
     search_fields = ('title',)
 
     # def get_permissions(self):
@@ -44,6 +43,26 @@ class ProjectView(CommonView):
             projects = Project.objects.filter(owner=request.user)
         else:
             projects = Project.objects.for_investor(request.user)
+
+        status_filter = request.GET.get('status', None)
+        if status_filter:
+            status_filter = int(status_filter)
+            if request.user.type == CustomUser.INVESTOR:
+                if status_filter == Project.FUNDRAISING:
+                    projects = projects.filter(
+                        invested=False, status=status_filter
+                    )
+                elif status_filter == Project.ACTIVE:
+                    projects = projects.filter(
+                        invested=True, 
+                        status__in=[Project.FUNDRAISING, Project.ACTIVE]
+                    )
+                else:
+                    projects = projects.filter(
+                        invested=True, status=status_filter
+                    )
+            else:
+                projects = projects.filter(status=status_filter)
 
         if request.GET.get('nodetails', None):
             self.serializer_class = ProjectNoDetailsSerializer

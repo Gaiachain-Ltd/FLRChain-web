@@ -75,10 +75,22 @@ export default {
   computed: {
     ...mapGetters(["isFacililator"]),
     fundraisingProjects() {
-      return _.filter(this.projects, ["status", STATUS.FUNDRAISING]);
+      return _.filter(
+        this.projects,
+        this.isFacililator
+          ? { status: STATUS.FUNDRAISING }
+          : { status: STATUS.FUNDRAISING, invested: false }
+      );
     },
     activeProjects() {
-      return _.filter(this.projects, ["status", STATUS.ACTIVE]);
+      const isFac = this.isFacililator
+      return _.filter(this.projects, function(project) {
+        if (isFac) {
+          return project.status == STATUS.ACTIVE;
+        } else {
+          return [STATUS.ACTIVE, STATUS.FUNDRAISING].includes(project.status) && project.invested;
+        }
+      });
     },
     closedProjects() {
       return _.filter(this.projects, ["status", STATUS.CLOSED]);
@@ -109,7 +121,7 @@ export default {
         params: {
           status: this.status !== -1 ? this.status : undefined,
           search: !!this.search ? this.search : undefined,
-          nodetails: true
+          nodetails: true,
         },
       })
       .then((reply) => reply.data.results);
