@@ -176,11 +176,11 @@ class ProjectSerializer(ProjectNoDetailsSerializer):
             project_obj = Project.objects.create(
                 owner=self.context['owner'],
                 title=validated_data['title'],
-                description=validated_data['description'],
+                description=validated_data.get('description', ""),
                 start=validated_data['start'],
                 end=validated_data['end'],
                 fac_adm_funds=validated_data['fac_adm_funds'],
-                maplink=validated_data['maplink']
+                maplink=validated_data.get('maplink', "")
             )
 
             for action in validated_data['actions']:
@@ -208,6 +208,24 @@ class ProjectSerializer(ProjectNoDetailsSerializer):
                         )
                         milestone_obj.tasks.add(task_obj)
 
+                        if task.get('data_type_tag', None):
+                            dtt = task['data_type_tag']
+                            dtt_obj = DataTypeTag.objects.get(
+                                id=dtt['id']
+                            )
+                            task_obj.data_type_tag = dtt_obj
+                        else:
+                            task_obj.data_type_tag = None
+
+                        task_obj.data_tags.clear()
+                        for tag in task['data_tags']:
+                            tag_obj = DataTag.objects.get(
+                                id=tag['id']
+                            )
+                            task_obj.data_tags.add(tag_obj)
+
+                        task_obj.save()
+
             project_obj.save()
             return project_obj
 
@@ -220,11 +238,11 @@ class ProjectSerializer(ProjectNoDetailsSerializer):
                 instance.sync = Project.TO_SYNC
 
             instance.title = validated_data['title']
-            instance.description = validated_data['description']
+            instance.description = validated_data.get('description', "")
             instance.start = validated_data['start']
             instance.end = validated_data['end']
             instance.fac_adm_funds = validated_data['fac_adm_funds']
-            instance.maplink = validated_data['maplink']
+            instance.maplink = validated_data.get('maplink', "")
 
             actions_dict = {
                 action.id: action for action in instance.actions.all()
