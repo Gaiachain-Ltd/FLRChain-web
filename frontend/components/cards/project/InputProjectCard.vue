@@ -6,10 +6,10 @@
         :project.sync="project"
         :readonly="readonly"
       ></ProjectForm>
-      <DefaultText>{{ `Milestones & Tasks` }}</DefaultText>
-      <v-layout wrap>
-        <v-flex xs3>
-          <v-layout column class="mr-6">
+      <DefaultText class="mb-3">{{ `Milestones & Tasks` }}</DefaultText>
+      <v-layout :class="$vuetify.breakpoint.mdAndDown && 'wrap'">
+        <v-flex :class="$vuetify.breakpoint.mdAndDown ? 'mb-6' : 'mr-6'">
+          <v-layout column>
             <ProjectStructure :project="project"></ProjectStructure>
             <ProjectFundDistribution
               class="mt-6"
@@ -25,7 +25,6 @@
           <InputBudgetCard
             :project.sync="project"
             :readonly="readonly"
-            class="mt-6"
           ></InputBudgetCard>
         </v-layout>
       </v-layout>
