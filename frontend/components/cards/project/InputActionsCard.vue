@@ -6,78 +6,19 @@
       :key="actionIndex"
     >
       <v-layout column mb-6 class="border-wrapper pa-6">
-        <v-layout ma-0 mb-3 justify-center>
-          <DefaultText color="#02595b" size="24" bold>{{
-            `FLR Action ${actionIndex + 1}`
-          }}</DefaultText>
-          <v-spacer></v-spacer>
-          <DefaultIconButton
-            v-if="project.actions.length > 1"
-            :config="deleteBtnConf"
-            @clicked="() => onDeleteAction(actionIndex)"
-          ></DefaultIconButton>
-        </v-layout>
         <ActionForm
+          :actionIndex="actionIndex"
+          :project="project"
           v-model="project.actions[actionIndex]"
           :readonly="readonly"
+          @add:milestone="() => onAddMilestone(action)"
+          @add:task="onAddTask"
+          @delete:action="() => onDeleteAction(actionIndex)"
+          @delete:milestone="
+            (milestoneIndex) => onDeleteMilestone(action, milestoneIndex)
+          "
+          @delete:task="onDeleteTask"
         ></ActionForm>
-        <v-layout
-          column
-          v-for="(milestone, milestoneIndex) in action.milestones"
-          :key="milestoneIndex"
-        >
-          <v-layout column mb-6 class="border-wrapper pa-6">
-            <v-layout ma-0 mb-3 justify-center>
-              <DefaultText color="#00868a" size="20" bold>{{
-                `Milesone ${actionIndex + 1}.${milestoneIndex + 1}`
-              }}</DefaultText>
-              <v-spacer></v-spacer>
-              <DefaultIconButton
-                v-if="action.milestones.length > 1"
-                :config="deleteBtnConf"
-                @clicked="() => onDeleteMilestone(action, milestoneIndex)"
-              ></DefaultIconButton>
-            </v-layout>
-            <v-layout column>
-              <MilestoneForm
-                v-model="action.milestones[milestoneIndex]"
-                :readonly="readonly"
-              ></MilestoneForm>
-              <v-layout column class="border-wrapper pa-6">
-                <v-layout
-                  column
-                  v-for="(task, taskIndex) in milestone.tasks"
-                  :key="taskIndex"
-                >
-                  <TaskForm
-                    v-model="milestone.tasks[taskIndex]"
-                    :index="taskIndex"
-                    :actionIndex="actionIndex + 1"
-                    :milestoneIndex="milestoneIndex + 1"
-                    :showDeleteBtn="milestone.tasks.length > 1"
-                    :readonly="readonly || task.finished"
-                    @delete="() => onDeleteTask(milestone, taskIndex)"
-                  ></TaskForm>
-                  <v-divider class="mb-4"></v-divider>
-                </v-layout>
-                <v-layout justify-center class="mt-2">
-                  <DefaultIconButton
-                    v-if="!readonly"
-                    :config="addTaskBtnConfig"
-                    @clicked="() => onAddTask(milestone)"
-                  ></DefaultIconButton>
-                </v-layout>
-              </v-layout>
-            </v-layout>
-            <v-layout justify-center class="mt-6">
-              <DefaultIconButton
-                v-if="!readonly"
-                :config="addMilestoneBtnConfig"
-                @clicked="() => onAddMilestone(action)"
-              ></DefaultIconButton>
-            </v-layout>
-          </v-layout>
-        </v-layout>
         <v-layout justify-center>
           <DefaultIconButton
             v-if="!readonly"
@@ -134,8 +75,6 @@ export default {
   components: {
     DefaultText: () => import("@/components/texts/DefaultText"),
     ActionForm: () => import("@/components/forms/project/ActionForm"),
-    MilestoneForm: () => import("@/components/forms/project/MilestoneForm"),
-    TaskForm: () => import("@/components/forms/project/TaskForm"),
     ActionButton: () => import("@/components/buttons/ActionButton"),
     DefaultIconButton: () => import("@/components/buttons/DefaultIconButton"),
   },

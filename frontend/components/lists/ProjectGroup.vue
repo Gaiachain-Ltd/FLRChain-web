@@ -4,15 +4,7 @@
       <DefaultText class="mb-3" size="20">{{ title }}</DefaultText>
       <v-badge class="badge" inline :content="projects.length" :color="counterColor"></v-badge>
       <v-spacer></v-spacer>
-      <v-btn
-        small
-        icon
-        style="background-color: white"
-        class="elevation-16"
-        @click.prevent="onClicked"
-      >
-        <v-img max-width="16" :src="collapseIcon" contain></v-img>
-      </v-btn>
+      <CollapseButton v-model="collapsed"></CollapseButton>
     </v-layout>
     <v-expand-transition>
       <v-row v-if="projects.length && !collapsed">
@@ -42,14 +34,9 @@ export default {
   data() {
     return {
       collapsed: false,
-      upIcon: require("@/assets/icons/up.svg"),
-      downIcon: require("@/assets/icons/down.svg"),
     };
   },
   computed: {
-    collapseIcon() {
-      return this.collapsed ? this.downIcon : this.upIcon;
-    },
     counterColor() {
       switch (this.title) {
         case "Fundraising":
@@ -66,15 +53,11 @@ export default {
     },
   },
   components: {
+    CollapseButton: () => import("@/components/buttons/CollapseButton"),
     DefaultText: () => import("@/components/texts/DefaultText"),
     DefaultProjectDelegate: () =>
       import("@/components/delegates/DefaultProjectDelegate"),
-  },
-  methods: {
-    onClicked() {
-      this.collapsed = !this.collapsed;
-    },
-  },
+  }
 };
 </script>
 

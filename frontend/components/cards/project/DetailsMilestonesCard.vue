@@ -3,30 +3,6 @@
     <DefaultText :color="$vuetify.theme.themes.light.primary" bold>{{
       `Milestones & Tasks`
     }}</DefaultText>
-    <!-- <v-layout
-      mt-3
-      column
-      v-for="(milestone, milestoneIndex) in project.milestones"
-      :key="milestone.id"
-    >
-      <v-divider v-if="milestoneIndex" class="mt-2 mb-3"></v-divider>
-      <v-layout column my-2>
-        <v-layout mb-2>
-          <DefaultText :size="14" bold>{{
-            `Milestone ${milestoneIndex + 1}`
-          }}</DefaultText>
-          <v-spacer></v-spacer
-          ><DefaultText :size="14">{{ `${milestone.name}` }}</DefaultText>
-        </v-layout>
-        <v-layout>
-          <DefaultText :size="14" bold>Rewards (tasks and batch):</DefaultText>
-          <v-spacer></v-spacer
-          ><DefaultText :size="14">{{
-            `${rewards(milestone)} USDC`
-          }}</DefaultText>
-        </v-layout>
-      </v-layout>
-    </v-layout> -->
   </DefaultCard>
 </template>
 

@@ -1,21 +1,27 @@
 <template>
   <v-form ref="form">
     <v-layout column ma-0>
-      <v-layout ma-0>
+      <v-layout ma-0 align-center :class="collapsed && 'mb-3'">
         <DefaultText color="#06bcc1" bold size="18">{{
           `Task ${actionIndex}.${milestoneIndex}.${index + 1}`
         }}</DefaultText>
-        <v-spacer></v-spacer>
         <DefaultIconButton
+          class="ml-6"
           v-if="showDeleteBtn && !readonly"
           :config="deleteBtnConf"
           @clicked="$emit('delete')"
         ></DefaultIconButton>
+        <v-spacer></v-spacer>
+        <CollapseButton v-model="collapsed"></CollapseButton>
       </v-layout>
-      <DefaultText class="mb-2 mt-1" color="#06bcc1" size="14"
+      <DefaultText
+        v-show="!collapsed"
+        class="mb-2 mt-1"
+        color="#06bcc1"
+        size="14"
         >Task Description</DefaultText
       >
-      <v-layout column>
+      <v-layout v-show="!collapsed" column>
         <TextInput
           label="Task name*"
           v-model="task.name"
@@ -25,7 +31,10 @@
           required
         ></TextInput>
         <DataTypeTags :task.sync="task" :readonly="readonly"></DataTypeTags>
-        <DataRequiredTags :task.sync="task" :readonly="readonly"></DataRequiredTags>
+        <DataRequiredTags
+          :task.sync="task"
+          :readonly="readonly"
+        ></DataRequiredTags>
         <TextAreaInput
           label="Instructions for steward"
           v-model="task.instructions"
@@ -104,9 +113,11 @@ export default {
         label: "Delete",
         enabled: true,
         colorEnabled: this.$vuetify.theme.themes.light.error,
-        spacing: 2,
+        spacing: 1,
+        iconSize: 16,
       },
       icon: require("@/assets/icons/currency.svg"),
+      collapsed: false,
     };
   },
   computed: {
@@ -119,10 +130,16 @@ export default {
       },
     },
     total() {
-      return parseFloat((parseFloat(this.task.batch) + (parseFloat(this.task.reward) * parseFloat(this.task.count))).toFixed(6));
-    }
+      return parseFloat(
+        (
+          parseFloat(this.task.batch) +
+          parseFloat(this.task.reward) * parseFloat(this.task.count)
+        ).toFixed(6)
+      );
+    },
   },
   components: {
+    CollapseButton: () => import("@/components/buttons/CollapseButton"),
     DefaultText: () => import("@/components/texts/DefaultText"),
     TextInput: () => import("@/components/inputs/TextInput"),
     TextAreaInput: () => import("@/components/inputs/TextAreaInput"),
