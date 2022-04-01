@@ -22,7 +22,7 @@
     <v-col>
       <DefaultText size="14">Project</DefaultText>
       <DefaultText size="18" :color="$vuetify.theme.themes.light.octonary">{{
-        transaction.project_title ? transaction.project_title : "-"
+        transaction.project_name ? transaction.project_name : "-"
       }}</DefaultText>
     </v-col>
     <v-col>

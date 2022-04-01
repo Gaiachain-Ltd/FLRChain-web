@@ -12,4 +12,4 @@ class TransactionSerializer(serializers.Serializer):
     )
     created = serializers.DateTimeField()
     project_id = serializers.IntegerField(required=False)
-    project_title = serializers.CharField(required=False)
+    project_name = serializers.CharField(required=False)

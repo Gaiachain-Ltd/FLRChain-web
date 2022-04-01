@@ -49,7 +49,7 @@ class TransactionView(CommonView):
         for project in projects:
             project_dict[application_address(project[2])] = {
                 "project_id": project[0],
-                "project_title": project[1]
+                "project_name": project[1]
             }
 
         transactions = get_transactions(
