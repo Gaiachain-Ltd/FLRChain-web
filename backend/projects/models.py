@@ -151,7 +151,10 @@ class DataTag(models.Model):
 
 
 class Task(models.Model):
+    action = models.ForeignKey(Action, on_delete=models.SET_NULL, null=True)
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    milestone = models.ForeignKey(Milestone, on_delete=models.SET_NULL, null=True)
+
     name = models.CharField(max_length=255)
     instructions = models.TextField(blank=True, null=True)
     deleted = models.BooleanField(default=False)

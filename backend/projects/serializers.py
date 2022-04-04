@@ -34,6 +34,10 @@ class TaskSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(required=False)
     project_id = serializers.IntegerField(source="project.id", read_only=True)
     project_name = serializers.CharField(source="project.title", read_only=True)
+    milestone_id = serializers.IntegerField(source="milestone.id", read_only=True)
+    milestone_name = serializers.CharField(source="milestone.name", read_only=True)
+    action_id = serializers.IntegerField(source="action.id", read_only=True)
+    action_name = serializers.CharField(source="action.name", read_only=True)
     data_type_tag = DataTypeTagSerializer(required=False, allow_null=True)
     data_tags = DataTagSerializer(many=True)
     instructions = serializers.CharField(allow_null=True, allow_blank=True)
@@ -43,7 +47,9 @@ class TaskSerializer(serializers.ModelSerializer):
         model = Task
         fields = ('id', 'reward', 'deleted', 'batch', 'count',
                   'name', 'data_type_tag', 'data_tags', 'finished',
-                  'project_id', 'project_name', 'instructions')
+                  'project_id', 'project_name', 'instructions',
+                  'milestone_id', 'milestone_name', 'action_id', 
+                  'action_name')
         read_only_fields = ('id', 'project_id', 'project_name')
 
     def to_representation(self, instance):
@@ -200,7 +206,9 @@ class ProjectSerializer(ProjectNoDetailsSerializer):
                     for task in milestone['tasks']:
                         task_obj = Task.objects.create(
                             name=task['name'],
+                            action=action_obj,
                             project=project_obj,
+                            milestone=milestone_obj,
                             reward=task['reward'],
                             batch=task['batch'],
                             count=task['count'],
@@ -290,6 +298,8 @@ class ProjectSerializer(ProjectNoDetailsSerializer):
                             task_obj = Task.objects.get(
                                 id=task['id'],
                                 project=instance,
+                                action=action_obj,
+                                milestone=milestone_obj
                             )
                             task_obj.name = task['name']
                             task_obj.reward = task['reward']
@@ -298,7 +308,9 @@ class ProjectSerializer(ProjectNoDetailsSerializer):
                             del tasks_dict[task_obj.id]
                         else:
                             task_obj = Task.objects.create(
+                                action=action_obj,
                                 project=instance,
+                                milestone=milestone_obj,
                                 name=task['name'],
                                 reward=task['reward'],
                                 batch=task['batch'],

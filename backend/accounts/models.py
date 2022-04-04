@@ -112,7 +112,11 @@ class Account(models.Model):
         )
 
     def generate_qr_code(self):
-        img = qrcode.make(f"algorand://{self.address}", version=1, image_factory=qrcode.image.svg.SvgPathImage)
+        img = qrcode.make(
+            f"algorand://{self.address}", 
+            version=1, 
+            image_factory=qrcode.image.svg.SvgPathImage
+        )
         cp = ContentFile(b'')
         img.save(cp)
         self.qr_code.save('qr_code.svg', cp, save=False)
