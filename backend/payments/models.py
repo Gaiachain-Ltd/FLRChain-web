@@ -126,7 +126,7 @@ class MTNPayout(models.Model):
             INDEXER.transaction(self.transaction)
             self.status = MTNPayout.CONFIRMED
             self.success = True
-        except:
+        except Exception as e:
             self.success = None
 
         self.save()

@@ -34,12 +34,14 @@ class MTNPayoutSerializer(serializers.Serializer):
 
 class FacililatorSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(source="owner.id")
-    first_name = serializers.CharField(source="owner.first_name")
-    last_name = serializers.CharField(source="owner.last_name")
+    name = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Project
-        fields = ('id', 'first_name', 'last_name')
+        fields = ('id', 'name')
+
+    def get_name(self, obj):
+        return f"{obj.owner.first_name} {obj.owner.last_name}"
 
 
 class FacililatorPayoutSerializer(serializers.Serializer):
