@@ -6,7 +6,7 @@
       :color="$vuetify.theme.themes.light.senary"
       >Required data</DefaultText
     >
-    <v-layout>
+    <v-layout wrap>
       <TagButton
         v-for="tag in task.data_tags"
         :key="tag.id"

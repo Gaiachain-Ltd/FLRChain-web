@@ -6,7 +6,7 @@
       :color="$vuetify.theme.themes.light.senary"
       >Type of data</DefaultText
     >
-    <v-layout>
+    <v-layout wrap>
       <TagButton
         v-if="task.data_type_tag"
         :showDeleteIcon="!readonly"

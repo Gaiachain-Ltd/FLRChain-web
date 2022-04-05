@@ -47,6 +47,7 @@
         color="primary"
         @click.prevent="handleAdd"
         :loading="loading"
+        :disabled="tags.length == 0"
         >Add type</ActionButton
       >
     </v-layout>
@@ -72,15 +73,11 @@ export default {
         this.$emit("input", value);
       },
     },
-  },
-  data() {
-    return {
-      loading: false,
-      name: "",
-      unit: "",
-      NUMBER_TYPE: TAG_TYPES.NUMBER_TYPE,
-      selectedTagType: TAG_TYPES.TEXT_TYPE,
-      tags: [
+    tags() {
+      const usedTags = this.task.data_tags.map(
+        tag => tag.tag_type
+      );
+      return [
         {
           icon: require("@/assets/icons/edit.svg"),
           highlightIcon: require("@/assets/icons/edit-white.svg"),
@@ -105,7 +102,16 @@ export default {
           name: "Photo",
           tagType: TAG_TYPES.PHOTO_TYPE,
         },
-      ],
+      ].filter(tag => !usedTags.includes(tag.tagType));
+    }
+  },
+  data() {
+    return {
+      loading: false,
+      name: "",
+      unit: "",
+      NUMBER_TYPE: TAG_TYPES.NUMBER_TYPE,
+      selectedTagType: TAG_TYPES.TEXT_TYPE,
     };
   },
   components: {
