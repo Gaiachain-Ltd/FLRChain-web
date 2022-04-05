@@ -49,6 +49,7 @@
       v-model="date"
       no-title
       color="primary"
+      :min="minimumDate"
       @input="showMenu = false"
     ></v-date-picker>
   </v-menu>
@@ -75,12 +76,28 @@ export default {
     readonly: {
       type: Boolean,
       default: false
+    },
+    min: {
+      type: String,
+      default: ""
     }
   },
   data() {
     return {
       showMenu: false,
     };
+  },
+  watch: {
+    min() {
+      if (!this.min) {
+        return;
+      }
+      const min = this.$moment(this.min, "YYYY-MM-DD");
+      const current = this.$moment(this.date, "YYYY-MM-DD");
+      if (min > current) {
+        this.date = min.format("YYYY-MM-DD");
+      }
+    }
   },
   computed: {
     date: {
@@ -91,6 +108,13 @@ export default {
         this.$emit("update:text", value);
       },
     },
+    minimumDate() {
+      if (this.min == "") {
+        return this.$moment().format("YYYY-MM-DD");
+      } else {
+        return this.min;
+      }
+    }
   },
   components: {
     DefaultSVGIcon: () => import("@/components/icons/DefaultSVGIcon"),

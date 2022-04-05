@@ -29,6 +29,7 @@
                   :text.sync="project.end"
                   :rules="[...requiredRules, ...dateRules]"
                   :readonly="readonly"
+                  :min="project.start"
                   required
                 ></DateInput>
               </v-flex>
