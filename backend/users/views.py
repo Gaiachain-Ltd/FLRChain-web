@@ -12,6 +12,8 @@ from django.core.mail import EmailMultiAlternatives
 from django.dispatch import receiver
 from django.conf import settings
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.authtoken.models import Token
 
 
 @receiver(reset_password_token_created)
@@ -82,6 +84,33 @@ def user_register(request):
         Account.generate(user)
 
         return Response(status=status.HTTP_201_CREATED)
+    
+
+class CustomAuthToken(ObtainAuthToken):
+    @swagger_auto_schema(
+        operation_summary="Login user",
+        operation_description=(
+            "Beneficiary can log ONLY from mobile devices."
+            "Facililators and investors ONLY from browsers."
+        ),
+        tags=['users', 'facililator', 'beneficiary', 'investor']
+    )
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data,
+                                           context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data['user']
+
+        is_qt_user_agent = request.META.get("HTTP_USER_AGENT", "") == "Qt"
+        if ((is_qt_user_agent and user.type != CustomUser.BENEFICIARY) 
+            or (not is_qt_user_agent and user.type == CustomUser.BENEFICIARY)
+        ):
+            raise serializers.ValidationError({'error': 'Incorrect browser.'})
+
+        token, _ = Token.objects.get_or_create(user=user)
+        return Response({
+            'token': token.key,
+        })
 
 
 class UserInfoView(CommonView):
