@@ -305,6 +305,7 @@ class ProjectSerializer(ProjectNoDetailsSerializer):
                             task_obj.reward = task['reward']
                             task_obj.batch = task['batch']
                             task_obj.count = task['count']
+                            task_obj.instructions = task['instructions']
                             del tasks_dict[task_obj.id]
                         else:
                             task_obj = Task.objects.create(
