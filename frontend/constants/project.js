@@ -4,6 +4,16 @@ const STATUS = {
     CLOSED: 3,
 };
 
+const STATE = {
+    INITIAL: 0,
+    CREATED: 1,
+    INITIALIZED: 2,
+    POSTPONED: 3,
+    STARTED: 4,
+    FINISHED: 5,
+    DELETED: 6
+}
+
 const APPROVAL = {
     INITIAL: 0,
     ACCEPTED: 1,
@@ -23,4 +33,4 @@ const TAG_TYPES = {
     PHOTO_TYPE: 3
 };
 
-export { STATUS, SYNC, APPROVAL, TAG_TYPES };
+export { STATUS, STATE, SYNC, APPROVAL, TAG_TYPES };

@@ -149,6 +149,25 @@ class ProjectView(CommonView):
         serializer = TaskSerializer(tasks, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    def close_project(self, request, pk=None):
+        project = get_object_or_404(
+            Project, 
+            state=Project.POSTPONED,
+            status=Project.FUNDRAISING,
+            owner=request.user,
+            pk=pk
+        )
+
+        project.status = Project.CLOSED
+        project.state = Project.FINISHED
+        project.sync = Project.TO_SYNC
+        project.save()
+
+        return Response(
+            ProjectSerializer(project).data,
+            status=status.HTTP_200_OK
+        )
+
 
 class DataTypeTagView(CommonView):
     serializer_class = DataTypeTagSerializer

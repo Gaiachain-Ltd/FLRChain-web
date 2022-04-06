@@ -35,14 +35,24 @@
       @save="update"
       hideCancel
       :loading="isSyncing"
-    ></ActionBarCard>
+    >
+      <ActionButton
+        v-if="project.status == FUNDRAISING && project.state == POSTPONED"
+        slot="extra"
+        color="white"
+        :border="`1px ${$vuetify.theme.themes.light.error} solid !important`"
+        :textColor="`${$vuetify.theme.themes.light.error} !important`"
+        @click.prevent="close"
+        >Close project</ActionButton
+      >
+    </ActionBarCard>
   </v-layout>
 </template>
 
 <script>
 import ProjectMixin from "@/mixins/ProjectMixin";
 import SyncMixin from "@/mixins/SyncMixin";
-import { SYNC, STATUS } from "@/constants/project";
+import { SYNC, STATUS, STATE } from "@/constants/project";
 import { mapGetters } from "vuex";
 
 export default {
@@ -51,6 +61,7 @@ export default {
     return {
       FUNDRAISING: STATUS.FUNDRAISING,
       CLOSED: STATUS.CLOSED,
+      POSTPONED: STATE.POSTPONED
     };
   },
   computed: {
@@ -66,6 +77,7 @@ export default {
     },
   },
   components: {
+    ActionButton: () => import("@/components/buttons/ActionButton"),
     ActionBarCard: () => import("@/components/cards/ActionBarCard"),
     DetailsBlockchainCard: () =>
       import("@/components/cards/project/DetailsBlockchainCard"),
@@ -78,6 +90,15 @@ export default {
       import("@/components/cards/project/InputInvestmentCard"),
   },
   methods: {
+    close() {
+      this.project.sync = SYNC.TO_SYNC;
+      this.$axios.post(`${this.url}close/`, {}).then(
+        reply => {
+          this.requestRefresh();
+          this.onUpdate(reply.data);
+        }
+      )
+    },
     update() {
       this.project.sync = SYNC.TO_SYNC;
       this.$axios.put(this.url, this.project).then((reply) => {
