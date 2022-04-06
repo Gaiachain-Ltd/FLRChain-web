@@ -91,12 +91,12 @@ export default {
                 .put(`projects/${reply.data.id}/image/`, formData)
                 .then(() => {
                   this.updateDetailsProjectId(reply.data.id);
-                  this.$router.push("/project/all/details");
+                  this.$router.replace("/project/all/details");
                 })
                 .catch(() => (this.errorPopupVisible = true));
             } else {
                 this.updateDetailsProjectId(reply.data.id);
-                this.$router.push("/project/all/details");
+                this.$router.replace("/project/all/details");
             }
           })
           .catch(() => (this.errorPopupVisible = true));

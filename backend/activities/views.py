@@ -201,6 +201,6 @@ class PhotoView(CommonView):
             activity.photos.add(photo)
             
             return Response(
-                ActivitySerializer(activity), 
+                ActivitySerializer(activity).data, 
                 status=status.HTTP_201_CREATED
             )

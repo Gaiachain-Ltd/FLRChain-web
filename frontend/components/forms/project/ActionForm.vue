@@ -16,9 +16,10 @@
     <v-layout column v-show="!collapsed">
       <v-form>
         <TextInput
-          label="FLR action name"
+          label="FLR action name*"
           v-model="action.name"
           :readonly="readonly"
+          required
         ></TextInput>
       </v-form>
     </v-layout>

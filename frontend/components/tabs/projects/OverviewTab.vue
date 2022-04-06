@@ -24,6 +24,7 @@
       </v-col>
       <v-col class="ma-0 pa-3" :md="!isFundraising ? 12 : 8" sm="12">
         <InputProjectCard
+          ref="form"
           :project.sync="project"
           :readonly="!isFacililator || project.status === CLOSED || isSyncing"
         ></InputProjectCard>
@@ -100,11 +101,13 @@ export default {
       )
     },
     update() {
-      this.project.sync = SYNC.TO_SYNC;
-      this.$axios.put(this.url, this.project).then((reply) => {
-        this.requestRefresh();
-        this.onUpdate(reply.data);
-      });
+      if (this.$refs.form.validate()) {
+        this.project.sync = SYNC.TO_SYNC;
+        this.$axios.put(this.url, this.project).then((reply) => {
+          this.requestRefresh();
+          this.onUpdate(reply.data);
+        });
+      }
     },
     fetch() {
       this.$axios.get(this.url).then((reply) => {

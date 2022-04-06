@@ -16,9 +16,10 @@
     <v-layout column v-show="!collapsed">
       <v-form>
         <TextInput
-          label="Milestone name"
+          label="Milestone name*"
           v-model="milestone.name"
           :readonly="readonly"
+          required
         ></TextInput>
       </v-form>
     </v-layout>
