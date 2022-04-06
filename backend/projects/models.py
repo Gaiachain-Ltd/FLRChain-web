@@ -80,12 +80,17 @@ class Project(models.Model):
     actions = models.ManyToManyField('projects.Action', related_name="actions")
 
     fac_adm_funds = models.DecimalField(
-        max_digits=26, decimal_places=6, default=0)
+        max_digits=26, decimal_places=6, default=0
+    )
 
     app_id = models.IntegerField(null=True)
 
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
+
+    total = models.DecimalField(
+        max_digits=26, decimal_places=6, default=0
+    )
 
     objects = ProjectManager.from_queryset(ProjectQuerySet)()
 
@@ -94,7 +99,8 @@ class Project(models.Model):
             old_instance = Project.objects.get(pk=self.pk)
             if (old_instance.fac_adm_funds != self.fac_adm_funds or 
                 old_instance.start != self.start or 
-                old_instance.end != self.end
+                old_instance.end != self.end or
+                old_instance.total != self.total
             ):
                 self.sync = Project.TO_SYNC
                 

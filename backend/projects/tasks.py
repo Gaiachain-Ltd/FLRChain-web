@@ -69,7 +69,8 @@ def initialize_project():
                 ).timestamp()
             ),
             project.fac_adm_funds,
-            project.status
+            project.status,
+            project.total
         )
         project.state = Project.INITIALIZED
         project.sync = Project.SYNCED
@@ -83,10 +84,6 @@ def start_project():
         status=Project.FUNDRAISING,
         sync=Project.SYNCED,
         start__lte=datetime.datetime.now().date()
-    ).annotate(reward_total=Sum(
-        F('task__reward') * F('task__count')
-    )).annotate(batch_total=Sum('task__batch')).annotate(
-        total=F('fac_adm_funds') + F('reward_total') + F('batch_total')
     )
 
     for project in projects:
@@ -126,7 +123,8 @@ def update_project():
                     ).timestamp()
                 ),
                 project.fac_adm_funds,
-                project.status
+                project.status,
+                project.total,
             )
             project.sync = Project.SYNCED
             project.save()

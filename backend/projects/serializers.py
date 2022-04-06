@@ -189,6 +189,8 @@ class ProjectSerializer(ProjectNoDetailsSerializer):
                 maplink=validated_data.get('maplink', "")
             )
 
+            total = project_obj.fac_adm_funds
+
             for action in validated_data['actions']:
                 action_obj = Action.objects.create(
                     project=project_obj,
@@ -216,6 +218,9 @@ class ProjectSerializer(ProjectNoDetailsSerializer):
                         )
                         milestone_obj.tasks.add(task_obj)
 
+                        total += task_obj.batch
+                        total += task_obj.reward * task_obj.count
+
                         if task.get('data_type_tag', None):
                             dtt = task['data_type_tag']
                             dtt_obj = DataTypeTag.objects.get(
@@ -234,6 +239,7 @@ class ProjectSerializer(ProjectNoDetailsSerializer):
 
                         task_obj.save()
 
+            project_obj.total = total
             project_obj.save()
             return project_obj
 
@@ -251,6 +257,8 @@ class ProjectSerializer(ProjectNoDetailsSerializer):
             instance.end = validated_data['end']
             instance.fac_adm_funds = validated_data['fac_adm_funds']
             instance.maplink = validated_data.get('maplink', "")
+
+            total = instance.fac_adm_funds
 
             actions_dict = {
                 action.id: action for action in instance.actions.all()
@@ -320,6 +328,9 @@ class ProjectSerializer(ProjectNoDetailsSerializer):
                             )
                             milestone_obj.tasks.add(task_obj)
 
+                        total += task_obj.batch
+                        total += task_obj.reward * task_obj.count
+
                         if task.get('data_type_tag', None):
                             dtt = task['data_type_tag']
                             dtt_obj = DataTypeTag.objects.get(
@@ -338,6 +349,30 @@ class ProjectSerializer(ProjectNoDetailsSerializer):
                         
                         task_obj.save()
 
+                        for task in tasks_dict.values():
+                            milestone_obj.tasks.remove(task)
+                            milestone_obj.save()
+
+                            task.deleted = True
+                            task.save()
+
+                for milestone in milestones_dict.values():
+                    action_obj.milestones.remove(milestone)
+                    action_obj.save()
+
+                    for task in milestone.tasks.all():
+                        task.deleted = True
+                        task.save()
+
+            for action in actions_dict.values():
+                instance.actions.remove(action)
+
+                for milestone in action.milestones.all():
+                    for task in milestone.tasks.all():
+                        task.deleted = True
+                        task.save()
+
+            instance.total = total
             instance.save()
             return instance
 

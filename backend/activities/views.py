@@ -44,7 +44,6 @@ class ActivityView(CommonView):
         status_filter = request.GET.get("status", None)
         
         data = dict()
-        batches = dict()
         for transaction in transactions:
             notes = base64.b64decode(transaction['note']).decode().split('|')
             if len(notes) != 3:
@@ -109,7 +108,8 @@ class ActivityView(CommonView):
             task = get_object_or_404(
                 Task, 
                 project=project, 
-                pk=task_pk
+                pk=task_pk,
+                deleted=False
             )
 
             serializer = CreateActivitySerializer(data=request.data)

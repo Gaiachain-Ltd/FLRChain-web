@@ -74,9 +74,12 @@ export default {
       },
     },
     tags() {
-      const usedTags = this.task.data_tags.map(
-        tag => tag.tag_type
-      );
+      let usedTags = [];
+      if (this.task.data_tags) {
+        usedTags = this.task.data_tags.map(
+          tag => tag.tag_type
+        );
+      }
       return [
         {
           icon: require("@/assets/icons/edit.svg"),

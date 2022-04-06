@@ -142,7 +142,8 @@ class ProjectView(CommonView):
 
         tasks = Task.objects.filter(
             id__in=serializer.validated_data['ids'],
-            project__id__in=projects
+            project__id__in=projects,
+            deleted=False
         )
 
         serializer = TaskSerializer(tasks, many=True)

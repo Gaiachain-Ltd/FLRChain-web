@@ -14,9 +14,8 @@ from django.conf import settings
 def approval_program():
     G_STATUS_KEY = Bytes("status")
     G_TOTAL_KEY = Bytes("total")
-    G_START_KEY = Bytes("start")
-    G_END_KEY = Bytes("end")
     G_ADM_KEY = Bytes("adm")
+    G_DETAILS_KEY = Bytes("details")
 
     L_TOTAL_KEY = Bytes("total")
     L_ROLE_KEY = Bytes("role")
@@ -60,9 +59,18 @@ def approval_program():
     @Subroutine(TealType.none)
     def set_project_properties():
         return Seq([
+            Assert(Txn.application_args.length() == Int(6)),
             Assert(Btoi(Txn.application_args[1]) <= Btoi(Txn.application_args[2])),
-            App.globalPut(G_START_KEY, Btoi(Txn.application_args[1])),
-            App.globalPut(G_END_KEY, Btoi(Txn.application_args[2])),
+            App.globalPut(G_DETAILS_KEY, Concat(
+                    Txn.application_args[1],
+                    Bytes(";"),
+                    Txn.application_args[2],
+                    Bytes(";"),
+                    Txn.application_args[3],
+                    Bytes(";"),
+                    Txn.application_args[5]
+                )
+            ),
             App.globalPut(G_ADM_KEY, Btoi(Txn.application_args[3])),
         ])
 
@@ -353,8 +361,8 @@ def create(creator_address, creator_pk):
 
     local_ints = 5
     local_bytes = 0
-    global_ints = 5
-    global_bytes = 0
+    global_ints = 3
+    global_bytes = 1
     global_schema = transaction.StateSchema(global_ints, global_bytes)
     local_schema = transaction.StateSchema(local_ints, local_bytes)
 
@@ -388,7 +396,8 @@ def initialize(
     start,
     end,
     fac_adm_funds,
-    status
+    status,
+    total
 ):
     params = CLIENT.suggested_params()
     app_address = get_application_address(app_id)
@@ -403,7 +412,14 @@ def initialize(
         facilitator_address,
         params,
         app_id,
-        ["INIT", start, end, algos_to_microalgos(fac_adm_funds), status],
+        [
+            "INIT", 
+            start, 
+            end, 
+            algos_to_microalgos(fac_adm_funds), 
+            status,
+            algos_to_microalgos(total)
+        ],
         foreign_assets=[settings.ALGO_ASSET]
     )
     
@@ -426,7 +442,7 @@ def opt_out(address, app_id, amount):
         address, 
         params, 
         app_id,
-        [int(amount * 1000000)],
+        [algos_to_microalgos(amount)],
         foreign_assets=[settings.ALGO_ASSET])
     return txn
 
@@ -440,7 +456,7 @@ def invest(address, priv_key, app_id, amount, asset=settings.ALGO_ASSET):
         address,
         params,
         app_id,
-        ["INVEST", int(amount * 1000000)],
+        ["INVEST", algos_to_microalgos(amount)],
         foreign_assets=[asset],
         note="I|"
     )
@@ -455,13 +471,20 @@ def invest(address, priv_key, app_id, amount, asset=settings.ALGO_ASSET):
     wait_for_confirmation(txn_id)
 
 
-def update(address, priv_key, app_id, start, end, fac_adm_funds, status):
+def update(address, priv_key, app_id, start, end, fac_adm_funds, status, total):
     params = CLIENT.suggested_params()
     txn = transaction.ApplicationNoOpTxn(
         address,
         params,
         app_id,
-        ["UPDATE", start, end, algos_to_microalgos(fac_adm_funds), status],
+        [
+            "UPDATE", 
+            start, 
+            end, 
+            algos_to_microalgos(fac_adm_funds), 
+            status,
+            algos_to_microalgos(total)
+        ],
         foreign_assets=[settings.ALGO_ASSET]
     )
 
