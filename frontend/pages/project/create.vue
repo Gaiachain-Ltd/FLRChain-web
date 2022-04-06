@@ -26,6 +26,8 @@
 </template>
 
 <script>
+import { mapActions } from "vuex";
+
 export default {
   data() {
     return {
@@ -76,6 +78,7 @@ export default {
     },
   },
   methods: {
+    ...mapActions(["updateDetailsProjectId"]),
     handleCreate() {
       if (this.$refs.inputProject.validate()) {
         this.$axios
@@ -86,10 +89,14 @@ export default {
               formData.append("image", this.project.fileToUpload);
               this.$axios
                 .put(`projects/${reply.data.id}/image/`, formData)
-                .then(() => this.$router.push("/"))
+                .then(() => {
+                  this.updateDetailsProjectId(reply.data.id);
+                  this.$router.push("/project/all/details");
+                })
                 .catch(() => (this.errorPopupVisible = true));
             } else {
-              this.$router.push("/");
+                this.updateDetailsProjectId(reply.data.id);
+                this.$router.push("/project/all/details");
             }
           })
           .catch(() => (this.errorPopupVisible = true));
