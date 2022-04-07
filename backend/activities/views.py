@@ -117,7 +117,8 @@ class ActivityView(CommonView):
             activity = serializer.save(
                 user=request.user,
                 project=project,
-                task=task
+                task=task,
+                reward=task.reward
             )
 
             serializer = self.serializer_class(activity)
