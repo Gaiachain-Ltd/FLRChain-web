@@ -23,7 +23,7 @@
           label="Milestone name*"
           v-model="milestone.name"
           :readonly="readonly"
-          :rules="requiredRules"
+          :rules="[...requiredRules, ...maxLengthRules()]"
           required
         ></TextInput>
       </v-layout>

@@ -18,7 +18,7 @@
         <TextInput
           label="FLR action name*"
           v-model="action.name"
-          :rules="requiredRules"
+          :rules="[...requiredRules, ...maxLengthRules()]"
           :readonly="readonly"
           required
         ></TextInput>

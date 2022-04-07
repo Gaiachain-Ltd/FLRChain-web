@@ -90,6 +90,11 @@ class ProjectView(CommonView):
         if request.user.type == CustomUser.BENEFICIARY:
             project = Project.objects.with_beneficiary_assignment_status(
                 request.user).filter(pk=pk).first()
+        elif request.user.type == CustomUser.FACILITATOR:
+            project = Project.objects.filter(
+                pk=pk, 
+                owner=request.user
+            ).first()
         else:
             project = Project.objects.filter(pk=pk).first()
 
@@ -103,14 +108,14 @@ class ProjectView(CommonView):
         operation_summary="Project update",
         tags=['projects', 'facililator'])
     def update(self, request, pk=None):
-        project = get_object_or_404(Project, pk=pk)
+        project = get_object_or_404(Project, pk=pk, owner=request.user)
         serializer = self.serializer_class(project, data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def image(self, request, pk=None):
-        project = get_object_or_404(Project, pk=pk)
+        project = get_object_or_404(Project, pk=pk, owner=request.user)
         serializer = ProjectImageSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 

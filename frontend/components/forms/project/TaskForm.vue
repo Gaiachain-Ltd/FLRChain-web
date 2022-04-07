@@ -26,7 +26,7 @@
           label="Task name*"
           v-model="task.name"
           placeholder="Please enter task name..."
-          :rules="requiredRules"
+          :rules="[...requiredRules, ...maxLengthRules()]"
           :readonly="readonly"
           required
         ></TextInput>
@@ -38,6 +38,7 @@
         <TextAreaInput
           label="Instructions for steward"
           v-model="task.instructions"
+          :rules="[...maxLengthRules(2000)]"
           :readonly="readonly"
         ></TextAreaInput>
         <DefaultText class="mb-2 mt-1" color="#06bcc1" size="14"

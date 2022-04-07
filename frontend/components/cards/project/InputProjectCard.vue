@@ -8,7 +8,7 @@
       ></ProjectForm>
       <DefaultText class="mb-3">{{ `Milestones & Tasks` }}</DefaultText>
       <v-layout :class="$vuetify.breakpoint.mdAndDown && 'wrap'">
-        <v-flex :class="$vuetify.breakpoint.mdAndDown ? 'mb-6' : 'mr-6'">
+        <v-flex :class="$vuetify.breakpoint.mdAndDown ? 'mb-6' : 'mr-6 details-wrapper'">
           <v-layout column>
             <ProjectStructure :project="project"></ProjectStructure>
             <ProjectFundDistribution
@@ -17,7 +17,7 @@
             ></ProjectFundDistribution>
           </v-layout>
         </v-flex>
-        <v-layout column>
+        <v-layout column >
           <InputActionsCard
             ref="actionsForm"
             :project.sync="project"
@@ -72,3 +72,9 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.details-wrapper {
+  max-width: 40%;
+}
+</style>

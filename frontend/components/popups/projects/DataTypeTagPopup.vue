@@ -2,17 +2,20 @@
   <DefaultPopup :show.sync="show">
     <v-flex slot="icon"> </v-flex>
     <v-flex slot="content" ma-6>
-      <v-layout column>
-        <DefaultText :color="$vuetify.theme.themes.light.primary"
-          >Add new type</DefaultText
-        >
-        <TextInput
-          class="mt-3"
-          label="Type name"
-          placeholder="Please enter tag type name..."
-          v-model="name"
-        ></TextInput>
-      </v-layout>
+      <v-form ref="form">
+        <v-layout column>
+          <DefaultText :color="$vuetify.theme.themes.light.primary"
+            >Add new type</DefaultText
+          >
+          <TextInput
+            class="mt-3"
+            label="Type name"
+            placeholder="Please enter tag type name..."
+            v-model="name"
+            :rules="[...maxLengthRules()]"
+          ></TextInput>
+        </v-layout>
+      </v-form>
     </v-flex>
     <v-layout slot="buttons" mb-6 mx-6>
       <v-spacer></v-spacer>
@@ -24,7 +27,10 @@
         @click.prevent="show = false"
         >Cancel</ActionButton
       >
-      <ActionButton color="primary" @click.prevent="handleAdd" :loading="loading"
+      <ActionButton
+        color="primary"
+        @click.prevent="handleAdd"
+        :loading="loading"
         >Add type</ActionButton
       >
     </v-layout>
@@ -32,7 +38,10 @@
 </template>
 
 <script>
+import ValidatorMixin from "@/validators";
+
 export default {
+  mixins: [ValidatorMixin],
   props: {
     value: {
       type: Boolean,
@@ -63,13 +72,15 @@ export default {
   },
   methods: {
     async handleAdd() {
-      this.loading = true;
-      await this.$axios
-        .post("projects/datatypetag/", { name: this.name })
-        .then((reply) => {
-          this.$set(this.task, "data_type_tag", reply.data);
-          this.show = false;
-        });
+      if (this.$refs.form.validate()) {
+        this.loading = true;
+        await this.$axios
+          .post("projects/datatypetag/", { name: this.name })
+          .then((reply) => {
+            this.$set(this.task, "data_type_tag", reply.data);
+            this.show = false;
+          });
+      }
     },
   },
 };

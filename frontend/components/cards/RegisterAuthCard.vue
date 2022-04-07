@@ -41,7 +41,7 @@
             label="Email*"
             placeholder="Email..."
             v-model="user.email"
-            :rules="emailRules"
+            :rules="[...requiredRules, ...emailRules]"
             :error.sync="usedEmail"
             required
           ></TextInput>

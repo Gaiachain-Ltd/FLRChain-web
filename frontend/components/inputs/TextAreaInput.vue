@@ -14,6 +14,7 @@
       v-model="internalText"
       auto-grow
       :rows="4"
+      :rules="rules"
     ></v-textarea>
   </v-layout>
 </template>
@@ -37,7 +38,11 @@ export default {
     readonly: {
       type: Boolean,
       default: false
-    }
+    },
+    rules: {
+      type: Array,
+      default: () => [],
+    },
   },
   computed: {
     internalText: {

@@ -17,20 +17,24 @@
             >{{ tag.name }}</TagButton
           >
         </v-layout>
-        <v-layout wrap>
-          <TextInput
-            class="mt-6"
-            label="Tag name"
-            placeholder="Please enter tag name..."
-            v-model="name"
-          ></TextInput>
-          <TextInput
-            v-if="selectedTagType == NUMBER_TYPE"
-            label="Unit"
-            placeholder="Please enter unit..."
-            v-model="unit"
-          ></TextInput>
-        </v-layout>
+        <v-form ref="form">
+          <v-layout wrap>
+            <TextInput
+              class="mt-6"
+              label="Tag name"
+              placeholder="Please enter tag name..."
+              v-model="name"
+              :rules="[...maxLengthRules()]"
+            ></TextInput>
+            <TextInput
+              v-if="selectedTagType == NUMBER_TYPE"
+              label="Unit"
+              placeholder="Please enter unit..."
+              v-model="unit"
+              :rules="[...maxLengthRules()]"
+            ></TextInput>
+          </v-layout>
+        </v-form>
       </v-layout>
     </v-flex>
     <v-layout slot="buttons" mb-6 mx-6>
@@ -55,9 +59,11 @@
 </template>
 
 <script>
+import ValidatorMixin from "@/validators";
 import { TAG_TYPES } from "@/constants/project";
 
 export default {
+  mixins: [ValidatorMixin],
   props: {
     value: {
       type: Boolean,
@@ -76,9 +82,7 @@ export default {
     tags() {
       let usedTags = [];
       if (this.task.data_tags) {
-        usedTags = this.task.data_tags.map(
-          tag => tag.tag_type
-        );
+        usedTags = this.task.data_tags.map((tag) => tag.tag_type);
       }
       return [
         {
@@ -105,8 +109,8 @@ export default {
           name: "Photo",
           tagType: TAG_TYPES.PHOTO_TYPE,
         },
-      ].filter(tag => !usedTags.includes(tag.tagType));
-    }
+      ].filter((tag) => !usedTags.includes(tag.tagType));
+    },
   },
   data() {
     return {
@@ -126,26 +130,28 @@ export default {
   },
   methods: {
     async handleAdd() {
-      this.loading = true;
-      await this.$axios
-        .post("projects/datatag/", {
-          name: this.name,
-          tag_type: this.selectedTagType,
-          unit:
-            this.selectedTagType == TAG_TYPES.NUMBER_TYPE
-              ? this.unit
-              : undefined,
-        })
-        .then((reply) => {
-          let tags = [];
-          if (this.task.data_tags && this.task.data_tags.length > 0) {
-            tags = [reply.data, ...this.task.data_tags];
-          } else {
-            tags = [reply.data];
-          }
-          this.$set(this.task, "data_tags", tags);
-          this.show = false;
-        });
+      if (this.$refs.form.validate()) {
+        this.loading = true;
+        await this.$axios
+          .post("projects/datatag/", {
+            name: this.name,
+            tag_type: this.selectedTagType,
+            unit:
+              this.selectedTagType == TAG_TYPES.NUMBER_TYPE
+                ? this.unit
+                : undefined,
+          })
+          .then((reply) => {
+            let tags = [];
+            if (this.task.data_tags && this.task.data_tags.length > 0) {
+              tags = [reply.data, ...this.task.data_tags];
+            } else {
+              tags = [reply.data];
+            }
+            this.$set(this.task, "data_tags", tags);
+            this.show = false;
+          });
+      }
     },
   },
 };

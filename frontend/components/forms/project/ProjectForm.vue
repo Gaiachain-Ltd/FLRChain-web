@@ -8,7 +8,7 @@
               label="Project title*"
               placeholder="Please enter project name..."
               v-model="project.title"
-              :rules="requiredRules"
+              :rules="[...requiredRules, ...maxLengthRules()]"
               :readonly="readonly"
               required
             ></TextInput>
@@ -38,6 +38,7 @@
               v-if="!readonly"
               label="Map link"
               placeholder="Please paste map link..."
+              :rules="[...maxLengthRules(1000)]"
               v-model="project.maplink"
             ></TextInput>
             <MapButton
@@ -59,6 +60,7 @@
         label="Summarize the project. What problem are you trying to solve and how?"
         placeholder="Please enter project description..."
         v-model="project.description"
+        :rules="[...maxLengthRules(2000)]"
         :readonly="readonly"
       ></TextAreaInput>
     </v-layout>

@@ -2,6 +2,7 @@
   <v-layout column fill-height ma-6>
     <ToolBar title="Profile"></ToolBar>
     <InputOrganizationCard
+      ref="organizationForm"
       :organization.sync="organization"
     ></InputOrganizationCard>
     <ActionBarCard
@@ -19,11 +20,11 @@
         >Change password</ActionButton
       >
     </ActionBarCard>
-    <SnackBar
-      :visible.sync="snackBarVisible"
-      :message="message"
-      :positive="snackBarPositive"
-    ></SnackBar>
+    <ErrorPopup
+      v-if="errorPopupVisible"
+      :value.sync="errorPopupVisible"
+      :text="errorText"
+    ></ErrorPopup>
     <ChangePasswordPopup
       v-if="showChangePasswordPopup"
       v-model="showChangePasswordPopup"
@@ -34,15 +35,14 @@
 </template>
 
 <script>
-import CRUDMixin from "@/mixins/CRUDMixin";
-
 export default {
-  mixins: [CRUDMixin],
   data() {
     return {
       organization: {},
       showChangePasswordPopup: false,
       loading: false,
+      errorPopupVisible: false,
+      errorText: "",
     };
   },
   components: {
@@ -53,30 +53,40 @@ export default {
     ActionBarCard: () => import("@/components/cards/ActionBarCard"),
     SuccessPopup: () => import("@/components/popups/SuccessPopup"),
     ErrorPopup: () => import("@/components/popups/ErrorPopup"),
-    SnackBar: () => import("@/components/popups/SnackBar"),
     ChangePasswordPopup: () =>
       import("@/components/popups/profile/ChangePasswordPopup"),
   },
   methods: {
     handleEdit() {
-      this.beforeRequest();
-      this.$axios
-        .patch("organization/", this.organization)
-        .then((reply) => {
-          this.organization = reply.data;
-          this.onSuccess("Changes saved successfully!");
-        })
-        .catch((error) => {
-          this.onError("Something has gone wrong. Please try again later.");
-        });
+      if (this.$refs.organizationForm.validate()) {
+        this.$axios
+          .patch("organization/", this.organization)
+          .then((reply) => {
+            this.organization = reply.data;
+            // this.onSuccess("Changes saved successfully!");
+          })
+          .catch(() => {
+            this.showErrorPopup();
+          });
+      } else {
+        this.showErrorPopup("Please correct fields marked on red.");
+      }
+    },
+    showErrorPopup(text) {
+      if (text) {
+        this.errorText = text;
+      } else {
+        this.errorText = "Something went wrong. Please try again later.";
+      }
+      this.errorPopupVisible = true;
     },
   },
   async fetch() {
     this.organization = await this.$axios
       .get("organization/")
       .then((reply) => reply.data)
-      .catch((error) => {
-        this.onError("Something has gone wrong. Please try again later.");
+      .catch(() => {
+        this.showErrorPopup();
       });
   },
 };

@@ -6,7 +6,7 @@
           <TextInput
             label="Email*"
             v-model="username"
-            :rules="emailRules"
+            :rules="[...requiredRules, ...emailRules]"
             :error.sync="wrongEmail"
             placeholder="Please enter your email..."
             required
