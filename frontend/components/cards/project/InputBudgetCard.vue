@@ -1,6 +1,6 @@
 <template>
   <v-layout column class="border-wrapper pa-3">
-    <BudgetForm :project="project" :readonly="readonly"></BudgetForm>
+    <BudgetForm ref="form" :project="project" :readonly="readonly"></BudgetForm>
   </v-layout>
 </template>
 
@@ -15,6 +15,11 @@ export default {
   },
   components: {
     BudgetForm: () => import("@/components/forms/project/BudgetForm"),
+  },
+  methods: {
+    validate() {
+      this.$refs.form.validate();
+    },
   },
 };
 </script>

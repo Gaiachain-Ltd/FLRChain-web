@@ -16,6 +16,7 @@
     <ErrorPopup
       v-if="errorPopupVisible"
       :value.sync="errorPopupVisible"
+      :text="errorText"
     ></ErrorPopup>
     <InfoPopup
       v-if="infoPopupVisible"
@@ -33,6 +34,7 @@ export default {
     return {
       infoPopupVisible: false,
       errorPopupVisible: false,
+      errorText: "",
       project: {
         title: "",
         description: "",
@@ -93,17 +95,27 @@ export default {
                   this.updateDetailsProjectId(reply.data.id);
                   this.$router.replace("/project/all/details");
                 })
-                .catch(() => (this.errorPopupVisible = true));
+                .catch(() => this.showErrorPopup());
             } else {
                 this.updateDetailsProjectId(reply.data.id);
                 this.$router.replace("/project/all/details");
             }
           })
-          .catch(() => (this.errorPopupVisible = true));
+          .catch(() => this.showErrorPopup());
+      } else {
+        this.showErrorPopup("Please correct fields marked on red.");
       }
     },
     handleCancel() {
       this.$router.back();
+    },
+    showErrorPopup(text) {
+      if (text) {
+        this.errorText = text;
+      } else {
+        this.errorText = "Something went wrong. Please try again later.";
+      }
+      this.errorPopupVisible = true;
     },
   },
   async fetch() {

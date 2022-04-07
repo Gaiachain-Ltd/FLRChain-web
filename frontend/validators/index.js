@@ -38,6 +38,12 @@ export default {
             ],
             nonZeroDecimalRules: [
                 (v) => parseFloat(v) > 0.0 || "Value has to be greater than 0",
+            ],
+            oneOrMoreInteger: [
+                (v) => parseInt(v) >= 1 || "Value has to be greater than 1"
+            ],
+            integerRules: [
+                (v) => !isNaN(v) && (function(x) { return (x | 0) === x; })(parseFloat(v)) || "Invalid value"
             ]
         };
     },

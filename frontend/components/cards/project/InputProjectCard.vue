@@ -19,10 +19,12 @@
         </v-flex>
         <v-layout column>
           <InputActionsCard
+            ref="actionsForm"
             :project.sync="project"
             :readonly="readonly"
           ></InputActionsCard>
           <InputBudgetCard
+            ref="budgetForm"
             :project.sync="project"
             :readonly="readonly"
           ></InputBudgetCard>
@@ -62,7 +64,10 @@ export default {
   },
   methods: {
     validate() {
-      return this.$refs.projectForm.validate();
+      const p = this.$refs.projectForm.validate();
+      const a = this.$refs.actionsForm.validate();
+      const b = this.$refs.budgetForm.validate();
+      return p && a && b;
     },
   },
 };

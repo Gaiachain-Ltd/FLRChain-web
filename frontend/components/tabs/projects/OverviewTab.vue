@@ -47,6 +47,11 @@
         >Close project</ActionButton
       >
     </ActionBarCard>
+    <ErrorPopup
+      v-if="errorPopupVisible"
+      :value.sync="errorPopupVisible"
+      :text="errorText"
+    ></ErrorPopup>
   </v-layout>
 </template>
 
@@ -63,6 +68,8 @@ export default {
       FUNDRAISING: STATUS.FUNDRAISING,
       CLOSED: STATUS.CLOSED,
       POSTPONED: STATE.POSTPONED,
+      errorPopupVisible: false,
+      errorText: "",
     };
   },
   computed: {
@@ -102,10 +109,15 @@ export default {
     update() {
       if (this.$refs.form.validate()) {
         this.project.sync = SYNC.TO_SYNC;
-        this.$axios.put(this.url, this.project).then((reply) => {
-          this.requestRefresh();
-          this.onUpdate(reply.data);
-        });
+        this.$axios
+          .put(this.url, this.project)
+          .then((reply) => {
+            this.requestRefresh();
+            this.onUpdate(reply.data);
+          })
+          .catch(() => this.showErrorPopup());
+      } else {
+        this.showErrorPopup("Please correct fields marked on red.");
       }
     },
     onUpdate(project) {
@@ -113,6 +125,14 @@ export default {
     },
     onRefresh() {
       this.$refs.progress.$fetch();
+    },
+    showErrorPopup(text) {
+      if (text) {
+        this.errorText = text;
+      } else {
+        this.errorText = "Something went wrong. Please try again later.";
+      }
+      this.errorPopupVisible = true;
     },
   },
   async fetch() {

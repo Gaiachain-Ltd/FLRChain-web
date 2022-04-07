@@ -7,6 +7,7 @@
     >
       <v-layout column mb-6 class="border-wrapper pa-6">
         <ActionForm
+          ref="form"
           :actionIndex="actionIndex"
           :project="project"
           v-model="project.actions[actionIndex]"
@@ -127,6 +128,15 @@ export default {
     onDeleteTask(milestone, index) {
       milestone.tasks.splice(index, 1);
     },
+    validate() {
+      for (let index = 0; index < this.$refs.form.length; index++) {
+        const element = this.$refs.form[index];
+        if (!element.validate()) {
+          return false;
+        }
+      }
+      return true;
+    }
   },
 };
 </script>

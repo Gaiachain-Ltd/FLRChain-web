@@ -44,15 +44,15 @@
           >Task Rewards</DefaultText
         >
         <TextInput
-          label="Batch"
+          label="Batch*"
           v-model="task.batch"
-          :rules="requiredRules"
+          :rules="[...requiredRules, ...decimalRules]"
           :icon="icon"
           :readonly="readonly"
           required
         ></TextInput>
         <TextInput
-          label="How much will a steward receive upon confirmation of the task?"
+          label="How much will a steward receive upon confirmation of the task?*"
           v-model="task.reward"
           :rules="[...requiredRules, ...decimalRules, ...nonZeroDecimalRules]"
           :icon="icon"
@@ -60,9 +60,9 @@
           required
         ></TextInput>
         <TextInput
-          label="How many times can this task be performed?"
+          label="How many times can this task be performed?*"
           v-model="task.count"
-          :rules="requiredRules"
+          :rules="[...requiredRules, ...oneOrMoreInteger, ...integerRules]"
           :readonly="readonly"
           required
         ></TextInput>
