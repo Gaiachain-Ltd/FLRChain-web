@@ -10,9 +10,8 @@ export default {
   },
   watch: {
     isSyncing() {
-      if (this.isSyncing) {
-        this.$timer.start("refresh");
-      }
+      this.$timer.stop("refresh");
+      this.$timer.start("refresh");
     }
   },
   methods: {
