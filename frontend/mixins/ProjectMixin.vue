@@ -24,6 +24,9 @@ export default {
     },
     totalRewards() {
       let rewards = 0;
+      if (!this.project.actions) {
+        return 0;
+      }
       this.project.actions.forEach((action) =>
         action.milestones.forEach((milestone) => {
           milestone.tasks.forEach((task) => {
@@ -35,6 +38,9 @@ export default {
     },
     totalBatch() {
       let batches = 0;
+      if (!this.project.actions) {
+        return 0;
+      }
       this.project.actions.forEach((action) =>
         action.milestones.forEach((milestone) => {
           milestone.tasks.forEach((task) => {

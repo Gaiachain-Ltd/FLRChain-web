@@ -150,6 +150,7 @@ export default {
       .get("projects/", {
         params: {
           status: Utility.statusValueByName(this.$route.params.status),
+          nodetails: true
         },
       })
       .then((reply) => reply.data.results);

@@ -13,9 +13,17 @@
 </template>
 
 <script>
+import SyncMixin from "@/mixins/SyncMixin";
+
 export default {
+  mixins: [SyncMixin],
   props: {
     project: {},
+  },
+  computed: {
+    url() {
+      return `projects/${this.project.id}/`;
+    },
   },
   components: {
     RewardsProgressCard: () =>
@@ -27,6 +35,9 @@ export default {
     onRefresh() {
       this.$refs.progress.$fetch();
     },
+  },
+  async fetch() {
+    this.refresh();
   },
 };
 </script>

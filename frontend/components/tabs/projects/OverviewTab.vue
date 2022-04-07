@@ -62,7 +62,7 @@ export default {
     return {
       FUNDRAISING: STATUS.FUNDRAISING,
       CLOSED: STATUS.CLOSED,
-      POSTPONED: STATE.POSTPONED
+      POSTPONED: STATE.POSTPONED,
     };
   },
   computed: {
@@ -84,7 +84,8 @@ export default {
       import("@/components/cards/project/DetailsBlockchainCard"),
     DetailsStewardsCard: () =>
       import("@/components/cards/project/DetailsStewardsCard"),
-    FundraisingProgressCard: () => import("@/components/cards/project/FundraisingProgressCard"),
+    FundraisingProgressCard: () =>
+      import("@/components/cards/project/FundraisingProgressCard"),
     InputProjectCard: () =>
       import("@/components/cards/project/InputProjectCard"),
     InputInvestmentCard: () =>
@@ -93,12 +94,10 @@ export default {
   methods: {
     close() {
       this.project.sync = SYNC.TO_SYNC;
-      this.$axios.post(`${this.url}close/`, {}).then(
-        reply => {
-          this.requestRefresh();
-          this.onUpdate(reply.data);
-        }
-      )
+      this.$axios.post(`${this.url}close/`, {}).then((reply) => {
+        this.requestRefresh();
+        this.onUpdate(reply.data);
+      });
     },
     update() {
       if (this.$refs.form.validate()) {
@@ -109,19 +108,15 @@ export default {
         });
       }
     },
-    fetch() {
-      this.$axios.get(this.url).then((reply) => {
-        if (!this.requestRefresh()) {
-          this.onUpdate(reply.data);
-        }
-      });
-    },
     onUpdate(project) {
       this.$emit("update:project", project);
     },
     onRefresh() {
       this.$refs.progress.$fetch();
     },
+  },
+  async fetch() {
+    this.refresh();
   },
   mounted() {
     this.requestRefresh();

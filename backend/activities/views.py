@@ -9,13 +9,11 @@ from rest_framework import status
 from rest_framework.response import Response
 from activities.models import Activity
 from django.db import transaction
-from transactions.models import Transaction
-from users.models import CustomUser
 from users.permissions import isBeneficiary, isOptedIn
 from algorand import utils
-from algorand import smartcontract
 from activities.serializers import *
 from decimal import *
+from algosdk import util
 
 
 class ActivityView(CommonView):
@@ -68,7 +66,7 @@ class ActivityView(CommonView):
             data[activity_id] = {
                 "id": activity_id,
                 "txid": transaction['id'],
-                "amount": int.from_bytes(amount, "big"),
+                "amount": util.microalgos_to_algos(int.from_bytes(amount, "big")),
                 "status": activity_status,
                 "round-time": transaction['round-time']
             }
@@ -85,7 +83,8 @@ class ActivityView(CommonView):
                 "text": activity.text,
                 "area": activity.area,
                 "number": activity.number,
-                "activity_type": activity.activity_type
+                "activity_type": activity.activity_type,
+                "amount": activity.reward
             })
         
         return Response(data.values(), status=status.HTTP_200_OK)

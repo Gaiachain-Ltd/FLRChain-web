@@ -119,7 +119,7 @@ export default {
   },
   methods: {
     amount(item) {
-      return `${algosdk.microalgosToAlgos(item.amount)} USDC`;
+      return `${item.amount} USDC`;
     },
     datetime(item) {
       return this.$moment.unix(item["round-time"]).format("YYYY-MM-DD HH:mm");
