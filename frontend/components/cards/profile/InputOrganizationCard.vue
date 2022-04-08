@@ -20,8 +20,8 @@ export default {
     ...mapGetters(["isFacililator"]),
     title() {
       return this.isFacililator
-        ? "Facililator public profile"
-        : "Investor public profile";
+        ? "Facililator profile"
+        : "Investor profile";
     },
   },
   components: {
