@@ -84,34 +84,36 @@ export default {
   methods: {
     ...mapActions(["updateRegEmail"]),
     logIn() {
-      this.$auth
-        .loginWith("local", {
-          data: {
-            username: this.username,
-            password: this.password,
-          },
-        })
-        .then(() => {
-          this.$nextTick(() => {
-            //Disable auto-logout:
-            if (this.remember) {
-              this.$auth.$storage.setUniversal(
-                "_token_expiration.local",
-                false
-              );
+      if (this.$refs.form.validate()) {
+        this.$auth
+          .loginWith("local", {
+            data: {
+              username: this.username,
+              password: this.password,
+            },
+          })
+          .then(() => {
+            this.$nextTick(() => {
+              //Disable auto-logout:
+              if (this.remember) {
+                this.$auth.$storage.setUniversal(
+                  "_token_expiration.local",
+                  false
+                );
+              }
+              this.$router.push("/");
+            });
+          })
+          .catch(({ response }) => {
+            if (response && response.data.non_field_errors) {
+              this.wrongPassword = true;
+              this.wrongEmail = true;
+              this.externalError = "Provided credentials are incorrect";
+            } else {
+              this.$refs.card.showErrorPopup();
             }
-            this.$router.push("/");
           });
-        })
-        .catch(({ response }) => {
-          if (response && response.data.non_field_errors) {
-            this.wrongPassword = true;
-            this.wrongEmail = true;
-            this.externalError = "Provided credentials are incorrect";
-          } else {
-            this.$refs.card.showErrorPopup();
-          }
-        });
+      }
     },
   },
   mounted() {
