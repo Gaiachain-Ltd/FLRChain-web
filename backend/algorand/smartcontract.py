@@ -227,7 +227,6 @@ def approval_program():
     # Update project properties.
     on_update = Seq([
         Assert(is_facilitator),
-        Assert(Or(is_initialized, is_started)),
         set_project_properties(),
         App.globalPut(G_STATUS_KEY, Btoi(Txn.application_args[4])),
         If(is_started). # Send ADM FEE

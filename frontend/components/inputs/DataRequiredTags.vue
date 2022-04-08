@@ -4,7 +4,7 @@
       class="mb-2"
       :size="12"
       :color="$vuetify.theme.themes.light.senary"
-      >Required data</DefaultText
+      >Required data*</DefaultText
     >
     <v-layout wrap>
       <TagButton
@@ -23,6 +23,11 @@
         >+ Add tag</TagButton
       >
     </v-layout>
+    <v-flex v-if="error && (!task.data_tags || task.data_tags.length == 0)">
+      <DefaultText :size="12" class="error--text">
+        Please add at least one tag.
+      </DefaultText>
+    </v-flex>
     <DataTagPopup
       v-if="showAddPopup"
       v-model="showAddPopup"
@@ -52,6 +57,7 @@ export default {
       tagToDeleteId: 0,
       showAddPopup: false,
       showConfirmPopup: false,
+      error: false,
     };
   },
   components: {
@@ -72,6 +78,18 @@ export default {
       if (index != -1) {
         this.task.data_tags.splice(index, 1);
       }
+
+      if (this.task.data_tags.length == 0) {
+        this.error = true;
+      }
+    },
+    validate() {
+      if (!this.task.data_tags || this.task.data_tags.length == 0) {
+        this.error = true;
+        return false;
+      }
+      this.error = false;
+      return true;
     },
   },
 };

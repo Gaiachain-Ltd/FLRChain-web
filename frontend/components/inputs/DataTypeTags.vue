@@ -4,7 +4,7 @@
       class="mb-2"
       :size="12"
       :color="$vuetify.theme.themes.light.senary"
-      >Type of data</DefaultText
+      >Type of data*</DefaultText
     >
     <v-layout wrap>
       <TagButton
@@ -22,6 +22,11 @@
         >+ Add type</TagButton
       >
     </v-layout>
+    <v-flex v-if="error && !task.data_type_tag">
+      <DefaultText :size="12" class="error--text">
+        Tag is required.
+      </DefaultText>
+    </v-flex>
     <DataTypeTagPopup
       v-if="showAddPopup"
       v-model="showAddPopup"
@@ -41,13 +46,14 @@ export default {
     task: {},
     readonly: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
   data() {
     return {
       showAddPopup: false,
       showConfirmPopup: false,
+      error: false,
     };
   },
   components: {
@@ -60,6 +66,15 @@ export default {
   methods: {
     deleteTag() {
       this.$set(this.task, "data_type_tag", undefined);
+      this.error = true;
+    },
+    validate() {
+      if (!this.task.data_type_tag) {
+        this.error = true;
+        return false;
+      }
+      this.error = false;
+      return true;
     },
   },
 };

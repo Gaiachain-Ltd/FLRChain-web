@@ -8,6 +8,7 @@
     ></InputProjectCard>
     <ActionBarCard
       class="mt-6"
+      saveBtnText="Create project"
       :disabled="!$auth.user.opted_in"
       @save="handleCreate"
       @cancel="handleCancel"

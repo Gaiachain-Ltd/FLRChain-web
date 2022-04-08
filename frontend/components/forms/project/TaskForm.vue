@@ -30,8 +30,13 @@
           :readonly="readonly"
           required
         ></TextInput>
-        <DataTypeTags :task.sync="task" :readonly="readonly"></DataTypeTags>
+        <DataTypeTags
+          ref="dataTypeTag"
+          :task.sync="task"
+          :readonly="readonly"
+        ></DataTypeTags>
         <DataRequiredTags
+          ref="dataReqTags"
           :task.sync="task"
           :readonly="readonly"
         ></DataRequiredTags>
@@ -150,7 +155,10 @@ export default {
   },
   methods: {
     validate() {
-      return this.$refs.form.validate();
+      const drt = this.$refs.dataReqTags.validate();
+      const dtt = this.$refs.dataTypeTag.validate();
+      const form = this.$refs.form.validate();
+      return drt && dtt & form;
     },
   },
 };

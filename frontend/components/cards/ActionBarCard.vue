@@ -17,7 +17,7 @@
         <ActionButton
           :disabled="disabled"
           color="primary"
-          label="Save changes"
+          :label="saveBtnText"
           :loading="loading"
           @click.prevent="$emit('save')"
         ></ActionButton>
@@ -40,6 +40,10 @@ export default {
     hideCancel: {
       type: Boolean,
       default: false
+    },
+    saveBtnText: {
+      type: String,
+      default: "Save changes"
     }
   },
   components: {
