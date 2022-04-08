@@ -12,8 +12,8 @@
               :readonly="readonly"
               required
             ></TextInput>
-            <v-layout>
-              <v-flex mr-3>
+            <v-layout :class="$vuetify.breakpoint.lgAndDown && 'wrap'">
+              <v-flex :class="!$vuetify.breakpoint.lgAndDown ? 'mr-3' : 'xs12'">
                 <DateInput
                   label="Start of project*"
                   :text.sync="project.start"
@@ -22,10 +22,9 @@
                   required
                 ></DateInput>
               </v-flex>
-              <v-flex ml-3>
+              <v-flex :class="!$vuetify.breakpoint.lgAndDown ? 'ml-3' : 'xs12'">
                 <DateInput
                   label="End of project*"
-                  class="ml-3"
                   :text.sync="project.end"
                   :rules="[...requiredRules, ...dateRules]"
                   :readonly="readonly"
