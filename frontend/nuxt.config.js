@@ -66,7 +66,8 @@ module.exports = {
           property: 'token',
           type: 'Token',
           name: 'Authorization',
-          global: true
+          global: true,
+          maxAge: 43200
         },
         refreshToken: {
           required: false,
