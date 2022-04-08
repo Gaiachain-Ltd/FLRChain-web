@@ -15,7 +15,9 @@
         size="15"
         class="mb-1 mr-2"
       ></DefaultSVGIcon>
-      <slot></slot>
+      <span class="text-truncate">
+        <slot></slot>
+      </span>
       <DefaultSVGIcon
         v-if="showDeleteIcon"
         :icon="require('@/assets/icons/delete.svg')"
@@ -43,38 +45,42 @@ export default {
     },
     showPrepIcon: {
       type: Boolean,
-      default: false
+      default: false,
     },
     tagType: {
       type: Number,
-      default: 0
+      default: 0,
     },
   },
   data() {
     return {
       icons: {
-        0: { //TEXT
+        0: {
+          //TEXT
           icon: require("@/assets/icons/edit.svg"),
           highlightIcon: require("@/assets/icons/edit-white.svg"),
         },
-        1: { //NUMBER
+        1: {
+          //NUMBER
           icon: require("@/assets/icons/hashtag.svg"),
           highlightIcon: require("@/assets/icons/hashtag-white.svg"),
         },
-        2: { //AREA
+        2: {
+          //AREA
           icon: require("@/assets/icons/area.svg"),
           highlightIcon: require("@/assets/icons/area-white.svg"),
         },
-        3: { //PHOTO
+        3: {
+          //PHOTO
           icon: require("@/assets/icons/upload.svg"),
           highlightIcon: require("@/assets/icons/upload-white.svg"),
         },
-      }
-    }
+      },
+    };
   },
   components: {
     DefaultSVGIcon: () => import("@/components/icons/DefaultSVGIcon"),
-  }
+  },
 };
 </script>
 
@@ -87,6 +93,11 @@ export default {
   border-width: 1px;
   padding-top: 3px !important;
   background-color: white !important;
+  max-width: 100%;
+}
+.default ::v-deep .v-btn__content {
+  width: 100%;
+  white-space: normal;
 }
 .creator {
   background-color: #f7f9fb !important;

@@ -12,13 +12,12 @@
         :key="tag.id"
         :tagType="tag.tag_type"
         :showDeleteIcon="!readonly"
-        :class="readonly && 'no-events'"
+        :class="[readonly && 'no-events']"
         @click.prevent="() => handleConfirm(tag.id)"
         showPrepIcon
-        >{{
-          tag.tag_type == 1 ? `${tag.name} (${tag.unit})` : tag.name
-        }}</TagButton
       >
+        {{ tag.tag_type == 1 ? `${tag.name} (${tag.unit})` : tag.name }}
+      </TagButton>
       <TagButton v-if="!readonly" creator @click.prevent="showAddPopup = true"
         >+ Add tag</TagButton
       >
