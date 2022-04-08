@@ -349,12 +349,12 @@ class ProjectSerializer(ProjectNoDetailsSerializer):
                         
                         task_obj.save()
 
-                        for task in tasks_dict.values():
-                            milestone_obj.tasks.remove(task)
-                            milestone_obj.save()
+                    for t in tasks_dict.values():
+                        milestone_obj.tasks.remove(t)
+                        milestone_obj.save()
 
-                            task.deleted = True
-                            task.save()
+                        t.deleted = True
+                        t.save()
 
                 for milestone in milestones_dict.values():
                     action_obj.milestones.remove(milestone)
