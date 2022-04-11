@@ -233,19 +233,23 @@ def approval_program():
         Then(
             Seq([
                 tmp.store(facilitator_adm_fee_withdraw()),
-                Assert(tmp.load() > Int(0)),
-                InnerTxnBuilder.Begin(),
-                InnerTxnBuilder.SetFields({
-                    TxnField.type_enum: TxnType.AssetTransfer,
-                    TxnField.xfer_asset: Txn.assets[0],
-                    TxnField.asset_receiver: Txn.sender(),
-                    TxnField.asset_amount: tmp.load()
-                }),
-                InnerTxnBuilder.Submit(),
-                App.localPut(
-                    Txn.sender(), 
-                    L_TOTAL_KEY, 
-                    App.globalGet(G_ADM_KEY)
+                If(tmp.load() > Int(0)).
+                Then(
+                    Seq([
+                        InnerTxnBuilder.Begin(),
+                        InnerTxnBuilder.SetFields({
+                            TxnField.type_enum: TxnType.AssetTransfer,
+                            TxnField.xfer_asset: Txn.assets[0],
+                            TxnField.asset_receiver: Txn.sender(),
+                            TxnField.asset_amount: tmp.load()
+                        }),
+                        InnerTxnBuilder.Submit(),
+                        App.localPut(
+                            Txn.sender(), 
+                            L_TOTAL_KEY, 
+                            App.globalGet(G_ADM_KEY)
+                        )
+                    ])
                 )
             ])
         ),
