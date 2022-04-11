@@ -311,3 +311,16 @@ EMAIL_USE_TLS = True
 
 # Frontend
 FRONTEND_URL = os.environ.get('FRONTEND_URL', 'http://localhost:8080')
+
+# Sentry
+SENTRY_DSN = os.environ.get('SENTRY_DSN', None)
+if SENTRY_DSN:
+    import sentry_sdk
+    from sentry_sdk.integrations.django import DjangoIntegration
+
+    sentry_sdk.init(
+        dsn=SENTRY_DSN,
+        integrations=[DjangoIntegration()],
+        traces_sample_rate=0.7,
+        send_default_pii=True,
+    )
