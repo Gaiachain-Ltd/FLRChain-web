@@ -32,7 +32,7 @@
     </template>
     <v-flex slot="icon"> </v-flex>
     <v-flex slot="content" ma-6>
-      <DefaultText :size="22" color="#253F50" family="open-sans"
+      <DefaultText :size="22" color="#253F50" family="Open Sans"
         >Are you sure you want to log out?</DefaultText
       >
     </v-flex>

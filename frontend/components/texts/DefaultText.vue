@@ -30,7 +30,7 @@ export default {
     },
     family: {
       type: String,
-      default: "muli",
+      default: "Open Sans",
     },
     bold: {
       type: Boolean,

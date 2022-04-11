@@ -113,6 +113,17 @@ export default {
               this.$refs.card.showErrorPopup();
             }
           });
+      } else {
+        const u = !this.username.length;
+        const p = !this.password.length;
+        if (u && p) {
+          this.wrongEmail = true;
+          this.wrongPassword = true;
+        } else if (u) {
+          this.wrongEmail = true;
+        } else if (p) {
+          this.wrongPassword = true;
+        }
       }
     },
   },

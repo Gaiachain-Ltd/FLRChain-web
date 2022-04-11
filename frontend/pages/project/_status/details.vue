@@ -168,7 +168,6 @@ export default {
   border-radius: 10px;
   color: white !important;
   margin-top: 15px;
-  padding-top: 5px;
   margin-bottom: 20px;
   opacity: 1;
   word-spacing: normal;

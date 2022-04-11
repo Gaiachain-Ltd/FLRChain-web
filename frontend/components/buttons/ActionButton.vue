@@ -30,7 +30,7 @@ export default {
 <style scoped>
 .action-btn-style {
   border-radius: 7px !important;
-  font-family: "open-sans" !important;
+  font-family: "Open Sans" !important;
   font-size: 12px !important;
   font-weight: 600 !important;
 }

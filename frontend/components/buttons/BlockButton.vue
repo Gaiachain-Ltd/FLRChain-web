@@ -33,7 +33,7 @@ export default {
 <style scoped>
 .btn-style {
   border-radius: 7px !important;
-  font-family: "open-sans" !important;
+  font-family: "Open Sans" !important;
   font-size: 14px !important;
   font-weight: 600 !important;
 }

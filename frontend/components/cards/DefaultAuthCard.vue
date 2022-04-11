@@ -82,7 +82,7 @@ export default {
 
 <style scoped>
 .auth-title {
-  font-family: "open-sans" !important;
+  font-family: "Open Sans" !important;
   font-weight: 400 !important;
   font-size: 28px !important;
   line-height: 40px !important;
