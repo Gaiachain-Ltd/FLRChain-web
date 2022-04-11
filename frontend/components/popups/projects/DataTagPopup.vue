@@ -17,7 +17,7 @@
             >{{ tag.name }}</TagButton
           >
         </v-layout>
-        <v-form ref="form">
+        <v-form ref="form" @submit.prevent>
           <v-layout wrap>
             <TextInput
               class="mt-6"

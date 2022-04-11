@@ -2,7 +2,7 @@
   <DefaultPopup :show.sync="show">
     <v-flex slot="icon"> </v-flex>
     <v-flex slot="content" ma-6>
-      <v-form ref="form">
+      <v-form ref="form" @submit.prevent>
         <v-layout column>
           <DefaultText :color="$vuetify.theme.themes.light.primary"
             >Add new type</DefaultText

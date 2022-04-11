@@ -1,5 +1,5 @@
 <template>
-  <v-form ref="form">
+  <v-form ref="form" @submit.prevent>
     <v-layout column>
       <v-layout wrap align-center>
         <v-flex md5 class="pr-3">

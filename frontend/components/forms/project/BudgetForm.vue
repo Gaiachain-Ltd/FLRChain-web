@@ -1,5 +1,5 @@
 <template>
-  <v-form ref="form">
+  <v-form ref="form" @submit.prevent>
     <v-layout column>
       <DefaultText class="mb-3" :color="$vuetify.theme.themes.light.primary"
         >Budget</DefaultText

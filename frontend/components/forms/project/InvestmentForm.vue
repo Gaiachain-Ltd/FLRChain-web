@@ -1,5 +1,5 @@
 <template>
-  <v-form ref="form">
+  <v-form ref="form" @submit.prevent>
     <v-layout column>
       <TextInput
         v-if="investment"

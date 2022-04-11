@@ -1,5 +1,5 @@
 <template>
-  <v-form ref="form">
+  <v-form ref="form" @submit.prevent>
     <v-layout column>
       <v-layout ma-0 mb-3 justify-center>
         <DefaultText color="#02595b" size="24" bold>{{

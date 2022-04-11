@@ -1,5 +1,5 @@
 <template>
-  <v-form ref="form">
+  <v-form ref="form" @submit.prevent>
     <v-layout column ma-0>
       <v-layout ma-0 align-center :class="collapsed && 'mb-3'">
         <DefaultText color="#06bcc1" bold size="18">{{
