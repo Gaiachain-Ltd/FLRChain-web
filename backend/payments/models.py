@@ -60,8 +60,6 @@ class CircleTransfer(models.Model):
     status = models.CharField(max_length=10, choices=STATUS, default=PENDING)
     user = models.ForeignKey(
         'users.CustomUser', on_delete=models.SET_NULL, null=True)
-    transaction = models.OneToOneField(
-        'transactions.Transaction', on_delete=models.SET_NULL, null=True)
 
 
 class MTNPayout(models.Model):

@@ -7,7 +7,7 @@
         }}</DefaultText>
         <DefaultIconButton
           class="ml-6"
-          v-if="project.actions.length > 1"
+          v-if="project.actions.length > 1 && !readonly"
           :config="deleteBtnConf"
           @clicked="onDeleteAction"
         ></DefaultIconButton>

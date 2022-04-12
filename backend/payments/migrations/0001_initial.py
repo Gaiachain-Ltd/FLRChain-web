@@ -11,7 +11,6 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('transactions', '0017_auto_20210513_1005'),
     ]
 
     operations = [
@@ -21,7 +20,6 @@ class Migration(migrations.Migration):
                 ('id', models.CharField(editable=False, max_length=255, primary_key=True, serialize=False)),
                 ('amount', models.DecimalField(decimal_places=6, default=0, max_digits=26)),
                 ('status', models.CharField(choices=[('failed', 'Failed'), ('pending', 'Pending'), ('complete', 'Complete')], default='pending', max_length=10)),
-                ('transaction', models.OneToOneField(null=True, on_delete=django.db.models.deletion.SET_NULL, to='transactions.transaction')),
                 ('user', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to=settings.AUTH_USER_MODEL)),
             ],
         ),

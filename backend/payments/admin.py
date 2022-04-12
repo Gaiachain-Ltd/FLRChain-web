@@ -10,8 +10,7 @@ admin.site.register(CirclePayment, CirclePaymentAdmin)
 
 
 class CircleTransferAdmin(admin.ModelAdmin):
-    list_display = ('user', 'transaction', 'amount', 
-                    'status', 'id')
+    list_display = ('user', 'amount', 'status', 'id')
 
 admin.site.register(CircleTransfer, CircleTransferAdmin)
 

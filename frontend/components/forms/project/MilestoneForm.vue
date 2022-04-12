@@ -11,7 +11,7 @@
         }}</DefaultText>
         <DefaultIconButton
           class="ml-6"
-          v-if="action.milestones.length > 1"
+          v-if="action.milestones.length > 1 && !readonly"
           :config="deleteBtnConf"
           @clicked="onDeleteMilestone"
         ></DefaultIconButton>
