@@ -87,7 +87,7 @@ def start_project():
     )
 
     for project in projects:
-        print("USDC: ", usdc_balance(application_address(project.app_id)), project.total)
+        # print("USDC: ", usdc_balance(application_address(project.app_id)), project.total)
         if usdc_balance(application_address(project.app_id)) < project.total:
             project.state = Project.POSTPONED
         else:
@@ -333,7 +333,7 @@ def payout_batch():
                     task.project.owner.account.address,
                     beneficiary.beneficiary.account.address,
                     batch_activity.id,
-                    int(amount * 1000000),
+                    amount,
                     task.project.app_id
                 )
             )

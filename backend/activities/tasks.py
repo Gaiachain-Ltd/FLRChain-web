@@ -4,6 +4,8 @@ from celery import shared_task
 from activities.models import Activity
 from django.db import transaction
 from projects.models import Task
+from algorand.utils import usdc_balance, application_address
+from algosdk import util
 
 
 logger = logging.getLogger(__name__)
@@ -21,10 +23,18 @@ def create_activity():
             activity.user.account.address,
             activity.user.account.private_key,
             activity.id,
-            int(activity.task.reward * 1000000),
+            activity.reward,
             activity.project.app_id
         )
-        activity.sync = Activity.SYNCED
+
+        if (activity.task.finished
+            | usdc_balance(application_address(activity.project.app_id)) < activity.reward
+        ):
+            activity.status = Activity.REJECTED
+            activity.sync = Activity.TO_SYNC
+        else:
+            activity.sync = Activity.SYNCED
+
         activity.save()
 
 
@@ -47,7 +57,7 @@ def verify_activity():
                 activity.project.owner.account.private_key,
                 activity.user.account.address,
                 activity.id,
-                int(activity.reward * 1000000),
+                activity.reward,
                 activity.status,
                 activity.project.app_id
             )

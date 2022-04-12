@@ -567,7 +567,7 @@ def work(address, priv_key, activity_id, amount, app_id):
         address,
         params,
         app_id,
-        ["WORK", amount],
+        ["WORK", util.algos_to_microalgos(amount)],
         note=f"W|W|{activity_id}"
     )
     txn_signed = txn.sign(priv_key)
@@ -580,7 +580,7 @@ def verify(address, priv_key, beneficiary_address, activity_id, amount, value, a
         address,
         params,
         app_id,
-        ["VERIFY", amount, value],
+        ["VERIFY", util.algos_to_microalgos(amount), value],
         note=f"W|V|{activity_id}",
         foreign_assets=[settings.ALGO_ASSET],
         accounts=[beneficiary_address]
@@ -596,7 +596,7 @@ def batch(address, beneficiary_address, task_id, amount, app_id):
         address,
         params,
         app_id,
-        ["BATCH", amount],
+        ["BATCH", util.algos_to_microalgos(amount)],
         note=f"W|B|{task_id}",
         foreign_assets=[settings.ALGO_ASSET],
         accounts=[beneficiary_address]
