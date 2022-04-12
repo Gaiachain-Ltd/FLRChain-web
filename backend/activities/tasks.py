@@ -5,7 +5,6 @@ from activities.models import Activity
 from django.db import transaction
 from projects.models import Task
 from algorand.utils import usdc_balance, application_address
-from algosdk import util
 
 
 logger = logging.getLogger(__name__)
