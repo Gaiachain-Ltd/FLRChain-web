@@ -8,7 +8,6 @@ from projects.models import Project
 from investments.models import Investment
 from rest_framework.response import Response
 from django.db import transaction
-from smart_contracts.models import SmartContract
 from users.permissions import isInvestor, isOptedIn
 from rest_framework.permissions import IsAuthenticated
 from algorand.smartcontract import invest

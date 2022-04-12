@@ -4,9 +4,8 @@ import qrcode.image.svg
 from django.db import models, transaction
 from algorand import utils
 from django.conf import settings
-from transactions.models import Transaction
 from users.models import CustomUser
-from algorand.utils import wait_for_confirmation
+from algorand.utils import wait_for_confirmation, prepare_transfer_algos, prepare_transfer_assets
 from django.core.files.base import ContentFile
 
 logger = logging.getLogger(__name__)
@@ -80,36 +79,49 @@ class Account(models.Model):
             if account_type == Account.NORMAL_ACCOUNT and entity.type == CustomUser.INVESTOR and (settings.TESTING or settings.AUTO_INV_FUELING == '1'):
                 main_account = Account.get_main_account()
                 chained = [
-                    Transaction.prepare_transfer(
+                    prepare_transfer_algos(
                         main_account,
                         created_account,
-                        0.01,
-                        action=Transaction.FUELING),
-                    Transaction.prepare_transfer(
+                        0.01
+                    ),
+                    prepare_transfer_assets(
                         main_account,
                         created_account,
-                        1,
-                        currency=Transaction.USDC,
-                        action=Transaction.FUELING)]
+                        1.0
+                    )
+                ]
+                keys = [main_account.private_key, main_account.private_key]
             else:
                 chained = []
+                keys = []
 
-            tx_ids = created_account.opt_in(chained, initial_amount=initial_amount)
+            tx_ids = created_account.opt_in(chained, keys, initial_amount=initial_amount)
             if sync:
                 for tx_id in tx_ids:
                     wait_for_confirmation(tx_id)
 
             return created_account
 
-    def opt_in(self, chain=[], initial_amount=settings.ALGO_OPT_IN_AMOUNT):
+    def opt_in(self, chain=[], keys=[], initial_amount=settings.ALGO_OPT_IN_AMOUNT):
         main_account = Account.get_main_account()
         logger.debug("Opt-In transaction for %s account.", self.address)
-        return Transaction.opt_in(
-            self,
-            main_account,
-            chain,
-            initial_amount=initial_amount
-        )
+        chain.extend([
+            prepare_transfer_algos(
+                self,
+                main_account,
+                initial_amount
+            ),
+            prepare_transfer_assets(
+                self,
+                self,
+                0.0,
+            )
+        ])
+        keys.extend([
+            self.private_key,
+            self.private_key
+        ])
+        return utils.sign_send_atomic_trasfer(keys, chain)
 
     def generate_qr_code(self):
         img = qrcode.make(

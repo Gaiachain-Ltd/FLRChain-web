@@ -61,8 +61,6 @@ INSTALLED_APPS = [
     'users',
     'accounts',
     'projects',
-    'smart_contracts',
-    'transactions',
     'investments',
     'activities',
     'payments',
@@ -181,18 +179,18 @@ REST_FRAMEWORK = {
 CELERY_BROKER_URL = "redis://redis:6379"
 CELERY_RESULT_BACKEND = "redis://redis:6379"
 CELERY_BEAT_SCHEDULE = {
-    "create_project_smart_contract": {
-        "task": "projects.tasks.create_project",
-        "schedule": crontab(minute="*/1")
-    },
-    "initialize_project_smart_contract": {
-        "task": "projects.tasks.initialize_project",
-        "schedule": crontab(minute="*/1")
-    },
-    "start_project_smart_contract": {
-        "task": "projects.tasks.start_project",
-        "schedule": crontab(minute="*/1")
-    }
+    # "create_project_smart_contract": {
+    #     "task": "projects.tasks.create_project",
+    #     "schedule": crontab(minute="*/1")
+    # },
+    # "initialize_project_smart_contract": {
+    #     "task": "projects.tasks.initialize_project",
+    #     "schedule": crontab(minute="*/1")
+    # },
+    # "start_project_smart_contract": {
+    #     "task": "projects.tasks.start_project",
+    #     "schedule": crontab(minute="*/1")
+    # }
     # "transfer_back_funds": {
     #     "task": "accounts.tasks.transfer_back_funds",
     #     "schedule": crontab(minute="*/1")

@@ -1,7 +1,6 @@
 import uuid
 import logging
 from django.db import models
-from transactions.models import Transaction
 from accounts.models import Account
 from payments.mtn import MTNAPI
 from django.conf import settings

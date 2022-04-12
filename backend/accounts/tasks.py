@@ -1,7 +1,6 @@
 import logging
 from celery import shared_task
 from accounts.models import Account
-from transactions.models import Transaction
 from algorand.utils import CLIENT, wait_for_confirmation, sign_send_atomic_trasfer, prepare_transfer_algos, prepare_transfer_assets
 from django.conf import settings
 
@@ -26,12 +25,12 @@ def opt_in_accounts():
         
         if not accounts.opted_in:
             main_account = Account.get_main_account()
-            txn1, _ = prepare_transfer_algos(
+            txn1 = prepare_transfer_algos(
                 main_account.address, 
                 account.address,
                 settings.ALGO_OPT_IN_AMOUNT
             )
-            txn2, _ = prepare_transfer_assets(
+            txn2 = prepare_transfer_assets(
                 account.address,
                 account.address,
                 0
@@ -50,7 +49,6 @@ def opt_in_accounts():
 def transfer_back_funds():
     accounts = Account.objects.filter(
         user__isnull=True,
-        smart_contract__isnull=True,
         type=Account.NORMAL_ACCOUNT)[:10]
 
     try:
@@ -61,21 +59,18 @@ def transfer_back_funds():
         
     for account in accounts:
         try:
-            Transaction.transfer(
+            prepare_transfer_assets(
                 account,
                 main,
-                0,
-                Transaction.USDC,
-                Transaction.CLOSE,
-                main)
-            Transaction.transfer(
+                0.0,
+                close_assets_to=main
+            )
+            prepare_transfer_algos(
                 account,
                 main,
-                0,
-                Transaction.ALGO,
-                Transaction.CLOSE,
-                main)
-
+                0.0,
+                close_remainder_to=main
+            )
             account.delete()
             logger.warning("Account %s closed.", account.address)
         except Exception as e:

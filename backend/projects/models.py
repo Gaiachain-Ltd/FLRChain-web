@@ -1,5 +1,5 @@
 from django.db import models
-from projects.managers import ProjectManager, ProjectQuerySet
+from projects.managers import ProjectManager
 
 
 def upload_project_image(instance, filename):
@@ -92,7 +92,7 @@ class Project(models.Model):
         max_digits=26, decimal_places=6, default=0
     )
 
-    objects = ProjectManager.from_queryset(ProjectQuerySet)()
+    objects = ProjectManager()
 
     def save(self, *args, **kwargs):
         if self.pk is not None:

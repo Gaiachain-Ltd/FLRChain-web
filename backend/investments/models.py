@@ -1,8 +1,4 @@
-import datetime
-from django.db import models, transaction
-from transactions.models import Transaction
-from accounts.models import Account
-from django.core.exceptions import ObjectDoesNotExist
+from django.db import models
 
 
 class Investment(models.Model):

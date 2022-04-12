@@ -4,7 +4,7 @@ import datetime
 import accounts
 from django.conf import settings
 from algosdk.v2client import *
-from algosdk import account
+from algosdk import account, util
 from algosdk.future.transaction import * 
 from algosdk.logic import get_application_address
 from decimal import *
@@ -145,12 +145,11 @@ def prepare_transfer_algos(
     txn = PaymentTxn(
         snd, 
         _params, 
-        rec, 
-        int(amount * 1000000),
+        rec,
+        util.algos_to_microalgos(amount),
         close_remainder_to=close_remainder_to
     )
-    fee = (_params.min_fee if _params.fee == 0 else _params.fee) / 1000000
-    return txn, fee
+    return txn
 
 
 def prepare_transfer_assets(
@@ -180,12 +179,11 @@ def prepare_transfer_assets(
         snd, 
         _params, 
         rec, 
-        int(amount * 1000000), 
+        util.algos_to_microalgos(amount),
         asset, 
         close_assets_to=close_assets_to
     )
-    fee = (_params.min_fee if _params.fee == 0 else _params.fee) / 1000000
-    return atxn, fee
+    return atxn
 
 def sign_send_atomic_trasfer(private_keys, txns):
     is_str = isinstance(private_keys, str)

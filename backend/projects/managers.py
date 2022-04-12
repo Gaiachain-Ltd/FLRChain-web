@@ -2,20 +2,6 @@ import projects.models
 from django.db import models
 
 
-class ProjectQuerySet(models.QuerySet):
-    def with_sum_spent_transactions(self):
-        from transactions.models import Transaction
-        return self.annotate(
-            spent=models.Subquery(
-                Transaction.objects.filter(
-                    models.Q(
-                        action=Transaction.REWARD, 
-                        status__in=[Transaction.CONFIRMED, Transaction.PENDING]) | models.Q(
-                        action=Transaction.FACILITATOR_FEE),
-                    project=models.OuterRef('pk')).values('amount').annotate(
-                        total_spent=models.Sum('amount')).values('total_spent')[:1]))
-
-
 class ProjectManager(models.Manager):
     def with_beneficiary_assignment_status(self, beneficiary):
         assignments = projects.models.Assignment.objects.filter(

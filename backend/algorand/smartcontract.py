@@ -405,7 +405,7 @@ def initialize(
     params = CLIENT.suggested_params()
     app_address = get_application_address(app_id)
 
-    txn1, _ = prepare_transfer_algos(
+    txn1 = prepare_transfer_algos(
         creator_address,
         app_address,
         settings.ALGO_OPT_IN_AMOUNT
@@ -463,7 +463,7 @@ def invest(address, priv_key, app_id, amount, asset=settings.ALGO_ASSET):
         foreign_assets=[asset],
         note="I|"
     )
-    txn3, _ = prepare_transfer_assets(
+    txn3 = prepare_transfer_assets(
         address,
         app_address,
         amount,

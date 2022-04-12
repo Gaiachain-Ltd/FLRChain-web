@@ -7,7 +7,6 @@ from django.db import models, transaction
 from django.db.models import Q
 from django.conf import settings
 from decimal import *
-from transactions.models import Transaction
 
 
 logger = logging.getLogger(__name__)
@@ -58,28 +57,6 @@ def check_payment_status():
                 payment.claimed = True
 
             payment.save()
-
-
-@shared_task()
-def check_transfer_status():
-    logger.debug("Transfers checking...")
-    for transfer in CircleTransfer.objects.filter(status=CircleTransfer.PENDING):
-        with transaction.atomic():
-            info_circle_reply = circle_client.transfer_info(transfer.id)
-            transfer.status = info_circle_reply['data']['status']
-
-            if transfer.status != CircleTransfer.PENDING:
-                txn = Transaction.objects.create(
-                    txid=info_circle_reply['data']['transactionHash'],
-                    action=Transaction.TOP_UP,
-                    currency=Transaction.USDC,
-                    amount=info_circle_reply['data']['amount']['amount'],
-                    to_account=transfer.user.account,
-                    status=Transaction.CONFIRMED if transfer.status == CircleTransfer.COMPLETE else Transaction.REJECTED,
-                )
-                transfer.transaction = txn
-
-            transfer.save()
 
 
 @shared_task()

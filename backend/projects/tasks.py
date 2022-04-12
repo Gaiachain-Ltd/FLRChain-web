@@ -236,7 +236,7 @@ def close_project():
         )
         keys.append(account.private_key)
 
-        txn2, _ = prepare_transfer_assets(
+        txn2 = prepare_transfer_assets(
             account.address,
             main.address,
             0,
@@ -245,7 +245,7 @@ def close_project():
         txns.append(txn2)
         keys.append(account.private_key)
 
-        txn3, _ = prepare_transfer_algos(
+        txn3 = prepare_transfer_algos(
             account.address,
             main.address,
             0,

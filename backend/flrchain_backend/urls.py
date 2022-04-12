@@ -49,6 +49,5 @@ urlpatterns = [
     path('api/v1/', include('investments.urls')),
     path('api/v1/', include('activities.urls')),
     path('api/v1/', include('accounts.urls')),
-    path('api/v1/', include('transactions.urls')),
     path('api/v1/', include('payments.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

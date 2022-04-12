@@ -2,7 +2,6 @@ from common.tests import CommonTestCase
 from users.models import CustomUser
 from accounts.models import Account
 from projects.models import Project
-from smart_contracts.models import SmartContract
 from algorand import utils
 from investments.models import Investment
 
