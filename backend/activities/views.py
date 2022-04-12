@@ -160,6 +160,12 @@ class ActivityView(CommonView):
 
             if notes[1] not in ["V", "B"]:
                 continue
+            
+            if notes[1] == "V":
+                value = base64.b64decode(transaction['application-transaction']['application-args'][-1])
+                value = int.from_bytes(value, "big")
+                if Activity.REJECTED == value:
+                    continue
 
             amount = base64.b64decode(transaction['application-transaction']['application-args'][1])
             sum += int.from_bytes(amount, "big")

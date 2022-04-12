@@ -107,8 +107,8 @@ class Account(models.Model):
         logger.debug("Opt-In transaction for %s account.", self.address)
         chain.extend([
             prepare_transfer_algos(
-                self,
                 main_account,
+                self,
                 initial_amount
             ),
             prepare_transfer_assets(
@@ -118,7 +118,7 @@ class Account(models.Model):
             )
         ])
         keys.extend([
-            self.private_key,
+            main_account.private_key,
             self.private_key
         ])
         return utils.sign_send_atomic_trasfer(keys, chain)

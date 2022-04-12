@@ -17,7 +17,7 @@
     <template v-slot:item.request="{ item }">
       <v-layout
         align-center
-        v-if="item.status == INITIAL || item.sync == SYNCING"
+        v-if="isFacililator && (item.status == INITIAL || item.sync == SYNCING)"
       >
         <ActionButton
           class="mr-1"
@@ -53,10 +53,10 @@
 </template>
 
 <script>
+import { mapGetters } from "vuex";
 import { SYNC, APPROVAL } from "@/constants/project";
 import SyncMixin from "@/mixins/SyncMixin";
 import AlgoExplorerMixin from "@/mixins/AlgoExplorerMixin";
-import algosdk from "algosdk";
 
 export default {
   mixins: [AlgoExplorerMixin, SyncMixin],
@@ -102,6 +102,7 @@ export default {
     };
   },
   computed: {
+    ...mapGetters(["isFacililator"]),
     isSyncing() {
       let syncing = false;
       for (let index = 0; index < this.activities.length; index++) {
