@@ -27,7 +27,7 @@ def create_activity():
         )
 
         if (activity.task.finished
-            | usdc_balance(application_address(activity.project.app_id)) < activity.reward
+            | (usdc_balance(application_address(activity.project.app_id)) < activity.reward)
         ):
             activity.status = Activity.REJECTED
             activity.sync = Activity.TO_SYNC
