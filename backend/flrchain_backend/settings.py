@@ -14,6 +14,7 @@ from pathlib import Path
 import os
 import sys
 from celery.schedules import crontab
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -178,43 +179,75 @@ REST_FRAMEWORK = {
 
 CELERY_BROKER_URL = "redis://redis:6379"
 CELERY_RESULT_BACKEND = "redis://redis:6379"
+DEFAULT_QUICK_SCHEDULE = timedelta(seconds=14)
+DEFAULT_NORMAL_SCHEDULE = timedelta(minutes=1)
+DEFAULT_SLOW_SCHEDULE = timedelta(minutes=5)
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers.DatabaseScheduler'
 CELERY_BEAT_SCHEDULE = {
-    # "create_project_smart_contract": {
-    #     "task": "projects.tasks.create_project",
-    #     "schedule": crontab(minute="*/1")
-    # },
-    # "initialize_project_smart_contract": {
-    #     "task": "projects.tasks.initialize_project",
-    #     "schedule": crontab(minute="*/1")
-    # },
-    # "start_project_smart_contract": {
-    #     "task": "projects.tasks.start_project",
-    #     "schedule": crontab(minute="*/1")
-    # }
-    # "transfer_back_funds": {
-    #     "task": "accounts.tasks.transfer_back_funds",
-    #     "schedule": crontab(minute="*/1")
-    # },
-    # "finish_investment": {
-    #     "task": "investments.tasks.finish_investment",
-    #     "schedule": crontab(minute="*/1")
-    # },
-    # "verify_transactions": {
-    #     "task": "transactions.tasks.verify_transactions",
-    #     "schedule": crontab(minute="*/1")
-    # },
-    # "check_payment_status": {
-    #     "task": "payments.tasks.check_payment_status",
-    #     "schedule": crontab(minute="*/1")
-    # },
-    # "check_transfer_status": {
-    #     "task": "payments.tasks.check_transfer_status",
-    #     "schedule": crontab(minute="*/1")
-    # },
-    # "process_payouts": {
-    #     "task": "payments.tasks.process_payouts",
-    #     "schedule": crontab(minute="*/1")
-    # }
+    "opt_in_accs": {
+        "task": "accounts.tasks.opt_in_accounts",
+        "schedule": DEFAULT_QUICK_SCHEDULE
+    },
+    "transfer_back_funds": {
+        "task": "accounts.tasks.transfer_back_funds",
+        "schedule": DEFAULT_SLOW_SCHEDULE
+    },
+    "create_project": {
+        "task": "projects.tasks.create_project",
+        "schedule": DEFAULT_QUICK_SCHEDULE
+    },
+    "initialize_project": {
+        "task": "projects.tasks.initialize_project",
+        "schedule": DEFAULT_QUICK_SCHEDULE
+    },
+    "start_project": {
+        "task": "projects.tasks.start_project",
+        "schedule": DEFAULT_QUICK_SCHEDULE
+    },
+    "update_project": {
+        "task": "projects.tasks.update_project",
+        "schedule": DEFAULT_QUICK_SCHEDULE
+    },
+    "finish_project": {
+        "task": "projects.tasks.finish_project",
+        "schedule": DEFAULT_QUICK_SCHEDULE
+    },
+    "close_project": {
+        "task": "projects.tasks.close_project",
+        "schedule": DEFAULT_SLOW_SCHEDULE
+    },
+    "join_request": {
+        "task": "projects.tasks.join_project",
+        "schedule": DEFAULT_QUICK_SCHEDULE
+    },
+    "beneficiary_approval": {
+        "task": "projects.tasks.beneficiary_approval",
+        "schedule": DEFAULT_QUICK_SCHEDULE
+    },
+    "payout_batch": {
+        "task": "projects.tasks.payout_batch",
+        "schedule": DEFAULT_NORMAL_SCHEDULE
+    },
+    "create_activity": {
+        "task": "activities.tasks.create_activity",
+        "schedule": DEFAULT_QUICK_SCHEDULE
+    },
+    "verify_activity": {
+        "task": "activities.tasks.verify_activity",
+        "schedule": DEFAULT_QUICK_SCHEDULE
+    },
+    "investment": {
+        "task": "investments.tasks.project_invest",
+        "schedule": DEFAULT_QUICK_SCHEDULE
+    },
+    "circle_transfer": {
+        "task": "payments.tasks.check_payment_status",
+        "schedule": DEFAULT_NORMAL_SCHEDULE
+    },
+    "mtn_payout": {
+        "task": "payments.tasks.process_payouts",
+        "schedule": DEFAULT_NORMAL_SCHEDULE
+    }
 }
 
 # Logging
