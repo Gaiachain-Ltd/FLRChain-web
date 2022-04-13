@@ -16,7 +16,10 @@
             :value="`${project.id}`"
             active-class="active-project-tab"
             class="text-none inactive-project-tab"
-            >{{ project.title }}
+            >
+            <span class="text-truncate">
+            {{ project.title }}
+            </span>
           </v-tab>
         </v-tabs>
       </v-card>
