@@ -109,8 +109,10 @@ export default {
       return this.$moment.unix(item["round-time"]).format("YYYY-MM-DD HH:mm");
     },
     onShowPopup(activity) {
-      this.activityToShow = activity;
-      this.showPopup = true;
+      if (activity.photos > 0) {
+        this.activityToShow = activity;
+        this.showPopup = true;
+      }
     },
   },
   async fetch() {
