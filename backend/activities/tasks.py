@@ -79,8 +79,8 @@ def verify_activity():
                 status=Activity.ACCEPTED
             ).count()
             
-            task = Task.objects.get(id=activity.task.id)
-
-            if accepted_activity_count == task.count:
-                task.finished = True
-                task.save()
+        task = Task.objects.get(id=activity.task.id)
+        print("accepted", accepted_activity_count, task.count)
+        if accepted_activity_count >= task.count:
+            task.finished = True
+            task.save()

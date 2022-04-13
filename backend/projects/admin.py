@@ -6,5 +6,9 @@ class ProjectAdmin(admin.ModelAdmin):
 
 admin.site.register(Project, ProjectAdmin)
 admin.site.register(Milestone)
-admin.site.register(Task)
+
+class TaskAdmin(admin.ModelAdmin):
+    list_display = ('name', 'project', 'reward', 'count', 'finished', 'batch_paid')
+
+admin.site.register(Task, TaskAdmin)
 admin.site.register(Assignment)

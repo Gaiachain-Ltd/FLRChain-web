@@ -82,7 +82,7 @@ class Account(models.Model):
                     prepare_transfer_algos(
                         main_account,
                         created_account,
-                        0.01
+                        0.1
                     ),
                     prepare_transfer_assets(
                         main_account,
@@ -105,7 +105,7 @@ class Account(models.Model):
     def opt_in(self, chain=[], keys=[], initial_amount=settings.ALGO_OPT_IN_AMOUNT):
         main_account = Account.get_main_account()
         logger.debug("Opt-In transaction for %s account.", self.address)
-        chain.extend([
+        internal_chain = [
             prepare_transfer_algos(
                 main_account,
                 self,
@@ -116,12 +116,14 @@ class Account(models.Model):
                 self,
                 0.0,
             )
-        ])
-        keys.extend([
+        ]
+        internal_chain.extend(chain)
+        internal_keys = [
             main_account.private_key,
             self.private_key
-        ])
-        return utils.sign_send_atomic_trasfer(keys, chain)
+        ]
+        internal_keys.extend(keys)
+        return utils.sign_send_atomic_trasfer(internal_keys, internal_chain)
 
     def generate_qr_code(self):
         img = qrcode.make(

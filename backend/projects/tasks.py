@@ -318,7 +318,7 @@ def payout_batch():
                 application_id=task.project.app_id,
                 note_prefix=f"W|B|{task.id}".encode()
             )['transactions']
-
+            print("TRANSACTIONS!", transactions)
             if len(transactions) > 0:
                 continue
 
@@ -340,7 +340,7 @@ def payout_batch():
                     sync=Activity.TO_SYNC,
                     status=Activity.ACCEPTED
                 )
-                
+                print("BATCH!!!", beneficiary)
                 txns.append(
                     smartcontract.batch(
                         task.project.owner.account.address,
