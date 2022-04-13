@@ -226,7 +226,8 @@ class AssignmentView(CommonView):
         project = get_object_or_404(Project, pk=pk)
         data = smartcontract.get_beneficiaries(project.app_id)
         beneficiaries = Assignment.objects.select_related('beneficiary','beneficiary__account').filter(
-            beneficiary__account__address__in=data.keys()
+            beneficiary__account__address__in=data.keys(),
+            project=project
         ).values_list(
             "id", 
             "status",
@@ -236,7 +237,7 @@ class AssignmentView(CommonView):
             "beneficiary__last_name", 
             "beneficiary__account__address"
         )
-
+        
         for beneficiary in beneficiaries:
             data[beneficiary[6]].update({
                 "id": beneficiary[0],

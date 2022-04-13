@@ -340,7 +340,7 @@ def payout_batch():
                     sync=Activity.TO_SYNC,
                     status=Activity.ACCEPTED
                 )
-
+                
                 txns.append(
                     smartcontract.batch(
                         task.project.owner.account.address,
