@@ -73,17 +73,7 @@ def transaction_info(txid):
         return None
 
 
-def wait_for_confirmation(transaction_id, timeout=1000):
-    """
-    Wait until the transaction is confirmed or rejected, or until 'timeout'
-    number of rounds have passed.
-    Args:
-        transaction_id (str): the transaction to wait for
-        timeout (int): maximum number of rounds to wait    
-    Returns:
-        dict: pending transaction information, or throws an error if the transaction
-            is not confirmed or rejected in the next timeout rounds
-    """
+def wait_for_confirmation(transaction_id, timeout=10):
     start_round = CLIENT.status()["last-round"] + 1
     current_round = start_round
 
@@ -95,10 +85,10 @@ def wait_for_confirmation(transaction_id, timeout=1000):
         if pending_txn.get("confirmed-round", 0) > 0:
             return pending_txn
         elif pending_txn["pool-error"]:  
-            return False
+            raise Exception(f"Pool error {transaction_id}")
         CLIENT.status_after_block(current_round)                   
         current_round += 1
-    return False
+    raise Exception(f"Timeout transaction {transaction_id}")
 
 
 def transfer_algos(sender, receiver, amount, close_remainder_to=None):
@@ -106,8 +96,7 @@ def transfer_algos(sender, receiver, amount, close_remainder_to=None):
     txn = PaymentTxn(sender.address, _params, receiver.address, int(amount * 1000000),
                      close_remainder_to=close_remainder_to.address if close_remainder_to else None)
     signed_txn = txn.sign(sender.private_key)
-    fee = (_params.min_fee if _params.fee == 0 else _params.fee) / 1000000
-    return CLIENT.send_transaction(signed_txn), fee
+    return CLIENT.send_transaction(signed_txn)
 
 
 def transfer_assets(sender, receiver, amount, 
@@ -116,8 +105,7 @@ def transfer_assets(sender, receiver, amount,
     atxn = AssetTransferTxn(sender.address, _params, receiver.address, int(amount * 1000000), asset, 
                             close_assets_to=close_assets_to.address if close_assets_to else None)
     signed_atxn = atxn.sign(sender.private_key)
-    fee = (_params.min_fee if _params.fee == 0 else _params.fee) / 1000000
-    return CLIENT.send_transaction(signed_atxn), fee
+    return CLIENT.send_transaction(signed_atxn)
 
 
 def prepare_transfer_algos(

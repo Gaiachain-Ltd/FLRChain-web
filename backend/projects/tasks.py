@@ -198,6 +198,9 @@ def close_project():
                     sync=Investment.SYNCED
                 ).amount
                 withdraw = (investment / invested) * total
+                if withdraw < 0:
+                    withdraw = 0
+                    
                 txns.append(
                     smartcontract.opt_out(
                         account.address, 

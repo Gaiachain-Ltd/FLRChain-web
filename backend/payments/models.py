@@ -105,7 +105,7 @@ class MTNPayout(models.Model):
             self.success = False
         else:
             try:
-                self.transaction, _ = transfer_assets(
+                self.transaction = transfer_assets(
                     self.user.account,
                     Account.get_main_account(),
                     self.amount

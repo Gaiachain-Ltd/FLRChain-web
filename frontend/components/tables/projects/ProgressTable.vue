@@ -5,6 +5,7 @@
       :items="activities"
       no-data-text="No progress"
       hide-default-footer
+      :items-per-page="-1"
     >
       <template v-slot:item.amount="{ item }">
         {{ amount(item) }}

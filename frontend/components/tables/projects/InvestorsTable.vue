@@ -4,6 +4,7 @@
     :items="investors"
     hide-default-footer
     no-data-text="No investors"
+    :items-per-page="-1"
   >
     <template v-slot:item.amount="{ item }">
       {{ amount(item) }}

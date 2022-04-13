@@ -18,23 +18,29 @@ def create_activity():
     )
 
     for activity in activities:
-        smartcontract.work(
-            activity.user.account.address,
-            activity.user.account.private_key,
-            activity.id,
-            activity.reward,
-            activity.project.app_id
-        )
+        with transaction.atomic():
+            activity = Activity.objects.select_for_update().get(
+                pk=activity.pk,
+                activity_type=Activity.WORK
+            )
 
-        if (activity.task.finished
-            | (usdc_balance(application_address(activity.project.app_id)) < activity.reward)
-        ):
-            activity.status = Activity.REJECTED
-            activity.sync = Activity.TO_SYNC
-        else:
-            activity.sync = Activity.SYNCED
+            smartcontract.work(
+                activity.user.account.address,
+                activity.user.account.private_key,
+                activity.id,
+                activity.reward,
+                activity.project.app_id
+            )
 
-        activity.save()
+            if (activity.task.finished
+                or (usdc_balance(application_address(activity.project.app_id)) < activity.reward)
+            ):
+                activity.status = Activity.REJECTED
+                activity.sync = Activity.TO_SYNC
+            else:
+                activity.sync = Activity.SYNCED
+
+            activity.save()
 
 
 @shared_task()
@@ -46,11 +52,17 @@ def verify_activity():
 
     for activity in activities:
         with transaction.atomic():
-            # TODO: optimization
             activity = Activity.objects.select_for_update().get(
                 pk=activity.pk,
                 activity_type=Activity.WORK
             )
+
+            if ((activity.status == Activity.ACCEPTED and activity.task.finished)
+                or (usdc_balance(application_address(activity.project.app_id)) < activity.reward)
+            ):
+                print("HERE!!")
+                activity.status = Activity.REJECTED
+            print("HERE", usdc_balance(application_address(activity.project.app_id)), activity.reward)
             smartcontract.verify(
                 activity.project.owner.account.address,
                 activity.project.owner.account.private_key,

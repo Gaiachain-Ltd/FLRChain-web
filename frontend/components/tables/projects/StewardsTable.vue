@@ -5,6 +5,7 @@
     :options.sync="options"
     hide-default-footer
     no-data-text="No stewards"
+    :items-per-page="-1"
   >
     <template v-slot:item.datetime="{ item }">
       {{ datetime(item) }}

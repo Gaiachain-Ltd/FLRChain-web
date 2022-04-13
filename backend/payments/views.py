@@ -212,7 +212,7 @@ class FacilitatorPayoutView(CommonView):
         )
 
         try:
-            txn, _ = transfer_assets(
+            txn = transfer_assets(
                 request.user.account,
                 facililator_account,
                 serializer.validated_data['amount']

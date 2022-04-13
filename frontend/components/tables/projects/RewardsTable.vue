@@ -4,6 +4,7 @@
     :items="activities"
     no-data-text="No rewards"
     hide-default-footer
+    :items-per-page="-1"
   >
     <template v-slot:item.task_name="{ item }">
       {{ item.activity_type == 0 ? `${item.task_name}` : `${item.task_name} (BATCH)`}}
