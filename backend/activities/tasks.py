@@ -78,9 +78,12 @@ def verify_activity():
                 activity_type=Activity.WORK, 
                 status=Activity.ACCEPTED
             ).count()
-            
-        task = Task.objects.get(id=activity.task.id)
-        print("accepted", accepted_activity_count, task.count)
-        if accepted_activity_count >= task.count:
-            task.finished = True
-            task.save()
+        
+        with transaction.atomic():
+            task = Task.objects.select_for_update().get(id=activity.task.id)
+            if accepted_activity_count >= task.count:
+                Task.objects.filter(
+                    pk=task.pk
+                ).update(
+                    finished=True
+                )

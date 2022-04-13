@@ -314,64 +314,73 @@ def payout_batch():
     with transaction.atomic():
 
         for task in tasks:
-            transactions = get_transactions(
-                application_id=task.project.app_id,
-                note_prefix=f"W|B|{task.id}".encode()
-            )['transactions']
-            print("TRANSACTIONS!", transactions)
-            if len(transactions) > 0:
-                continue
+            with transaction.atomic():
+                task = Task.objects.select_for_update().get(
+                    pk=task.pk
+                )
 
-            beneficiaries = Assignment.objects.filter(
-                project=task.project,
-                status=Assignment.ACCEPTED
-            )
+                transactions = get_transactions(
+                    application_id=task.project.app_id,
+                    note_prefix=f"W|B|{task.id}".encode()
+                )['transactions']
+                
+                if len(transactions) > 0:
+                    continue
 
-            amount = task.batch / beneficiaries.count()
-            
-            txns = list()
-            for beneficiary in beneficiaries:
-                batch_activity = Activity.objects.create(
-                    user=beneficiary.beneficiary,
-                    task=task,
+                beneficiaries = Assignment.objects.filter(
                     project=task.project,
-                    reward=amount,
-                    activity_type=Activity.BATCH,
-                    sync=Activity.TO_SYNC,
-                    status=Activity.ACCEPTED
-                )
-                print("BATCH!!!", beneficiary)
-                txns.append(
-                    smartcontract.batch(
-                        task.project.owner.account.address,
-                        beneficiary.beneficiary.account.address,
-                        batch_activity.id,
-                        amount,
-                        task.project.app_id
-                    )
+                    status=Assignment.ACCEPTED
                 )
 
-                if len(txns) == 15:
-                    txn = sign_send_atomic_trasfer(
-                        task.project.owner.account.private_key,
-                        txns
+                amount = task.batch / beneficiaries.count()
+                
+                txns = list()
+                for beneficiary in beneficiaries:
+                    batch_activity = Activity.objects.create(
+                        user=beneficiary.beneficiary,
+                        task=task,
+                        project=task.project,
+                        reward=amount,
+                        activity_type=Activity.BATCH,
+                        sync=Activity.TO_SYNC,
+                        status=Activity.ACCEPTED
                     )
-                    wait_for_confirmation(txn)
-                    txns = list()
 
-            txn = sign_send_atomic_trasfer(
-                task.project.owner.account.private_key,
-                txns
-            )
-            wait_for_confirmation(txn)
+                    txns.append(
+                        smartcontract.batch(
+                            task.project.owner.account.address,
+                            beneficiary.beneficiary.account.address,
+                            batch_activity.id,
+                            amount,
+                            task.project.app_id
+                        )
+                    )
 
-            Activity.objects.filter(
-                task=task, 
-                activity_type=Activity.BATCH, 
-                sync=Activity.TO_SYNC
-            ).update(
-                sync=Activity.SYNCED
-            )
-            
-            task.batch_paid = True
-            task.save()
+                    if len(txns) == 15:
+                        txn = sign_send_atomic_trasfer(
+                            task.project.owner.account.private_key,
+                            txns
+                        )
+                        wait_for_confirmation(txn)
+                        txns = list()
+
+                txn = sign_send_atomic_trasfer(
+                    task.project.owner.account.private_key,
+                    txns
+                )
+                wait_for_confirmation(txn)
+
+                Activity.objects.filter(
+                    task=task, 
+                    activity_type=Activity.BATCH, 
+                    sync=Activity.TO_SYNC
+                ).update(
+                    sync=Activity.SYNCED
+                )
+                
+                Task.objects.filter(
+                    pk=task.pk
+                ).update(
+                    batch_paid=True,
+                    finished=True
+                )

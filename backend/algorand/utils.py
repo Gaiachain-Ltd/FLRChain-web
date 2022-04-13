@@ -73,7 +73,7 @@ def transaction_info(txid):
         return None
 
 
-def wait_for_confirmation(transaction_id, timeout=10):
+def wait_for_confirmation(transaction_id, timeout=2):
     start_round = CLIENT.status()["last-round"] + 1
     current_round = start_round
 
