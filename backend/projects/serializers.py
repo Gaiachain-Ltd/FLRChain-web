@@ -245,17 +245,23 @@ class ProjectSerializer(ProjectNoDetailsSerializer):
 
     def update(self, instance, validated_data):
         with transaction.atomic():
-            if (instance.fac_adm_funds != validated_data['fac_adm_funds'] or
-                instance.start != validated_data['start'] or
-                instance.end != validated_data['end']
-            ):
-                instance.sync = Project.TO_SYNC
-
             instance.title = validated_data['title']
             instance.description = validated_data.get('description', "")
+            
+            if instance.status == Project.ACTIVE and instance.start != validated_data['start']:
+                raise serializers.ValidationError({
+                    'start': "You can't change start date if project is active."
+                })
             instance.start = validated_data['start']
+
             instance.end = validated_data['end']
+
+            if instance.fac_adm_funds > validated_data['fac_adm_funds']:
+                raise serializers.ValidationError({
+                    'fac_adm_funds': "Cannot be smaller than it is now."
+                })
             instance.fac_adm_funds = validated_data['fac_adm_funds']
+
             instance.maplink = validated_data.get('maplink', "")
 
             total = instance.fac_adm_funds

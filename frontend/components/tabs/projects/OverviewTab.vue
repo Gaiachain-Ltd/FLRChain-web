@@ -85,6 +85,7 @@ export default {
     },
   },
   components: {
+    ErrorPopup: () => import("@/components/popups/ErrorPopup"),
     ActionButton: () => import("@/components/buttons/ActionButton"),
     ActionBarCard: () => import("@/components/cards/ActionBarCard"),
     DetailsBlockchainCard: () =>
@@ -115,7 +116,10 @@ export default {
             this.requestRefresh();
             this.onUpdate(reply.data);
           })
-          .catch(() => this.showErrorPopup());
+          .catch(() => {
+            this.project.sync = SYNC.SYNCED;
+            this.showErrorPopup();
+          });
       } else {
         this.showErrorPopup("Please correct fields marked on red.");
       }
