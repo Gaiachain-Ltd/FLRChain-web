@@ -4,7 +4,6 @@ from celery import shared_task
 from activities.models import Activity
 from django.db import transaction
 from projects.models import Task
-from algorand.utils import usdc_balance, application_address
 
 
 logger = logging.getLogger(__name__)
@@ -15,7 +14,7 @@ def create_activity():
     activities = Activity.objects.filter(
         sync=Activity.INITIAL,
         activity_type=Activity.WORK
-    )
+    )[:1]
 
     for activity in activities:
         with transaction.atomic():
@@ -33,7 +32,7 @@ def create_activity():
             )
 
             if (activity.task.finished
-                or (usdc_balance(application_address(activity.project.app_id)) < activity.reward)
+                or (activity.project.usdc_balance() < activity.reward)
             ):
                 activity.status = Activity.REJECTED
                 activity.sync = Activity.TO_SYNC
@@ -48,7 +47,7 @@ def verify_activity():
     activities = Activity.objects.filter(
         sync=Activity.TO_SYNC,
         activity_type=Activity.WORK
-    )
+    )[:1]
 
     for activity in activities:
         with transaction.atomic():
@@ -58,11 +57,10 @@ def verify_activity():
             )
 
             if ((activity.status == Activity.ACCEPTED and activity.task.finished)
-                or (usdc_balance(application_address(activity.project.app_id)) < activity.reward)
+                or (activity.project.usdc_balance() < activity.reward)
             ):
-                print("HERE!!")
                 activity.status = Activity.REJECTED
-            print("HERE", usdc_balance(application_address(activity.project.app_id)), activity.reward)
+
             smartcontract.verify(
                 activity.project.owner.account.address,
                 activity.project.owner.account.private_key,

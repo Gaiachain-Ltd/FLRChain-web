@@ -23,7 +23,7 @@ def opt_in_accounts():
                 account.save()
                 break
         
-        if not accounts.opted_in:
+        if not account.opted_in:
             main_account = Account.get_main_account()
             txn1 = prepare_transfer_algos(
                 main_account.address, 

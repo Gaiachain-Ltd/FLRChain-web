@@ -8,7 +8,7 @@ from algorand.smartcontract import invest
 def project_invest():
     investments = Investment.objects.filter(
         sync=Investment.TO_SYNC
-    )
+    )[:1]
 
     for investment in investments:
         invest(

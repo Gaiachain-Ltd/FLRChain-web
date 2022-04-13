@@ -1,5 +1,6 @@
 from django.db import models
 from projects.managers import ProjectManager
+from algorand.utils import usdc_balance, application_address
 
 
 def upload_project_image(instance, filename):
@@ -93,6 +94,9 @@ class Project(models.Model):
     )
 
     objects = ProjectManager()
+
+    def usdc_balance(self):
+        return usdc_balance(application_address(self.app_id))
 
     def save(self, *args, **kwargs):
         if self.pk is not None:

@@ -22,7 +22,7 @@ def create_project():
     projects = Project.objects.filter(
         state=Project.INITIAL,
         status=Project.FUNDRAISING
-    )
+    )[:1]
 
     for project in projects:
         if hasattr(project, "account"):
@@ -47,7 +47,7 @@ def initialize_project():
     projects = Project.objects.filter(
         state=Project.CREATED,
         status=Project.FUNDRAISING
-    )
+    )[:1]
 
     for project in projects:
         smartcontract.initialize(
@@ -84,11 +84,10 @@ def start_project():
         status=Project.FUNDRAISING,
         sync=Project.SYNCED,
         start__lte=datetime.datetime.now().date()
-    )
+    )[:1]
 
     for project in projects:
-        # print("USDC: ", usdc_balance(application_address(project.app_id)), project.total)
-        if usdc_balance(application_address(project.app_id)) < project.total:
+        if project.usdc_balance() < project.total:
             project.state = Project.POSTPONED
         else:
             project.state = Project.STARTED
@@ -102,7 +101,7 @@ def update_project():
     projects = Project.objects.filter(
         Q(sync=Project.TO_SYNC) &
         ~Q(state__in=[Project.INITIAL, Project.CREATED, Project.DELETED])
-    ).order_by('-modified')
+    ).order_by('-modified')[:1]
 
     with transaction.atomic():
         for project in projects:
@@ -136,7 +135,7 @@ def finish_project():
         state=Project.STARTED,
         status=Project.ACTIVE,
         end__lte=datetime.datetime.now().date()
-    )
+    )[:1]
 
     with transaction.atomic():
         for project in projects:
@@ -151,7 +150,7 @@ def close_project():
     projects = Project.objects.filter(
         state=Project.FINISHED,
         status=Project.CLOSED
-    )
+    )[:1]
 
     for project in projects:
         investors_data = INDEXER.accounts(
@@ -270,7 +269,7 @@ def close_project():
 def join_project():
     assignments = Assignment.objects.filter(
         sync=Assignment.INITIAL
-    )
+    )[:1]
 
     for assignment in assignments:
         account = assignment.beneficiary.account
@@ -287,7 +286,7 @@ def join_project():
 def beneficiary_approval():
     assignments = Assignment.objects.filter(
         sync=Assignment.TO_SYNC
-    )
+    )[:1]
 
     for assignment in assignments:
         account = assignment.beneficiary.account
@@ -310,58 +309,69 @@ def payout_batch():
         batch_paid=False,
         finished=True,
         batch__gte=0
-    )
-    for task in tasks:
-        beneficiaries = Assignment.objects.filter(
-            project=task.project,
-            status=Assignment.ACCEPTED
-        )
+    )[:1]
 
-        amount = task.batch / beneficiaries.count()
-        
-        txns = list()
-        for beneficiary in beneficiaries:
-            batch_activity = Activity.objects.create(
-                user=beneficiary.beneficiary,
-                task=task,
+    with transaction.atomic():
+
+        for task in tasks:
+            transactions = get_transactions(
+                application_id=task.project.app_id,
+                note_prefix=f"W|B|{task.id}".encode()
+            )['transactions']
+
+            if len(transactions) > 0:
+                continue
+
+            beneficiaries = Assignment.objects.filter(
                 project=task.project,
-                reward=amount,
-                activity_type=Activity.BATCH,
-                sync=Activity.TO_SYNC,
-                status=Activity.ACCEPTED
+                status=Assignment.ACCEPTED
             )
 
-            txns.append(
-                smartcontract.batch(
-                    task.project.owner.account.address,
-                    beneficiary.beneficiary.account.address,
-                    batch_activity.id,
-                    amount,
-                    task.project.app_id
+            amount = task.batch / beneficiaries.count()
+            
+            txns = list()
+            for beneficiary in beneficiaries:
+                batch_activity = Activity.objects.create(
+                    user=beneficiary.beneficiary,
+                    task=task,
+                    project=task.project,
+                    reward=amount,
+                    activity_type=Activity.BATCH,
+                    sync=Activity.TO_SYNC,
+                    status=Activity.ACCEPTED
                 )
+
+                txns.append(
+                    smartcontract.batch(
+                        task.project.owner.account.address,
+                        beneficiary.beneficiary.account.address,
+                        batch_activity.id,
+                        amount,
+                        task.project.app_id
+                    )
+                )
+
+                if len(txns) == 15:
+                    txn = sign_send_atomic_trasfer(
+                        task.project.owner.account.private_key,
+                        txns
+                    )
+                    wait_for_confirmation(txn)
+                    txns = list()
+
+            txn = sign_send_atomic_trasfer(
+                task.project.owner.account.private_key,
+                txns
             )
+            wait_for_confirmation(txn)
 
-            if len(txns) == 15:
-                txn = sign_send_atomic_trasfer(
-                    task.project.owner.account.private_key,
-                    txns
-                )
-                wait_for_confirmation(txn)
-                txns = list()
-
-        txn = sign_send_atomic_trasfer(
-            task.project.owner.account.private_key,
-            txns
-        )
-        wait_for_confirmation(txn)
-
-        Activity.objects.filter(
-            task=task, 
-            activity_type=Activity.BATCH, 
-            sync=Activity.TO_SYNC
-        ).update(
-            sync=Activity.SYNCED
-        )
-        
-        task.batch_paid = True
-        task.save()
+            Activity.objects.filter(
+                task=task, 
+                activity_type=Activity.BATCH, 
+                sync=Activity.TO_SYNC
+            ).update(
+                sync=Activity.SYNCED
+            )
+            
+            task.batch_paid = True
+            task.save()
