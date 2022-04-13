@@ -36,7 +36,11 @@
         }}</DefaultText>
       </v-flex>
       <v-flex mb-8>
-        <BlockButton @clicked="changePassword" type="submit" :loading="loading"
+        <BlockButton
+          @clicked="changePassword"
+          type="submit"
+          :loading="loading"
+          :disabled="!isValid || passwordsNotTheSame"
           >Change password</BlockButton
         >
       </v-flex>
