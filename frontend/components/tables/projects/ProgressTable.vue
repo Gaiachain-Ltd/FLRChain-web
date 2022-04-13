@@ -10,7 +10,7 @@
       <template v-slot:item.amount="{ item }">
         {{ amount(item) }}
       </template>
-      <template v-slot:item.datetime="{ item }">
+      <template v-slot:item.round-time="{ item }">
         {{ datetime(item) }}
       </template>
       <template v-slot:item.details="{ item }">
@@ -86,11 +86,12 @@ export default {
         },
         {
           text: "Date",
-          value: "datetime",
+          value: "round-time",
         },
         {
           text: "Details",
           value: "details",
+          sortable: false
         },
       ],
     };

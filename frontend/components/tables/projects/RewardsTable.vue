@@ -12,10 +12,10 @@
     <template v-slot:item.amount="{ item }">
       {{ amount(item) }}
     </template>
-    <template v-slot:item.datetime="{ item }">
+    <template v-slot:item.round-time="{ item }">
       {{ datetime(item) }}
     </template>
-    <template v-slot:item.request="{ item }">
+    <template v-slot:item.status="{ item }">
       <v-layout
         align-center
         v-if="isFacililator && (item.status == INITIAL || item.sync == SYNCING)"
@@ -89,15 +89,16 @@ export default {
         },
         {
           text: "Date",
-          value: "datetime",
+          value: "round-time",
         },
         {
           text: "Request",
-          value: "request",
+          value: "status",
         },
         {
           text: "Details",
           value: "details",
+          sortable: false
         },
       ],
     };
