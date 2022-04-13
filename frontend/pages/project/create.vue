@@ -29,6 +29,7 @@
 
 <script>
 import { mapActions } from "vuex";
+import { STATUS } from "@/constants/project";
 
 export default {
   data() {
@@ -42,6 +43,7 @@ export default {
         start: this.$moment().format("YYYY-MM-DD"),
         end: this.$moment().format("YYYY-MM-DD"),
         fac_adm_funds: "0",
+        status: STATUS.FUNDRAISING,
         actions: [
           {
             name: "",

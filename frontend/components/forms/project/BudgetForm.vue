@@ -7,7 +7,7 @@
       <TextInput
         label="Facilitator administration funds"
         v-model="project.fac_adm_funds"
-        :rules="[...requiredRules, ...decimalRules]"
+        :rules="[...requiredRules, ...decimalRules, ...noLessThan(facAdmFunds)]"
         :readonly="readonly"
         :icon="icon"
       >
@@ -54,6 +54,7 @@ export default {
   },
   data() {
     return {
+      facAdmFunds: this.project && this.project.fac_adm_funds ? this.project.fac_adm_funds : 0.0, 
       icon: require("@/assets/icons/currency.svg"),
     };
   },

@@ -13,7 +13,10 @@
               required
             ></TextInput>
             <v-layout :class="$vuetify.breakpoint.lgAndDown && 'wrap'">
-              <v-flex :class="!$vuetify.breakpoint.lgAndDown ? 'mr-3' : 'xs12'">
+              <v-flex
+                v-if="project.status == FUNDRAISING"
+                :class="!$vuetify.breakpoint.lgAndDown ? 'mr-3' : 'xs12'"
+              >
                 <DateInput
                   label="Start of project*"
                   :text.sync="project.start"
@@ -22,7 +25,13 @@
                   required
                 ></DateInput>
               </v-flex>
-              <v-flex :class="!$vuetify.breakpoint.lgAndDown ? 'ml-3' : 'xs12'">
+              <v-flex
+                :class="
+                  !$vuetify.breakpoint.lgAndDown
+                    ? project.status == FUNDRAISING && 'ml-3'
+                    : 'xs12'
+                "
+              >
                 <DateInput
                   label="End of project*"
                   :text.sync="project.end"
@@ -67,6 +76,7 @@
 </template>
 
 <script>
+import { STATUS } from "@/constants/project";
 import ValidatorMixin from "@/validators";
 import _ from "lodash";
 
@@ -81,6 +91,7 @@ export default {
   },
   data() {
     return {
+      FUNDRAISING: STATUS.FUNDRAISING,
       fundraisingPeriods: [
         { text: "1 month", value: 30 },
         { text: "2 months", value: 60 },

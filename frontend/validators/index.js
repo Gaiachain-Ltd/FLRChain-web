@@ -46,7 +46,12 @@ export default {
             ],
             maxLengthRules(max=255) {
                 return [
-                    (v) => (!v || v.length <= max) || `Limit of ${max} characters exceeded.`
+                    (v) => (!v || v.length <= max) || `Limit of ${max} characters exceeded`
+                ]
+            },
+            noLessThan(value) {
+                return [
+                    (v) => parseFloat(v) >= value || `Value has to be greater than ${value}`
                 ]
             }
         };
