@@ -3,6 +3,9 @@
     <v-flex slot="icon"></v-flex>
     <v-flex slot="content" ma-6>
       <v-layout column v-if="images.length > 0">
+        <v-layout justify-end>
+          <DefaultText>{{ `${index + 1}/${activity.photos}` }}</DefaultText>
+        </v-layout>
         <v-img :src="source" contain></v-img>
         <v-layout class="mt-3">
           <ActionButton
@@ -88,7 +91,6 @@ export default {
     this.images = await this.$axios
       .get(`projects/activity/${this.activity.id}/photo/`)
       .then((reply) => reply.data);
-    console.log("IMAGES", this.images);
   },
 };
 </script>
