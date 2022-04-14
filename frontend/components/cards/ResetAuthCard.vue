@@ -129,7 +129,9 @@ export default {
       }
     },
     resetExternalErrors() {
-      this.passwordsNotTheSame = false;
+      if (this.isValid) {
+        this.passwordsNotTheSame = false;
+      }
       this.externalError = "";
     },
   },
