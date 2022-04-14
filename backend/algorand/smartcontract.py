@@ -561,6 +561,7 @@ def get_beneficiaries(app_id):
                     })
     return beneficiaries
 
+
 def work(address, priv_key, activity_id, amount, app_id):
     params = CLIENT.suggested_params()
     txn = transaction.ApplicationNoOpTxn(
@@ -573,6 +574,7 @@ def work(address, priv_key, activity_id, amount, app_id):
     txn_signed = txn.sign(priv_key)
     txn_id = CLIENT.send_transactions([txn_signed])
     wait_for_confirmation(txn_id)
+
 
 def verify(address, priv_key, beneficiary_address, activity_id, amount, value, app_id):
     params = CLIENT.suggested_params()

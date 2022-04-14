@@ -31,20 +31,20 @@ DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
 TESTING = sys.argv[1:2] == ['test']
 
-# if DEBUG:
-ALLOWED_HOSTS = '*'
-CORS_ORIGIN_ALLOW_ALL = True
-# else:
-#     ALLOWED_HOSTS = ['localhost', '127.0.0.1', '195.201.81.231',
-#                      '172.23.0.1', 'flrchain.milosolutions.com',
-#                      'dev.flrchain.milosolutions.com']
+if DEBUG:
+    ALLOWED_HOSTS = '*'
+    CORS_ORIGIN_ALLOW_ALL = True
+else:
+    ALLOWED_HOSTS = ['localhost', '127.0.0.1', '195.201.81.231',
+                     '172.23.0.1', 'flrchain.milosolutions.com',
+                     'dev.flrchain.milosolutions.com']
 
-#     CORS_ORIGIN_ALLOW_ALL = False
+    CORS_ORIGIN_ALLOW_ALL = False
 
-#     CORS_ORIGIN_WHITELIST = [
-#         'https://flrchain.milosolutions.com',
-#         'https://dev.flrchain.milosolutions.com'
-#     ]
+    CORS_ORIGIN_WHITELIST = [
+        'https://flrchain.milosolutions.com',
+        'https://dev.flrchain.milosolutions.com'
+    ]
 
 # Application definition
 

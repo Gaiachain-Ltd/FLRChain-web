@@ -85,7 +85,7 @@ export default {
   },
   async fetch() {
     await this.$axios
-      .get("accounts/details/")
+      .get("accounts/balance/")
       .then((reply) => (this.address = reply.data.address));
       
     if (!this.$auth.user.opted_in) {

@@ -9,7 +9,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from activities.models import Activity
 from django.db import transaction
-from users.permissions import isBeneficiary, isOptedIn
+from users.permissions import isFacilitator, isBeneficiary, isOptedIn
 from algorand import utils
 from activities.serializers import *
 from decimal import *
@@ -18,16 +18,18 @@ from algosdk import util
 
 class ActivityView(CommonView):
     serializer_class = ActivitySerializer
-    # parser_classes = (MultiPartParser,)
 
-    # def get_permissions(self):
-    #     """
-    #     Only facililator can make and update projects.
-    #     """
-    #     if self.request.method == "POST":
-    #         return [permission() for permission in [
-    #             *self.permission_classes, isBeneficiary, isOptedIn]]
-    #     return [permission() for permission in self.permission_classes]
+    def get_permissions(self):
+        """
+        Only facililator can update activities but only beneficiary can create them.
+        """
+        if self.request.method == "POST":
+            return [permission() for permission in [
+                *self.permission_classes, isBeneficiary, isOptedIn]]
+        elif self.request.method == "PUT":
+            return [permission() for permission in [
+                *self.permission_classes, isFacilitator, isOptedIn]]
+        return [permission() for permission in self.permission_classes]
 
     @swagger_auto_schema(
         operation_summary="History activity",
@@ -40,19 +42,21 @@ class ActivityView(CommonView):
         )['transactions']
 
         status_filter = request.GET.get("status", None)
-        
+
         data = dict()
         for transaction in transactions:
             notes = base64.b64decode(transaction['note']).decode().split('|')
             if len(notes) != 3:
                 continue
 
-            amount = base64.b64decode(transaction['application-transaction']['application-args'][1])
+            amount = base64.b64decode(
+                transaction['application-transaction']['application-args'][1])
             activity_status = notes[1]
             if activity_status == "W":
                 activity_status = Activity.WAITING
             elif activity_status == "V":
-                value = base64.b64decode(transaction['application-transaction']['application-args'][2])
+                value = base64.b64decode(
+                    transaction['application-transaction']['application-args'][2])
                 activity_status = int.from_bytes(value, "big")
             elif activity_status == "B" and status_filter is None:
                 activity_status = Activity.ACCEPTED
@@ -70,7 +74,7 @@ class ActivityView(CommonView):
                 "status": activity_status,
                 "round-time": transaction['round-time']
             }
-        
+
         activities = Activity.objects.filter(id__in=data.keys())
         for activity in activities:
             data[str(activity.id)].update({
@@ -86,7 +90,7 @@ class ActivityView(CommonView):
                 "activity_type": activity.activity_type,
                 "amount": activity.reward
             })
-        
+
         return Response(data.values(), status=status.HTTP_200_OK)
 
     @swagger_auto_schema(
@@ -99,14 +103,15 @@ class ActivityView(CommonView):
     def create(self, request, project_pk=None, task_pk=None):
         with transaction.atomic():
             project = get_object_or_404(
-                Project.objects.with_beneficiary_assignment_status(request.user),
+                Project.objects.with_beneficiary_assignment_status(
+                    request.user),
                 assignment_status=Assignment.ACCEPTED,
                 pk=project_pk
             )
 
             task = get_object_or_404(
-                Task, 
-                project=project, 
+                Task,
+                project=project,
                 pk=task_pk,
                 deleted=False
             )
@@ -129,16 +134,16 @@ class ActivityView(CommonView):
 
         with transaction.atomic():
             project = get_object_or_404(
-                Project, 
-                pk=project_pk, 
+                Project,
+                pk=project_pk,
                 owner=request.user
             )
             activity = get_object_or_404(
-                Activity.objects.select_for_update(), 
+                Activity.objects.select_for_update(),
                 pk=activity_pk,
                 project=project
             )
-            
+
             activity.status = serializer.validated_data['status']
             activity.sync = Activity.TO_SYNC
             activity.save()
@@ -160,14 +165,16 @@ class ActivityView(CommonView):
 
             if notes[1] not in ["V", "B"]:
                 continue
-            
+
             if notes[1] == "V":
-                value = base64.b64decode(transaction['application-transaction']['application-args'][-1])
+                value = base64.b64decode(
+                    transaction['application-transaction']['application-args'][-1])
                 value = int.from_bytes(value, "big")
                 if Activity.REJECTED == value:
                     continue
 
-            amount = base64.b64decode(transaction['application-transaction']['application-args'][1])
+            amount = base64.b64decode(
+                transaction['application-transaction']['application-args'][1])
             sum += int.from_bytes(amount, "big")
 
         return Response({"sum": sum}, status=status.HTTP_200_OK)
@@ -197,6 +204,7 @@ class PhotoView(CommonView):
         with transaction.atomic():
             activity = get_object_or_404(
                 Activity.objects.select_for_update(),
+                user=request.user,
                 pk=activity_pk
             )
 
@@ -205,8 +213,8 @@ class PhotoView(CommonView):
 
             photo = serializer.save()
             activity.photos.add(photo)
-            
+
             return Response(
-                ActivitySerializer(activity).data, 
+                ActivitySerializer(activity).data,
                 status=status.HTTP_201_CREATED
             )

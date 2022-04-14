@@ -4,6 +4,7 @@ from investments.models import Investment
 from django.db.models import F
 from algorand.smartcontract import invest
 
+
 @shared_task()
 def project_invest():
     investments = Investment.objects.filter(

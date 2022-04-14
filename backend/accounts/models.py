@@ -10,8 +10,10 @@ from django.core.files.base import ContentFile
 
 logger = logging.getLogger(__name__)
 
+
 def upload_qr_code(instance, filename):
     return f"accounts/{instance.address}/{filename}"
+
 
 class Account(models.Model):
     NORMAL_ACCOUNT = 0
@@ -19,7 +21,6 @@ class Account(models.Model):
     PROJECT_ACCOUNT = 2
     ACCOUNT_TYPES = (
         (NORMAL_ACCOUNT, "Normal account"),
-        # TODO: Add constraint to keep single main account.
         (MAIN_ACCOUNT, "Main account"),
         (PROJECT_ACCOUNT, "Smart contract account")
     )
@@ -58,9 +59,9 @@ class Account(models.Model):
 
     @staticmethod
     def generate(
-        entity, 
-        account_type=NORMAL_ACCOUNT, 
-        initial_amount=settings.ALGO_OPT_IN_AMOUNT, 
+        entity,
+        account_type=NORMAL_ACCOUNT,
+        initial_amount=settings.ALGO_OPT_IN_AMOUNT,
         sync=False
     ):
         with transaction.atomic():
@@ -95,7 +96,8 @@ class Account(models.Model):
                 chained = []
                 keys = []
 
-            tx_ids = created_account.opt_in(chained, keys, initial_amount=initial_amount)
+            tx_ids = created_account.opt_in(
+                chained, keys, initial_amount=initial_amount)
             if sync:
                 for tx_id in tx_ids:
                     wait_for_confirmation(tx_id)
@@ -127,8 +129,8 @@ class Account(models.Model):
 
     def generate_qr_code(self):
         img = qrcode.make(
-            f"algorand://{self.address}", 
-            version=1, 
+            f"algorand://{self.address}",
+            version=1,
             image_factory=qrcode.image.svg.SvgPathImage
         )
         cp = ContentFile(b'')

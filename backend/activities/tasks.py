@@ -33,7 +33,7 @@ def create_activity():
 
             if (activity.task.finished
                 or (activity.project.usdc_balance() < activity.reward)
-            ):
+                ):
                 activity.status = Activity.REJECTED
                 activity.sync = Activity.TO_SYNC
             else:
@@ -58,7 +58,7 @@ def verify_activity():
 
             if ((activity.status == Activity.ACCEPTED and activity.task.finished)
                 or (activity.project.usdc_balance() < activity.reward)
-            ):
+                ):
                 activity.status = Activity.REJECTED
 
             smartcontract.verify(
@@ -72,13 +72,13 @@ def verify_activity():
             )
             activity.sync = Activity.SYNCED
             activity.save()
-            
+
             accepted_activity_count = Activity.objects.filter(
                 task=activity.task,
-                activity_type=Activity.WORK, 
+                activity_type=Activity.WORK,
                 status=Activity.ACCEPTED
             ).count()
-        
+
         with transaction.atomic():
             task = Task.objects.select_for_update().get(id=activity.task.id)
             if accepted_activity_count >= task.count:

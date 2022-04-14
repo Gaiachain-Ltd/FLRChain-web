@@ -1,6 +1,5 @@
 from activities.models import *
 from rest_framework import serializers
-from projects.serializers import TaskSerializer
 
 
 class ActivityProjectSerializer(serializers.Serializer):

@@ -39,7 +39,7 @@ export default {
   },
   async fetch() {
     this.$axios
-      .get("accounts/details/")
+      .get("accounts/balance/")
       .then((reply) => (this.address = reply.data));
   },
 };

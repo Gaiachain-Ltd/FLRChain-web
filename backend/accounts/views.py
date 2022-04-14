@@ -33,24 +33,28 @@ class AccountView(CommonView):
                 properties={
                     'balance': openapi.Schema(
                         type=openapi.TYPE_INTEGER
+                    ),
+                    'address': openapi.Schema(
+                        type=openapi.TYPE_STRING
                     )
                 }
-            )
+            ),
         }
     )
     def balance(self, request):
         return Response(
             {
-                'balance': request.user.account.usdc_balance()
+                'balance': request.user.account.usdc_balance(),
+                'address': request.user.account.address
             },
             status=status.HTTP_200_OK
         )
 
     @swagger_auto_schema(
         auto_schema=NoGetQueryParametersSchema,
-        operation_summary="User balance",
+        operation_summary="Investor balance",
         operation_description=(""),
-        tags=['accounts', 'facililator', 'investor'],
+        tags=['accounts', 'investor'],
     )
     def details(self, request):
         invest_transactions = get_transactions(
@@ -62,7 +66,6 @@ class AccountView(CommonView):
 
         app_ids = dict()
         for invest_transaction in invest_transactions:
-            # print("TRR", invest_transaction)
             invest_details = invest_transaction['application-transaction']
             if len(invest_details['application-args']) > 1:
                 amount = base64.b64decode(
@@ -99,7 +102,8 @@ class AccountView(CommonView):
         tags=['accounts', 'beneficiary'],
     )
     def qr_code(self, request):
-        response = HttpResponse(request.user.account.qr_code, content_type='image/svg+xml')
+        response = HttpResponse(
+            request.user.account.qr_code, content_type='image/svg+xml')
         response['Content-Disposition'] = 'attachment; filename="code.svg"'
         return response
 
@@ -157,7 +161,7 @@ class TransactionView(CommonView):
 
             if transaction.get('asset-transfer-transaction', None) is None:
                 continue
-                    
+
             asset_transaction_details = transaction['asset-transfer-transaction']
             received = requestor_address == asset_transaction_details['receiver']
             data.append({
@@ -175,7 +179,7 @@ class TransactionView(CommonView):
                 )
             })
         return Response(
-            TransactionSerializer(data, many=True).data, 
+            TransactionSerializer(data, many=True).data,
             status=status.HTTP_200_OK
         )
 
@@ -183,8 +187,8 @@ class TransactionView(CommonView):
         auto_schema=NoGetQueryParametersSchema,
         operation_summary="Transaction info",
         operation_description=("Returns null if transaction is not confirmed yet."
-         " Otherwise, returns a transaction details."
-        ),
+                               " Otherwise, returns a transaction details."
+                               ),
         tags=['transactions', 'beneficiary', 'facililator', 'investor']
     )
     def retrieve(self, _, id=None):

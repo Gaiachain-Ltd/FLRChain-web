@@ -1,11 +1,8 @@
 import logging
-import base64
-import datetime
-import accounts
 from django.conf import settings
 from algosdk.v2client import *
 from algosdk import account, util
-from algosdk.future.transaction import * 
+from algosdk.future.transaction import *
 from algosdk.logic import get_application_address
 from decimal import *
 from collections import defaultdict
@@ -45,32 +42,8 @@ def usdc_balance(address):
     return Decimal(0)
 
 
-def algo_balance(address):
-    info = check_balance_info(address)
-    return Decimal(info.get('amount', 0) / 1000000)
-
-
 def params():
     return CLIENT.suggested_params()
-
-
-def compile(source):
-    return CLIENT.compile(source)
-
-
-def date_time_to_blocks(date_time):
-    _params = params()
-    now = datetime.datetime.now()
-    diff = (date_time - now.date()).seconds
-    return _params.first + int(diff / 4.5)
-
-
-def transaction_info(txid):
-    try:
-        return CLIENT.pending_transaction_info(txid)
-    except Exception as e:
-        logger.error(e)
-        return None
 
 
 def wait_for_confirmation(transaction_id, timeout=2):
@@ -84,9 +57,9 @@ def wait_for_confirmation(transaction_id, timeout=2):
             return False
         if pending_txn.get("confirmed-round", 0) > 0:
             return pending_txn
-        elif pending_txn["pool-error"]:  
+        elif pending_txn["pool-error"]:
             raise Exception(f"Pool error {transaction_id}")
-        CLIENT.status_after_block(current_round)                   
+        CLIENT.status_after_block(current_round)
         current_round += 1
     raise Exception(f"Timeout transaction {transaction_id}")
 
@@ -99,19 +72,19 @@ def transfer_algos(sender, receiver, amount, close_remainder_to=None):
     return CLIENT.send_transaction(signed_txn)
 
 
-def transfer_assets(sender, receiver, amount, 
+def transfer_assets(sender, receiver, amount,
                     asset=settings.ALGO_ASSET, close_assets_to=None):
     _params = params()
-    atxn = AssetTransferTxn(sender.address, _params, receiver.address, int(amount * 1000000), asset, 
+    atxn = AssetTransferTxn(sender.address, _params, receiver.address, int(amount * 1000000), asset,
                             close_assets_to=close_assets_to.address if close_assets_to else None)
     signed_atxn = atxn.sign(sender.private_key)
     return CLIENT.send_transaction(signed_atxn)
 
 
 def prepare_transfer_algos(
-    sender, 
-    receiver, 
-    amount, 
+    sender,
+    receiver,
+    amount,
     close_remainder_to=None
 ):
     if isinstance(sender, str):
@@ -131,8 +104,8 @@ def prepare_transfer_algos(
 
     _params = params()
     txn = PaymentTxn(
-        snd, 
-        _params, 
+        snd,
+        _params,
         rec,
         util.algos_to_microalgos(amount),
         close_remainder_to=close_remainder_to
@@ -141,10 +114,10 @@ def prepare_transfer_algos(
 
 
 def prepare_transfer_assets(
-    sender, 
-    receiver, 
-    amount, 
-    asset=settings.ALGO_ASSET, 
+    sender,
+    receiver,
+    amount,
+    asset=settings.ALGO_ASSET,
     close_assets_to=None
 ):
     if isinstance(sender, str):
@@ -164,14 +137,15 @@ def prepare_transfer_assets(
 
     _params = params()
     atxn = AssetTransferTxn(
-        snd, 
-        _params, 
-        rec, 
+        snd,
+        _params,
+        rec,
         util.algos_to_microalgos(amount),
-        asset, 
+        asset,
         close_assets_to=close_assets_to
     )
     return atxn
+
 
 def sign_send_atomic_trasfer(private_keys, txns):
     is_str = isinstance(private_keys, str)
@@ -186,29 +160,15 @@ def sign_send_atomic_trasfer(private_keys, txns):
 
     return CLIENT.send_transactions(signed_txns)
 
-def atomic_transfer(txns):
-    gtxn = calculate_group_id([txn[0] for txn in txns])
-
-    sgtxns = list()
-    for txn in txns:
-        txn[0].group = gtxn
-        
-        signed = txn[0].sign(txn[1].from_account.private_key)
-        sgtxns.append(signed)
-
-        txn[1].txid = signed.get_txid()
-        
-    CLIENT.send_transactions(sgtxns)
-    return base64.b64encode(gtxn).decode('ascii')
 
 def get_transactions(**kwargs):
     return INDEXER.search_transactions(
         **kwargs
     )
 
+
 def get_transactions_info(request_fields=dict(), reply_fields=[]):
     transactions = get_transactions(**request_fields)
-    # print("TRANSACTIONS", transactions)
     transactions_data = defaultdict(dict)
     for transaction in transactions['transactions']:
         for field in reply_fields:

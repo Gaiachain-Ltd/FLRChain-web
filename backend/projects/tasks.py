@@ -8,7 +8,7 @@ from celery import shared_task
 from algorand import smartcontract
 from algorand.utils import *
 from django.conf import settings
-from django.db.models import F, Sum, Q, Count
+from django.db.models import Sum, Q
 from django.db import transaction
 from activities.models import Activity
 from investments.models import Investment
@@ -219,10 +219,10 @@ def close_project():
                     withdraw = (investment / invested) * total
                     if withdraw < 0:
                         withdraw = 0
-                        
+
                     txns.append(
                         smartcontract.opt_out(
-                            account.address, 
+                            account.address,
                             project.app_id,
                             withdraw
                         )
@@ -230,7 +230,7 @@ def close_project():
                 else:
                     txns.append(
                         smartcontract.opt_out(
-                            account.address, 
+                            account.address,
                             project.app_id,
                             0
                         )
@@ -254,7 +254,8 @@ def close_project():
             account = project.account
 
             txns.append(
-                smartcontract.delete_application(account.address, project.app_id)
+                smartcontract.delete_application(
+                    account.address, project.app_id)
             )
             keys.append(account.private_key)
 
@@ -346,7 +347,7 @@ def payout_batch():
                     application_id=task.project.app_id,
                     note_prefix=f"W|B|{task.id}".encode()
                 )['transactions']
-                
+
                 if len(transactions) > 0:
                     continue
 
@@ -356,7 +357,7 @@ def payout_batch():
                 )
 
                 amount = task.batch / beneficiaries.count()
-                
+
                 txns = list()
                 for beneficiary in beneficiaries:
                     batch_activity = Activity.objects.create(
@@ -394,13 +395,13 @@ def payout_batch():
                 wait_for_confirmation(txn)
 
                 Activity.objects.filter(
-                    task=task, 
-                    activity_type=Activity.BATCH, 
+                    task=task,
+                    activity_type=Activity.BATCH,
                     sync=Activity.TO_SYNC
                 ).update(
                     sync=Activity.SYNCED
                 )
-                
+
                 Task.objects.filter(
                     pk=task.pk
                 ).update(

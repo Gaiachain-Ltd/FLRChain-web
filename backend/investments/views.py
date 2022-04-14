@@ -22,7 +22,15 @@ from algosdk import util
 
 class InvestmentView(CommonView):
     serializer_class = InvestmentSerializer
-    # permission_classes = [IsAuthenticated, isInvestor, isOptedIn]
+
+    def get_permissions(self):
+        """
+        Only facililator can update activities but only beneficiary can create them.
+        """
+        if self.request.method == "POST":
+            return [permission() for permission in [
+                *self.permission_classes, isInvestor, isOptedIn]]
+        return [permission() for permission in self.permission_classes]
 
     def list(self, _, pk=None):
         project = get_object_or_404(
@@ -37,7 +45,7 @@ class InvestmentView(CommonView):
                 "address": application_address(project.app_id),
                 "address_role": "receiver",
                 "asset_id": settings.ALGO_ASSET,
-                "min_amount": 1
+                "note_prefix": "I|".encode(),
             },
             reply_fields=[
                 "sender",
@@ -74,7 +82,7 @@ class InvestmentView(CommonView):
         Investment.objects.create(
             project=project,
             investor=request.user,
-            amount = serializer.validated_data['amount']
+            amount=serializer.validated_data['amount']
         )
 
         return Response(status=status.HTTP_201_CREATED)
@@ -98,7 +106,8 @@ class InvestmentView(CommonView):
         ).first()
 
         if len(transactions) > 0 and len(transactions[0]['application-transaction']['application-args']) > 1:
-            amount = base64.b64decode(transactions[0]['application-transaction']['application-args'][1])
+            amount = base64.b64decode(
+                transactions[0]['application-transaction']['application-args'][1])
             return Response(
                 {
                     "sync": Investment.SYNCED,

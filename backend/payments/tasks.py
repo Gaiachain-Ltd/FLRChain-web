@@ -2,7 +2,7 @@ import logging
 import uuid
 from celery import shared_task
 from payments.circle import CircleAPI
-from payments.models import CirclePayment, CircleTransfer, MTNPayout
+from payments.models import CirclePayment, MTNPayout
 from django.db import models, transaction
 from django.db.models import Q
 from django.conf import settings
@@ -47,13 +47,7 @@ def check_payment_status():
                         "currency": "USD"
                     }
                 }
-                transfer_circle_reply = circle_client.transfer_usdc(data)
-                CircleTransfer.objects.create(
-                    id=transfer_circle_reply['data']['id'],
-                    amount=transfer_circle_reply['data']['amount']['amount'],
-                    user=payment.user,
-                )
-
+                circle_client.transfer_usdc(data)
                 payment.claimed = True
 
             payment.save()
