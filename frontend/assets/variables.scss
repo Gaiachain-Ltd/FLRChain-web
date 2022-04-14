@@ -26,3 +26,7 @@ $text-field-details-padding-top: 2px !important;
     border-width: 1px;
     border-radius: 10px;
 }
+
+.v-data-table-header th {
+    white-space: nowrap;
+}
