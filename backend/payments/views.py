@@ -208,7 +208,7 @@ class FacilitatorPayoutView(CommonView):
 
         facililator_account = get_object_or_404(
             Account,
-            id=serializer.validated_data['id']
+            user__id=serializer.validated_data['id']
         )
 
         try:
