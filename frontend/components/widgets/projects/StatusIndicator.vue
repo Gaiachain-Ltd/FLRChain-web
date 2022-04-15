@@ -5,6 +5,8 @@
       backgroundColor: color,
       width: `${size}px`,
       height: `${size}px`,
+      minWidth: `${size}px`,
+      minHeight: `${size}px`,
       marginBottom: `${marginBottom}px`,
     }"
   ></div>

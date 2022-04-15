@@ -111,8 +111,6 @@ export default {
     DefaultProjectDelegate: () =>
       import("@/components/delegates/DefaultProjectDelegate"),
     ProjectGroup: () => import("@/components/lists/ProjectGroup"),
-    ProjectsCounter: () =>
-      import("@/components/widgets/projects/ProjectsCounter"),
     DefaultSVGIcon: () => import("@/components/icons/DefaultSVGIcon"),
   },
   async fetch() {

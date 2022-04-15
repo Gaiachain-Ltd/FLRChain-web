@@ -6,7 +6,7 @@
           project.title
         }}</DefaultText>
         <v-spacer></v-spacer>
-        <DefaultText :size="12" :color="$vuetify.theme.themes.light.quinary">{{
+        <DefaultText :size="12" class="mb-1" :color="$vuetify.theme.themes.light.quinary">{{
           indicatorTitle
         }}</DefaultText>
         <StatusIndicator class="ml-1" :color="indicatorColor"></StatusIndicator>
@@ -91,15 +91,6 @@ export default {
           return "Active";
         case STATUS.CLOSED:
           return "Closed";
-      }
-    },
-    arrowIcon() {
-      if (!this.project.investment) {
-        return require("@/assets/icons/arrow-project-blue.svg");
-      } else if (this.project.investment.status === 0) {
-        return require("@/assets/icons/arrow-project-red.svg");
-      } else {
-        return require("@/assets/icons/arrow-project-green.svg");
       }
     },
     timePeriod() {
