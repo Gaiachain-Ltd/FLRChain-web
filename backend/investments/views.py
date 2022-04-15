@@ -45,7 +45,7 @@ class InvestmentView(CommonView):
                 "address": application_address(project.app_id),
                 "address_role": "receiver",
                 "asset_id": settings.ALGO_ASSET,
-                "note_prefix": "I|".encode(),
+                "min_amount": 1
             },
             reply_fields=[
                 "sender",
