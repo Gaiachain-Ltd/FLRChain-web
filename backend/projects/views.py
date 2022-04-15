@@ -4,14 +4,16 @@ from rest_framework.response import Response
 from common.views import CommonView, NoGetQueryParametersSchema
 from projects.models import Project, Assignment
 from projects.serializers import *
-from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from users.models import CustomUser
-from django_filters import rest_framework as filters
 from users.permissions import *
 from algorand.utils import *
 from algorand import smartcontract
 from rest_framework import parsers
+from PIL import Image, ImageOps
+from django.core.files import File
+from io import BytesIO
+
 
 class ProjectView(CommonView):
     serializer_class = ProjectSerializer
@@ -119,7 +121,14 @@ class ProjectView(CommonView):
         serializer = ProjectImageSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        project.image = serializer.validated_data['image']
+        # Compress image:
+        im = Image.open(serializer.validated_data['image'])
+        im = im.convert('RGB')
+        im = ImageOps.exif_transpose(im)
+        im_io = BytesIO()
+        im.save(im_io, 'JPEG', quality=65)
+        new_image = File(im_io, name=project.image.name)
+        project.image = new_image
         project.save()
 
         return Response(
