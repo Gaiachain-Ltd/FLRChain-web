@@ -2,7 +2,7 @@
   <v-layout column shrink>
     <v-layout>
       <DefaultText class="mb-3" size="20">{{ title }}</DefaultText>
-      <v-badge class="badge" inline :content="projects.length" :color="counterColor"></v-badge>
+      <v-badge class="badge" style="margin-top: 6px" inline :content="projects.length" :color="counterColor"></v-badge>
       <v-spacer></v-spacer>
       <CollapseButton v-model="collapsed"></CollapseButton>
     </v-layout>
