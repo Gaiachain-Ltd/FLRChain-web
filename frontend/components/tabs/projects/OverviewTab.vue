@@ -63,6 +63,12 @@ import { mapGetters } from "vuex";
 
 export default {
   mixins: [ProjectMixin, SyncMixin],
+  props: {
+    isEditing: {
+      type: Boolean,
+      default: false,
+    },
+  },
   data() {
     return {
       FUNDRAISING: STATUS.FUNDRAISING,
@@ -72,8 +78,34 @@ export default {
       errorText: "",
     };
   },
+  watch: {
+    projectStringify(old_project, new_project) {
+      if (old_project && new_project) {
+        let a = JSON.parse(old_project);
+        let b = JSON.parse(new_project);
+        //Ignore some properties:
+        delete a["state"];
+        delete b["state"];
+        delete a["status"];
+        delete b["status"];
+        delete a["sync"];
+        delete b["sync"];
+        if (a.id == b.id && !!a.actions && !!b.actions && !_.isEqual(a, b)) {
+          this.internalIsEditing = true;
+        }
+      }
+    },
+  },
   computed: {
     ...mapGetters(["isFacililator"]),
+    internalIsEditing: {
+      get() {
+        return this.isEditing;
+      },
+      set(value) {
+        this.$emit("update:isEditing", value);
+      },
+    },
     isFundraising() {
       return this.project.status == this.FUNDRAISING;
     },
@@ -82,6 +114,13 @@ export default {
     },
     url() {
       return `projects/${this.project.id}/`;
+    },
+    projectStringify() {
+      if (this.project) {
+        return JSON.stringify(this.project);
+      } else {
+        return "";
+      }
     },
   },
   components: {
@@ -107,17 +146,22 @@ export default {
         this.onUpdate(reply.data);
       });
     },
-    update() {
+    update(silent) {
       if (this.$refs.form.validate()) {
-        this.project.sync = SYNC.TO_SYNC;
-        this.$axios
+        if (!silent) {
+          this.project.sync = SYNC.TO_SYNC;
+        }
+        return this.$axios
           .put(this.url, this.project)
           .then((reply) => {
             this.requestRefresh();
             this.onUpdate(reply.data);
+            this.$nextTick(() => (this.internalIsEditing = false));
           })
           .catch(() => {
-            this.project.sync = SYNC.SYNCED;
+            if (!silent) {
+              this.project.sync = SYNC.SYNCED;
+            }
             this.showErrorPopup();
           });
       } else {

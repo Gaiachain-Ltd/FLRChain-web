@@ -77,6 +77,9 @@ export default {
             this.$emit("update:project", reply.data);
           }
           this.loading = false;
+        })
+        .catch(error => {
+          console.log("ERROR", error);
         });
     },
   },

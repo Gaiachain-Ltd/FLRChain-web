@@ -28,6 +28,7 @@ export default {
         this.$timer.start("refresh");
         return true;
       }
+      this.$timer.stop("refresh");
       return false;
     },
   },

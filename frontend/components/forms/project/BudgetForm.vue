@@ -7,7 +7,7 @@
       <TextInput
         label="Facilitator administration funds"
         v-model="project.fac_adm_funds"
-        :rules="[...requiredRules, ...decimalRules, ...noLessThan(facAdmFunds)]"
+        :rules="facAdmFundsRules"
         :readonly="readonly"
         :icon="icon"
       >
@@ -42,6 +42,7 @@
 <script>
 import ValidatorMixin from "@/validators";
 import ProjectMixin from "@/mixins/ProjectMixin";
+import { STATUS } from "@/constants/project";
 
 export default {
   mixins: [ProjectMixin, ValidatorMixin],
@@ -57,6 +58,15 @@ export default {
       facAdmFunds: this.project && this.project.fac_adm_funds ? this.project.fac_adm_funds : 0.0, 
       icon: require("@/assets/icons/currency.svg"),
     };
+  },
+  computed: {
+    facAdmFundsRules() {
+      if (this.project && this.project.status == STATUS.FUNDRAISING) {
+        return [...this.requiredRules, ...this.decimalRules];
+      } else {
+        [...this.requiredRules, ...this.decimalRules, ...this.noLessThan(facAdmFunds)];
+      }
+    }
   },
   components: {
     DefaultText: () => import("@/components/texts/DefaultText"),

@@ -127,7 +127,7 @@ class ProjectView(CommonView):
         im = ImageOps.exif_transpose(im)
         im_io = BytesIO()
         im.save(im_io, 'JPEG', quality=65)
-        new_image = File(im_io, name=project.image.name)
+        new_image = File(im_io, name=f"image.jpg")
         project.image = new_image
         project.save()
 

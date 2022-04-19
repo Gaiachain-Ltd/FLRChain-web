@@ -2,6 +2,11 @@
   <v-layout column>
     <ToolBar title="Project details" showBackBtn></ToolBar>
     <v-layout column shrink>
+      <v-layout
+        v-if="isEditing"
+        @click.stop="handleLeaveBeforeSave"
+        class="unsavedChangesPanel"
+      ></v-layout>
       <v-card elevation-16 tile style="z-index: 1">
         <v-tabs
           v-model="currentProjectId"
@@ -16,9 +21,9 @@
             :value="`${project.id}`"
             active-class="active-project-tab"
             class="text-none inactive-project-tab"
-            >
+          >
             <span class="text-truncate">
-            {{ project.title }}
+              {{ project.title }}
             </span>
           </v-tab>
         </v-tabs>
@@ -36,8 +41,8 @@
                 :key="tab.name"
                 active-class="active-section-tab"
                 class="text-none inactive-section-tab"
-                >{{ tab.name }}</v-tab
-              >
+                >{{ tab.name }}
+              </v-tab>
             </v-tabs>
           </v-card>
           <v-layout>
@@ -50,6 +55,7 @@
                   class="ma-3"
                   v-if="currentProject && currentTab == index"
                   :project.sync="currentProject"
+                  :isEditing.sync="isEditing"
                   :is="tab.component"
                 ></component>
               </v-tab-item>
@@ -66,8 +72,10 @@
 import { mapGetters, mapActions } from "vuex";
 import { Utility } from "@/utils/project";
 import _ from "lodash";
+import UnsavedChangesMixin from "@/mixins/UnsavedChangesMixin";
 
 export default {
+  mixins: [UnsavedChangesMixin],
   data() {
     return {
       projects: [],
@@ -105,7 +113,7 @@ export default {
           this.getDetailsProjectId,
         ]);
         this.$set(this.projects, index, value);
-      }
+      },
     },
     tabs() {
       return [
@@ -139,6 +147,9 @@ export default {
   },
   methods: {
     ...mapActions(["updateDetailsProjectId"]),
+    handleLeaveBeforeSave(event) {
+      this.askForLeave(event, this.postClick);
+    }
   },
   components: {
     ToolBar: () => import("@/components/toolbar/ToolBar"),
@@ -149,14 +160,19 @@ export default {
     ProgressTab: () => import("@/components/tabs/projects/ProgressTab"),
   },
   async fetch() {
-    this.projects = await this.$axios
+    await this.$axios
       .get("projects/", {
         params: {
           status: Utility.statusValueByName(this.$route.params.status),
-          nodetails: true
+          nodetails: true,
         },
       })
-      .then((reply) => reply.data.results);
+      .then((reply) => {
+        this.projects = reply.data.results;
+        this.$nextTick(() => {
+          this.isEditing = false;
+        })
+      });
   },
 };
 </script>
@@ -183,5 +199,12 @@ export default {
   color: var(--v-primary-base);
   opacity: 1;
   word-spacing: normal;
+}
+.unsavedChangesPanel {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 140px;
+  z-index: 2;
 }
 </style>
