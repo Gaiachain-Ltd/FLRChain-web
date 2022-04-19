@@ -256,7 +256,7 @@ class ProjectSerializer(ProjectNoDetailsSerializer):
 
             instance.end = validated_data['end']
 
-            if instance.fac_adm_funds > validated_data['fac_adm_funds']:
+            if instance.status != Project.FUNDRAISING and instance.fac_adm_funds > validated_data['fac_adm_funds']:
                 raise serializers.ValidationError({
                     'fac_adm_funds': "Cannot be smaller than it is now."
                 })

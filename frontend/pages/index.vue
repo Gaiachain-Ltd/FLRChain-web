@@ -83,12 +83,15 @@ export default {
       );
     },
     activeProjects() {
-      const isFac = this.isFacililator
-      return _.filter(this.projects, function(project) {
+      const isFac = this.isFacililator;
+      return _.filter(this.projects, function (project) {
         if (isFac) {
           return project.status == STATUS.ACTIVE;
         } else {
-          return [STATUS.ACTIVE, STATUS.FUNDRAISING].includes(project.status) && project.invested;
+          return (
+            [STATUS.ACTIVE, STATUS.FUNDRAISING].includes(project.status) &&
+            project.invested
+          );
         }
       });
     },
@@ -113,16 +116,21 @@ export default {
     ProjectGroup: () => import("@/components/lists/ProjectGroup"),
     DefaultSVGIcon: () => import("@/components/icons/DefaultSVGIcon"),
   },
+  methods: {
+    getProjects: _.debounce(async function () {
+      this.projects = await this.$axios
+        .get("projects/", {
+          params: {
+            status: this.status !== -1 ? this.status : undefined,
+            search: !!this.search ? this.search : undefined,
+            nodetails: true,
+          },
+        })
+        .then((reply) => reply.data.results);
+    }, 300),
+  },
   async fetch() {
-    this.projects = await this.$axios
-      .get("projects/", {
-        params: {
-          status: this.status !== -1 ? this.status : undefined,
-          search: !!this.search ? this.search : undefined,
-          nodetails: true,
-        },
-      })
-      .then((reply) => reply.data.results);
+    this.getProjects();
   },
 };
 </script>

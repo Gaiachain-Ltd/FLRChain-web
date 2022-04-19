@@ -64,7 +64,7 @@ export default {
       if (this.project && this.project.status == STATUS.FUNDRAISING) {
         return [...this.requiredRules, ...this.decimalRules];
       } else {
-        [...this.requiredRules, ...this.decimalRules, ...this.noLessThan(facAdmFunds)];
+        [...this.requiredRules, ...this.decimalRules, ...this.noLessThan(this.facAdmFunds)];
       }
     }
   },
