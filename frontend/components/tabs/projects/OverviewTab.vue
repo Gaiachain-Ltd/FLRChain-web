@@ -43,7 +43,7 @@
         color="white"
         :border="`1px ${$vuetify.theme.themes.light.error} solid !important`"
         :textColor="`${$vuetify.theme.themes.light.error} !important`"
-        @click.prevent="close"
+        @click.prevent="showConfirmPopup"
         >Close project</ActionButton
       >
     </ActionBarCard>
@@ -52,6 +52,13 @@
       :value.sync="errorPopupVisible"
       :text="errorText"
     ></ErrorPopup>
+    <ConfirmPopup
+      v-if="confirmClosePopupVisible"
+      v-model="confirmClosePopupVisible"
+      text="Do you really want to close this project?"
+      @confirm="close"
+    >
+    </ConfirmPopup>
   </v-layout>
 </template>
 
@@ -76,6 +83,7 @@ export default {
       POSTPONED: STATE.POSTPONED,
       errorPopupVisible: false,
       errorText: "",
+      confirmClosePopupVisible: false,
     };
   },
   watch: {
@@ -84,13 +92,19 @@ export default {
         let a = JSON.parse(old_project);
         let b = JSON.parse(new_project);
         //Ignore some properties:
-        delete a["state"];
-        delete b["state"];
-        delete a["status"];
-        delete b["status"];
-        delete a["sync"];
-        delete b["sync"];
-        if (a.id == b.id && !!a.actions && !!b.actions && !_.isEqual(a, b)) {
+        ["state", "status", "sync", "app_id"].forEach((key) => {
+          delete a[key];
+          delete b[key];
+        });
+        if (
+          !!a.id &&
+          !!b.id &&
+          a.id == b.id &&
+          !!a.actions &&
+          !!b.actions &&
+          !_.isEqual(a, b)
+        ) {
+          console.log("EDITED!", a, b);
           this.internalIsEditing = true;
         }
       }
@@ -124,6 +138,7 @@ export default {
     },
   },
   components: {
+    ConfirmPopup: () => import("@/components/popups/ConfirmPopup"),
     ErrorPopup: () => import("@/components/popups/ErrorPopup"),
     ActionButton: () => import("@/components/buttons/ActionButton"),
     ActionBarCard: () => import("@/components/cards/ActionBarCard"),
@@ -156,7 +171,6 @@ export default {
           .then((reply) => {
             this.requestRefresh();
             this.onUpdate(reply.data);
-            this.$nextTick(() => (this.internalIsEditing = false));
           })
           .catch(() => {
             if (!silent) {
@@ -170,6 +184,7 @@ export default {
     },
     onUpdate(project) {
       this.$emit("update:project", project);
+      this.$nextTick(() => (this.internalIsEditing = false));
     },
     onRefresh() {
       this.$refs.progress.$fetch();
@@ -181,6 +196,9 @@ export default {
         this.errorText = "Something went wrong. Please try again later.";
       }
       this.errorPopupVisible = true;
+    },
+    showConfirmPopup() {
+      this.confirmClosePopupVisible = true;
     },
   },
   async fetch() {
