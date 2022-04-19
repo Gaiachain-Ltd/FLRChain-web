@@ -22,6 +22,3 @@ class Investment(models.Model):
     sync = models.PositiveSmallIntegerField(default=TO_SYNC, choices=STATES)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        unique_together = ('investor', 'project')

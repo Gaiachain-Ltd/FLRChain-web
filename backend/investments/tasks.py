@@ -16,7 +16,11 @@ def project_invest():
             investment.investor.account.address,
             investment.investor.account.private_key,
             investment.project.app_id,
-            investment.amount
+            investment.amount,
+            include_opt_in=not Investment.objects.filter(
+                sync=Investment.SYNCED, 
+                project=investment.project
+            ).exists()
         )
         investment.sync = Investment.SYNCED
         investment.save()

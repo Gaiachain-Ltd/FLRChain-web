@@ -103,14 +103,12 @@ def approval_program():
     # Invest:
     on_invest = Seq([
         Assert(is_investor),
-        Assert(Not(has_invested)),
         Assert(Or(is_initialized, is_started)),
         Assert(
             And(
-                Global.group_size() == Int(3),
-                Gtxn[2].type_enum() == TxnType.AssetTransfer,
-                Gtxn[2].xfer_asset() == Txn.assets[0],
-                Gtxn[2].asset_receiver() == Global.current_application_address()
+                Gtxn[Global.group_size()-Int(1)].type_enum() == TxnType.AssetTransfer,
+                Gtxn[Global.group_size()-Int(1)].xfer_asset() == Txn.assets[0],
+                Gtxn[Global.group_size()-Int(1)].asset_receiver() == Global.current_application_address()
             )
         ),
         App.localPut(
@@ -118,20 +116,23 @@ def approval_program():
             L_TOTAL_KEY,
             Add(
                 App.localGet(Txn.sender(), L_TOTAL_KEY),
-                Gtxn[2].asset_amount()
+                Gtxn[Global.group_size()-Int(1)].asset_amount()
             )
         ),
         App.globalPut(
             G_TOTAL_KEY,
             Add(
                 App.globalGet(G_TOTAL_KEY),
-                Gtxn[2].asset_amount()
+                Gtxn[Global.group_size()-Int(1)].asset_amount()
             )
         ),
         App.localPut(
             Txn.sender(),
             L_COUNT_KEY,
-            Int(1)
+            Add(
+                App.localGet(Txn.sender(), L_COUNT_KEY),
+                Int(1)
+            )
         ),
         Approve()
     ])
@@ -322,7 +323,7 @@ def approval_program():
         If(
             And(
                 And(is_investor, is_finished), 
-                App.localGet(Txn.sender(), L_COUNT_KEY) == Int(1)
+                App.localGet(Txn.sender(), L_COUNT_KEY) >= Int(1)
             ),
             Seq([
                 InnerTxnBuilder.Begin(),
@@ -390,6 +391,30 @@ def create(creator_address, creator_pk):
     return app_id
 
 
+def update_contract(creator_address, creator_pk, app_id):
+    approval_compiled = CLIENT.compile(approval_program())
+    clear_compiled = CLIENT.compile(clear_program())
+
+    approval_compiled_decoded = base64.b64decode(approval_compiled['result'])
+    clear_compiled_decoded = base64.b64decode(clear_compiled['result'])
+
+    params = CLIENT.suggested_params()
+
+    txn = transaction.ApplicationUpdateTxn(
+        creator_address,
+        params,
+        app_id,
+        approval_compiled_decoded,
+        clear_compiled_decoded,
+
+    )
+
+    txn_signed = txn.sign(creator_pk)
+    txn_id = CLIENT.send_transactions([txn_signed])
+
+    wait_for_confirmation(txn_id)
+
+
 def initialize(
     creator_address,
     creator_priv_key,
@@ -450,27 +475,30 @@ def opt_out(address, app_id, amount):
     return txn
 
 
-def invest(address, priv_key, app_id, amount, asset=settings.ALGO_ASSET):
+def invest(address, priv_key, app_id, amount, asset=settings.ALGO_ASSET, include_opt_in=True):
     params = CLIENT.suggested_params()
     app_address = get_application_address(app_id)
-
-    txn1 = opt_in(address, app_id, 2)
-    txn2 = transaction.ApplicationNoOpTxn(
+    
+    txns = list()
+    if include_opt_in:
+        txns.append(opt_in(address, app_id, 2))
+        
+    txns.append(transaction.ApplicationNoOpTxn(
         address,
         params,
         app_id,
         ["INVEST", algos_to_microalgos(amount)],
         foreign_assets=[asset],
         note="I|"
-    )
-    txn3 = prepare_transfer_assets(
+    ))
+    txns.append(prepare_transfer_assets(
         address,
         app_address,
         amount,
         asset=asset
-    )
+    ))
 
-    txn_id = sign_send_atomic_trasfer(priv_key, [txn1, txn2, txn3])
+    txn_id = sign_send_atomic_trasfer(priv_key, txns)
     wait_for_confirmation(txn_id)
 
 

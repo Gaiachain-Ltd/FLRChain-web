@@ -72,8 +72,8 @@ class InvestmentView(CommonView):
         project = get_object_or_404(
             Project,
             pk=pk,
-            status=Project.FUNDRAISING,
-            state__in=(Project.INITIALIZED, Project.POSTPONED)
+            status__in=(Project.FUNDRAISING, Project.ACTIVE),
+            state__in=(Project.INITIALIZED, Project.POSTPONED, Project.STARTED)
         )
 
         serializer = self.serializer_class(data=request.data)
@@ -97,7 +97,6 @@ class InvestmentView(CommonView):
             address=request.user.account.address,
             address_role="sender",
             note_prefix="I|".encode(),
-            limit=1
         )['transactions']
 
         registered_transaction = Investment.objects.filter(

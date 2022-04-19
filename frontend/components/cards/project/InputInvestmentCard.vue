@@ -12,23 +12,15 @@
           <InvestmentForm
             ref="investmentForm"
             :investment.sync="investment"
-            :readonly="status"
+            :readonly="!canInvest"
           ></InvestmentForm>
         </v-flex>
         <v-flex>
           <BlockButton
-            :disabled="project.sync == SYNCING"
+            :disabled="!canInvest"
             :loading="isSyncing"
-            @clicked="
-              () => {
-                if (status) {
-                  openExplorerTransactionLink(investment.txid);
-                } else {
-                  invest();
-                }
-              }
-            "
-            >{{ btnLabel }}</BlockButton
+            @clicked="invest"
+            >Invest</BlockButton
           >
         </v-flex>
       </v-layout>
@@ -41,7 +33,7 @@
 </template>
 
 <script>
-import { SYNC } from "@/constants/project";
+import { SYNC, STATUS } from "@/constants/project";
 import AlgoExplorerMixin from "@/mixins/AlgoExplorerMixin";
 import SyncMixin from "@/mixins/SyncMixin";
 
@@ -53,22 +45,25 @@ export default {
   data() {
     return {
       errorPopupVisible: false,
-      SYNCING: SYNC.TO_SYNC,
       investment: null,
     };
   },
   computed: {
-    status() {
-      return this.investment && this.investment.sync == SYNC.SYNCED;
-    },
-    btnLabel() {
-      return this.status ? "Details" : "Invest";
+    canInvest() {
+      return (
+        this.project.status != STATUS.CLOSED &&
+        this.project.sync != SYNC.SYNCING
+      );
     },
     url() {
       return `projects/${this.project.id}/investments/`;
     },
     isSyncing() {
-      return this.investment && (this.investment.sync == SYNC.SYNCING || this.investment.sync == SYNC.TO_SYNC);
+      return (
+        this.investment &&
+        (this.investment.sync == SYNC.SYNCING ||
+          this.investment.sync == SYNC.TO_SYNC)
+      );
     },
   },
   components: {
@@ -84,7 +79,7 @@ export default {
         this.$axios
           .post(`projects/${this.project.id}/investments/`, this.investment)
           .then(() => {
-            this.investment.sync = this.SYNCING;
+            this.investment.sync = SYNC.SYNCING;
             this.requestRefresh();
           })
           .catch(() => (this.errorPopupVisible = true));
