@@ -1,56 +1,93 @@
 <template>
-  <v-data-table
-    :headers="headers"
-    :items="activities"
-    no-data-text="No rewards"
-    hide-default-footer
-    :items-per-page="-1"
-  >
-    <template v-slot:item.task_name="{ item }">
-      {{ item.activity_type == 0 ? `${item.task_name}` : `${item.task_name} (BATCH)`}}
-    </template>
-    <template v-slot:item.amount="{ item }">
-      {{ amount(item) }}
-    </template>
-    <template v-slot:item.round-time="{ item }">
-      {{ datetime(item) }}
-    </template>
-    <template v-slot:item.status="{ item }">
-      <v-layout
-        align-center
-        v-if="isFacililator && (item.status == INITIAL || item.sync == SYNCING)"
-      >
-        <ActionButton
-          class="mr-1"
-          color="white"
-          :border="`1px ${$vuetify.theme.themes.light.success} solid !important`"
-          :textColor="$vuetify.theme.themes.light.success"
-          :loading="item.status == ACCEPTED"
-          :disabled="item.status == REJECTED"
-          @click.prevent="() => handleApproval(item, ACCEPTED)"
-          >Approve</ActionButton
+  <div>
+    <v-data-table
+      :headers="headers"
+      :items="activities"
+      no-data-text="No rewards"
+      hide-default-footer
+      :items-per-page="-1"
+    >
+      <template v-slot:item.task_name="{ item }">
+        {{
+          item.activity_type == 0
+            ? `${item.task_name}`
+            : `${item.task_name} (BATCH)`
+        }}
+      </template>
+      <template v-slot:item.amount="{ item }">
+        {{ amount(item) }}
+      </template>
+      <template v-slot:item.round-time="{ item }">
+        {{ datetime(item) }}
+      </template>
+      <template v-slot:item.data="{ item }">
+        <v-layout column v-if="item.activity_type == 0">
+          <v-layout
+            shrink
+            style="cursor: pointer"
+            @click.prevent="() => onShowPopup(item)"
+          >
+            <div>Photos:</div>
+            <DefaultSVGIcon
+              class="mx-1"
+              :icon="item.photos > 0 ? photosIcon : noPhotosIcon"
+            ></DefaultSVGIcon>
+          </v-layout>
+          <v-layout v-if="item.text">
+            <div>Text: {{ item.text }}</div>
+          </v-layout>
+          <v-layout v-if="item.area">
+            <div>Area: {{ item.area }}</div>
+          </v-layout>
+          <v-layout v-if="item.number">
+            <div>Number: {{ item.number }}</div>
+          </v-layout>
+        </v-layout>
+      </template>
+      <template v-slot:item.status="{ item }">
+        <v-layout
+          align-center
+          v-if="
+            isFacililator && (item.status == INITIAL || item.sync == SYNCING)
+          "
         >
-        <ActionButton
-          class="ml-1"
-          color="white"
-          :border="`1px ${$vuetify.theme.themes.light.error} solid !important`"
-          :textColor="$vuetify.theme.themes.light.error"
-          :loading="item.status == REJECTED"
-          :disabled="item.status == ACCEPTED"
-          @click.prevent="() => handleApproval(item, REJECTED)"
-          >Reject</ActionButton
-        >
-      </v-layout>
-      <div v-else :style="{ color: statusColor(item.status) }">
-        {{ status(item.status) }}
-      </div>
-    </template>
-    <template v-slot:item.details="{ item }">
-      <v-layout @click.prevent="() => openExplorerTransactionLink(item.txid)">
-        <a>See more</a>
-      </v-layout>
-    </template>
-  </v-data-table>
+          <ActionButton
+            class="mr-1"
+            color="white"
+            :border="`1px ${$vuetify.theme.themes.light.success} solid !important`"
+            :textColor="$vuetify.theme.themes.light.success"
+            :loading="item.status == ACCEPTED"
+            :disabled="item.status == REJECTED"
+            @click.prevent="() => handleApproval(item, ACCEPTED)"
+            >Approve</ActionButton
+          >
+          <ActionButton
+            class="ml-1"
+            color="white"
+            :border="`1px ${$vuetify.theme.themes.light.error} solid !important`"
+            :textColor="$vuetify.theme.themes.light.error"
+            :loading="item.status == REJECTED"
+            :disabled="item.status == ACCEPTED"
+            @click.prevent="() => handleApproval(item, REJECTED)"
+            >Reject</ActionButton
+          >
+        </v-layout>
+        <div v-else :style="{ color: statusColor(item.status) }">
+          {{ status(item.status) }}
+        </div>
+      </template>
+      <template v-slot:item.details="{ item }">
+        <v-layout @click.prevent="() => openExplorerTransactionLink(item.txid)">
+          <a>See more</a>
+        </v-layout>
+      </template>
+    </v-data-table>
+    <PhotoGalleryPopup
+      v-if="showPopup"
+      v-model="showPopup"
+      :activity="activityToShow"
+    ></PhotoGalleryPopup>
+  </div>
 </template>
 
 <script>
@@ -66,11 +103,15 @@ export default {
   },
   data() {
     return {
+      showPopup: false,
+      activityToShow: null,
       ACCEPTED: APPROVAL.ACCEPTED,
       REJECTED: APPROVAL.REJECTED,
       INITIAL: APPROVAL.INITIAL,
       SYNCING: SYNC.TO_SYNC,
       activities: [],
+      photosIcon: require("@/assets/icons/photos.svg"),
+      noPhotosIcon: require("@/assets/icons/no-photos.svg"),
       options: {
         sortBy: ["status"],
       },
@@ -88,6 +129,11 @@ export default {
           value: "amount",
         },
         {
+          text: "Data",
+          value: "data",
+          sortable: false,
+        },
+        {
           text: "Date",
           value: "round-time",
         },
@@ -98,7 +144,7 @@ export default {
         {
           text: "Details",
           value: "details",
-          sortable: false
+          sortable: false,
         },
       ],
     };
@@ -164,8 +210,18 @@ export default {
       this.activities = value;
       this.$emit("refresh");
     },
+    onShowPopup(activity) {
+      if (activity.photos > 0) {
+        this.activityToShow = activity;
+        this.showPopup = true;
+      }
+    },
   },
   components: {
+    DefaultText: () => import("@/components/texts/DefaultText"),
+    DefaultSVGIcon: () => import("@/components/icons/DefaultSVGIcon"),
+    PhotoGalleryPopup: () =>
+      import("@/components/popups/projects/PhotoGalleryPopup"),
     ActionButton: () => import("@/components/buttons/ActionButton"),
   },
   async fetch() {

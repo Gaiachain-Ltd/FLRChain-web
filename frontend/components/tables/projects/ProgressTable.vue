@@ -39,7 +39,6 @@
 </template>
 
 <script>
-import algosdk from "algosdk";
 import AlgoExplorerMixin from "@/mixins/AlgoExplorerMixin";
 import { APPROVAL } from "@/constants/project";
 
