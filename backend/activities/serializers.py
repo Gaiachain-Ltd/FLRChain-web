@@ -11,7 +11,6 @@ class ActivityTaskSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     name = serializers.CharField()
 
-
 class ActivityBeneficiarySerializer(serializers.Serializer):
     id = serializers.IntegerField()
     first_name = serializers.CharField()
