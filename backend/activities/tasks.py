@@ -3,7 +3,7 @@ from algorand import smartcontract
 from celery import shared_task
 from activities.models import Activity
 from django.db import transaction
-from projects.models import Task
+from projects.models import Task, Project
 
 
 logger = logging.getLogger(__name__)
@@ -22,6 +22,12 @@ def create_activity():
                 pk=activity.pk,
                 activity_type=Activity.WORK
             )
+
+            if activity.project.status == Project.CLOSED:
+                activity.status = Activity.REJECTED
+                activity.sync = Activity.SYNCED
+                activity.save()
+                continue
 
             smartcontract.work(
                 activity.user.account.address,
@@ -55,6 +61,12 @@ def verify_activity():
                 pk=activity.pk,
                 activity_type=Activity.WORK
             )
+
+            if activity.project.status == Project.CLOSED:
+                activity.status = Activity.REJECTED
+                activity.sync = Activity.SYNCED
+                activity.save()
+                continue
 
             if ((activity.status == Activity.ACCEPTED and activity.task.finished)
                 or (activity.project.usdc_balance() < activity.reward)

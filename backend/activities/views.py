@@ -1,6 +1,6 @@
 import base64
 from django.shortcuts import get_object_or_404
-from common.views import CommonView
+from common.views import CommonView, NoGetQueryParametersSchema
 from activities.serializers import ActivitySerializer
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.parsers import MultiPartParser
@@ -179,6 +179,37 @@ class ActivityView(CommonView):
 
         return Response({"sum": sum}, status=status.HTTP_200_OK)
 
+    @swagger_auto_schema(
+        auto_schema=NoGetQueryParametersSchema,
+        operation_summary="Task activities",
+        responses={
+            status.HTTP_200_OK: ActivitySerializer(many=True)
+        },
+        tags=['activities', 'beneficiary']
+    )
+    def task_activities(self, request, project_pk=None, task_pk=None):
+        project = get_object_or_404(
+            Project.objects.with_beneficiary_assignment_status(
+                request.user),
+            assignment_status=Assignment.ACCEPTED,
+            pk=project_pk
+        )
+
+        task = get_object_or_404(
+            Task,
+            project=project,
+            pk=task_pk,
+            deleted=False
+        )
+
+        activities = Activity.objects.filter(
+            user=request.user,
+            project=project,
+            task=task
+        )
+
+        serializer = self.serializer_class(activities, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 class PhotoView(CommonView):
     serializer_class = ActivityPhotoSerializer
