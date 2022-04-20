@@ -7,7 +7,7 @@
         class="ma-1"
         v-if="tag.tag_type != PHOTO_TYPE"
       >
-        <b>{{ tag.name }}</b>
+        <DefaultText :size="14" bold>{{ tag.name }}</DefaultText>
         {{ tagValue(tag) }}
       </v-layout>
     </template>
@@ -39,6 +39,9 @@ export default {
           return;
       }
     },
+  },
+  components: {
+    DefaultText: () => import("@/components/texts/DefaultText"),
   },
 };
 </script>
