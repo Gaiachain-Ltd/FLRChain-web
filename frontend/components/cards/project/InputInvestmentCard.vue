@@ -33,7 +33,7 @@
 </template>
 
 <script>
-import { SYNC, STATUS } from "@/constants/project";
+import { SYNC, STATUS, STATE } from "@/constants/project";
 import AlgoExplorerMixin from "@/mixins/AlgoExplorerMixin";
 import SyncMixin from "@/mixins/SyncMixin";
 
@@ -53,7 +53,8 @@ export default {
     canInvest() {
       return (
         this.project.status != STATUS.CLOSED &&
-        this.project.sync != SYNC.SYNCING
+        this.project.sync != SYNC.SYNCING &&
+        this.project.state >= STATE.INITIALIZED
       );
     },
     url() {
@@ -84,6 +85,9 @@ export default {
           .then(() => {
             this.investment.sync = SYNC.SYNCING;
             this.requestRefresh();
+            if (this.$route.path.includes("/project/fundraising")) {
+              this.$router.replace("/project/investments/details");
+            }
           })
           .catch(() => (this.errorPopupVisible = true));
       }
