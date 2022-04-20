@@ -88,7 +88,11 @@ class ActivityView(CommonView):
                 "area": activity.area,
                 "number": activity.number,
                 "activity_type": activity.activity_type,
-                "amount": activity.reward
+                "amount": activity.reward,
+                "tags": ActivityTaskTagSerializer(
+                    activity.task.data_tags, 
+                    many=True
+                ).data
             })
 
         return Response(data.values(), status=status.HTTP_200_OK)

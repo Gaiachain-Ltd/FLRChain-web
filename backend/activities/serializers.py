@@ -2,6 +2,13 @@ from activities.models import *
 from rest_framework import serializers
 
 
+class ActivityTaskTagSerializer(serializers.Serializer):
+    id = serializers.IntegerField(read_only=True)
+    name = serializers.CharField(read_only=True)
+    tag_type = serializers.IntegerField(read_only=True)
+    unit = serializers.CharField(read_only=True)
+
+
 class ActivityProjectSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     title = serializers.CharField()
@@ -10,6 +17,7 @@ class ActivityProjectSerializer(serializers.Serializer):
 class ActivityTaskSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     name = serializers.CharField()
+
 
 class ActivityBeneficiarySerializer(serializers.Serializer):
     id = serializers.IntegerField()

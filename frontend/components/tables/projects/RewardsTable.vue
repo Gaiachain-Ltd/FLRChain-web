@@ -21,28 +21,10 @@
         {{ datetime(item) }}
       </template>
       <template v-slot:item.data="{ item }">
-        <v-layout column v-if="item.activity_type == 0">
-          <v-layout
-            shrink
-            style="cursor: pointer"
-            @click.prevent="() => onShowPopup(item)"
-          >
-            <div>Photos:</div>
-            <DefaultSVGIcon
-              class="mx-1"
-              :icon="item.photos > 0 ? photosIcon : noPhotosIcon"
-            ></DefaultSVGIcon>
-          </v-layout>
-          <v-layout v-if="item.text">
-            <div>Text: {{ item.text }}</div>
-          </v-layout>
-          <v-layout v-if="item.area">
-            <div>Area: {{ item.area }}</div>
-          </v-layout>
-          <v-layout v-if="item.number">
-            <div>Number: {{ item.number }}</div>
-          </v-layout>
-        </v-layout>
+        <SubmittedDataCell
+          v-if="item.activity_type == 0"
+          :data="item"
+        ></SubmittedDataCell>
       </template>
       <template v-slot:item.status="{ item }">
         <v-layout
@@ -75,6 +57,17 @@
         <div v-else :style="{ color: statusColor(item.status) }">
           {{ status(item.status) }}
         </div>
+      </template>
+      <template v-slot:item.photos="{ item }">
+        <v-layout
+          shrink
+          style="cursor: pointer"
+          @click.prevent="() => onShowPopup(item)"
+        >
+          <DefaultSVGIcon
+            :icon="item.photos > 0 ? photosIcon : noPhotosIcon"
+          ></DefaultSVGIcon>
+        </v-layout>
       </template>
       <template v-slot:item.details="{ item }">
         <v-layout @click.prevent="() => openExplorerTransactionLink(item.txid)">
@@ -121,7 +114,7 @@ export default {
           value: "name",
         },
         {
-          text: "Task name",
+          text: "Task",
           value: "task_name",
         },
         {
@@ -132,6 +125,10 @@ export default {
           text: "Data",
           value: "data",
           sortable: false,
+        },
+        {
+          text: "Photos",
+          value: "photos",
         },
         {
           text: "Date",
@@ -223,6 +220,8 @@ export default {
     PhotoGalleryPopup: () =>
       import("@/components/popups/projects/PhotoGalleryPopup"),
     ActionButton: () => import("@/components/buttons/ActionButton"),
+    SubmittedDataCell: () =>
+      import("@/components/tables/projects/SubmittedDataCell"),
   },
   async fetch() {
     await this.$axios.get(this.url).then((reply) => {

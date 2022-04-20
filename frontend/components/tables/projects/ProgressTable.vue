@@ -18,6 +18,12 @@
           <a>See more</a>
         </v-layout>
       </template>
+      <template v-slot:item.data="{ item }">
+        <SubmittedDataCell
+          v-if="item.activity_type == 0"
+          :data="item"
+        ></SubmittedDataCell>
+      </template>
       <template v-slot:item.photos="{ item }">
         <v-layout
           shrink
@@ -68,20 +74,13 @@ export default {
           value: "amount",
         },
         {
-          text: "Text",
-          value: "text",
+          text: "Data",
+          value: "data",
+          sortable: false,
         },
         {
           text: "Photos",
           value: "photos",
-        },
-        {
-          text: "Area",
-          value: "area",
-        },
-        {
-          text: "Number",
-          value: "number",
         },
         {
           text: "Date",
@@ -90,7 +89,7 @@ export default {
         {
           text: "Details",
           value: "details",
-          sortable: false
+          sortable: false,
         },
       ],
     };
@@ -99,6 +98,8 @@ export default {
     DefaultSVGIcon: () => import("@/components/icons/DefaultSVGIcon"),
     PhotoGalleryPopup: () =>
       import("@/components/popups/projects/PhotoGalleryPopup"),
+    SubmittedDataCell: () =>
+      import("@/components/tables/projects/SubmittedDataCell"),
   },
   methods: {
     amount(item) {
