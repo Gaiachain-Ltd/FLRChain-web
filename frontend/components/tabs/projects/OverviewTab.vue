@@ -9,7 +9,7 @@
       <v-col class="ma-0 pa-3" md="8" sm="12">
         <DetailsBlockchainCard :project="project"></DetailsBlockchainCard>
       </v-col>
-      <v-col class="ma-0 pa-3" md="4" sm="12" v-if="!isFacililator">
+      <v-col class="ma-0 pa-3" md="4" sm="12" v-if="!isFacililator && project.status != CLOSED">
         <InputInvestmentCard
           :project="project"
           @refresh="onRefresh"

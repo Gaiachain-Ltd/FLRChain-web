@@ -108,7 +108,8 @@ def approval_program():
             And(
                 Gtxn[Global.group_size()-Int(1)].type_enum() == TxnType.AssetTransfer,
                 Gtxn[Global.group_size()-Int(1)].xfer_asset() == Txn.assets[0],
-                Gtxn[Global.group_size()-Int(1)].asset_receiver() == Global.current_application_address()
+                Gtxn[Global.group_size()-Int(1)].asset_receiver() == Global.current_application_address(),
+                Gtxn[Global.group_size()-Int(1)].asset_amount() == Btoi(Txn.application_args[1])
             )
         ),
         App.localPut(

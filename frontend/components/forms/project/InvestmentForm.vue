@@ -2,9 +2,8 @@
   <v-form ref="form" @submit.prevent>
     <v-layout column>
       <TextInput
-        v-if="investment"
         label="Coins for investment*"
-        v-model="investment.amount"
+        v-model="internalAmount"
         :rules="[...requiredRules, ...decimalRules, ...nonZeroDecimalRules]"
         :icon="icon"
         :readonly="readonly"
@@ -20,7 +19,7 @@ import ValidatorMixin from "@/validators";
 export default {
   mixins: [ValidatorMixin],
   props: {
-    investment: {},
+    amount: {},
     readonly: {
       type: Boolean,
       default: false
@@ -30,6 +29,16 @@ export default {
     return {
       icon: require("@/assets/icons/currency.svg"),
     };
+  },
+  computed: {
+    internalAmount: {
+      get() {
+        return this.amount;
+      },
+      set(value) {
+        this.$emit('update:amount', value);
+      }
+    }
   },
   components: {
     TextInput: () => import("@/components/inputs/TextInput"),

@@ -11,7 +11,7 @@
         <v-flex>
           <InvestmentForm
             ref="investmentForm"
-            :investment.sync="investment"
+            :amount.sync="amount"
             :readonly="!canInvest"
           ></InvestmentForm>
         </v-flex>
@@ -46,6 +46,7 @@ export default {
     return {
       errorPopupVisible: false,
       investment: null,
+      amount: "",
     };
   },
   computed: {
@@ -77,7 +78,9 @@ export default {
     invest() {
       if (this.$refs.investmentForm.validate()) {
         this.$axios
-          .post(`projects/${this.project.id}/investments/`, this.investment)
+          .post(`projects/${this.project.id}/investments/`, {
+            amount: this.amount,
+          })
           .then(() => {
             this.investment.sync = SYNC.SYNCING;
             this.requestRefresh();
