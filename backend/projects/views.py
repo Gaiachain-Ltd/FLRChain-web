@@ -244,7 +244,8 @@ class AssignmentView(CommonView):
             "beneficiary__id", 
             "beneficiary__first_name", 
             "beneficiary__last_name", 
-            "beneficiary__account__address"
+            "beneficiary__account__address",
+            "beneficiary__village"
         )
         
         for beneficiary in beneficiaries:
@@ -255,6 +256,7 @@ class AssignmentView(CommonView):
                 "user_id": beneficiary[3],
                 "name": f"{beneficiary[4]} {beneficiary[5]}",
                 "address": beneficiary[6],
+                "village": beneficiary[7]
             })
             
         return Response(data.values(), status=status.HTTP_200_OK)
