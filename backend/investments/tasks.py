@@ -19,7 +19,8 @@ def project_invest():
             investment.amount,
             include_opt_in=not Investment.objects.filter(
                 sync=Investment.SYNCED, 
-                project=investment.project
+                project=investment.project,
+                investor=investment.investor
             ).exists()
         )
         investment.sync = Investment.SYNCED
