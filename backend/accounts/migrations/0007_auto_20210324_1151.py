@@ -11,11 +11,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AddField(
-            model_name='account',
-            name='smart_contract',
-            field=models.OneToOneField(null=True, on_delete=django.db.models.deletion.CASCADE, to='smart_contracts.smartcontract'),
-        ),
         migrations.AlterField(
             model_name='account',
             name='private_key',
