@@ -211,11 +211,11 @@ def close_project():
             for address in addresses:
                 account = Account.objects.get(address=address)
                 if invested > 0 and account.user.type == CustomUser.INVESTOR:
-                    investment = Investment.objects.get(
+                    investment = Investment.objects.filter(
                         investor=account.user,
                         project=project,
                         sync=Investment.SYNCED
-                    ).amount
+                    ).aggregate(Sum('amount'))['amount__sum']
                     withdraw = (investment / invested) * total
                     if withdraw < 0:
                         withdraw = 0
