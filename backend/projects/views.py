@@ -163,6 +163,23 @@ class ProjectView(CommonView):
         serializer = TaskSerializer(tasks, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    @swagger_auto_schema(
+        operation_summary="Task details",
+        responses={
+            status.HTTP_200_OK: TaskSerializer
+        },
+        tags=['projects', 'facililator', 'beneficiary', 'investor']
+    )
+    def task(self, request, pk=None):
+        task = get_object_or_404(
+            Task,
+            pk=pk,
+            deleted=False
+        )
+        
+        serializer = TaskSerializer(task)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
     def close_project(self, request, pk=None):
         project = get_object_or_404(
             Project, 

@@ -11,4 +11,5 @@ urlpatterns = [
     path('projects/datatypetag/', DataTypeTagView.as_view({'post': 'create', 'delete': 'destroy'})),
     path('projects/datatag/', DataTagView.as_view({'post': 'create', 'delete': 'destroy'})),
     path('projects/tasks/', ProjectView.as_view({'post': 'my_tasks'})),
+    path('projects/task/<int:pk>/', ProjectView.as_view({'get': 'task'})),
 ]
