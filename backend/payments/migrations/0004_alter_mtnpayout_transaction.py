@@ -10,9 +10,4 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AlterField(
-            model_name='mtnpayout',
-            name='transaction',
-            field=models.CharField(blank=True, max_length=64, null=True),
-        ),
     ]
