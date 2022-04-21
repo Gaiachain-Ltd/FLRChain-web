@@ -37,17 +37,17 @@ export default {
     DefaultText: () => import("@/components/texts/DefaultText"),
   },
   async fetch() {
-    this.invested = 0;
+    let inv = 0;
     await this.$axios
       .get(`projects/${this.project.id}/investors/`)
       .then((reply) =>
         reply.data
           .map((investor) => algosdk.microalgosToAlgos(investor.amount))
           .forEach((amount) => {
-            this.invested += amount;
+            inv += amount;
           })
       );
-    this.invested = parseFloat(this.invested.toFixed(6));
+    this.invested = parseFloat(inv.toFixed(6));
   },
 };
 </script>

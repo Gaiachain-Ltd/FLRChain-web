@@ -25,7 +25,7 @@
       v-mask="mask ? `${mask}` : undefined"
       @blur="validate"
     >
-      <v-layout v-if="icon" column pr-2 mb-1 align-center slot="prepend-inner">
+      <v-layout v-if="icon" column pr-2 align-center slot="prepend-inner">
         <DefaultSVGIcon
           :class="readonly && 'readonly-icon'"
           :icon="icon"

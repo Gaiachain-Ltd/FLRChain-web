@@ -4,6 +4,7 @@
       <TextInput
         label="Coins for investment*"
         v-model="internalAmount"
+        placeholder="0"
         :rules="[...requiredRules, ...decimalRules, ...nonZeroDecimalRules]"
         :icon="icon"
         :readonly="readonly"
