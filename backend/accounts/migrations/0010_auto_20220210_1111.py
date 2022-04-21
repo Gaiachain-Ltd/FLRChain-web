@@ -12,10 +12,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name='account',
-            name='smart_contract',
-        ),
         migrations.AddField(
             model_name='account',
             name='project',
