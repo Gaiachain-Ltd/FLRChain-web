@@ -123,6 +123,9 @@ class Action(models.Model):
     milestones = models.ManyToManyField(
         'projects.Milestone', related_name='milestones')
 
+    class Meta:
+        ordering = ('pk',)
+
     def __str__(self) -> str:
         return self.name
 
@@ -131,6 +134,9 @@ class Milestone(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     tasks = models.ManyToManyField('projects.Task', related_name='tasks')
+
+    class Meta:
+        ordering = ('pk',)
 
     def __str__(self) -> str:
         return self.name
@@ -159,6 +165,9 @@ class DataTag(models.Model):
     tag_type = models.PositiveSmallIntegerField(
         default=TEXT_TYPE, choices=TAG_TYPES)
 
+    class Meta:
+        ordering = ('pk',)
+
 
 class Task(models.Model):
     action = models.ForeignKey(Action, on_delete=models.SET_NULL, null=True)
@@ -183,6 +192,9 @@ class Task(models.Model):
 
     finished = models.BooleanField(default=False)
     batch_paid = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ('pk',)
 
     def __str__(self) -> str:
         return self.name
