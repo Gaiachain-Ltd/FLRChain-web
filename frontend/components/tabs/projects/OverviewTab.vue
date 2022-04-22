@@ -109,7 +109,6 @@ export default {
           !!b.actions &&
           !_.isEqual(a, b)
         ) {
-          console.log("EDITED!", a, b);
           this.internalIsEditing = true;
         }
       }

@@ -40,12 +40,15 @@ class ActivitySerializer(serializers.ModelSerializer):
     text = serializers.CharField(required=False)
     area = serializers.IntegerField(required=False)
     number = serializers.IntegerField(required=False)
+    reward = serializers.IntegerField(read_only=True)
+    status = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Activity
         fields = ('id', 'project', 'task',
                   'created', 'beneficiary', 'txid', 'sync',
-                  'photos', 'text', 'area', 'number')
+                  'photos', 'text', 'area', 'number', 'status',
+                  'reward')
         read_only_fields = ('id', 'project', 'task', 'beneficiary',
                             'txid', 'sync')
 

@@ -209,7 +209,8 @@ class ActivityView(CommonView):
         activities = Activity.objects.filter(
             user=request.user,
             project=project,
-            task=task
+            task=task,
+            activity_type=Activity.WORK
         )
 
         serializer = self.serializer_class(activities, many=True)
