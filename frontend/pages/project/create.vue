@@ -70,7 +70,6 @@ export default {
     ToolBar: () => import("@/components/toolbar/ToolBar"),
     InputProjectCard: () =>
       import("@/components/cards/project/InputProjectCard"),
-    InputTasksCard: () => import("@/components/cards/project/InputTasksCard"),
     ActionBarCard: () => import("@/components/cards/ActionBarCard"),
     DefaultTitle: () => import("@/components/texts/DefaultTitle"),
     ErrorPopup: () => import("@/components/popups/ErrorPopup"),

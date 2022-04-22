@@ -47,7 +47,6 @@ export default {
     DefaultText: () => import("@/components/texts/DefaultText"),
     DefaultCard: () => import("@/components/cards/DefaultCard"),
     BalanceCard: () => import("@/components/cards/balance/BalanceCard"),
-    ButtonCard: () => import("@/components/cards/balance/ButtonCard"),
   },
   async fetch() {
     const balanceInfo = await this.$axios
