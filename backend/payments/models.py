@@ -5,6 +5,7 @@ from accounts.models import Account
 from payments.mtn import MTNAPI
 from django.conf import settings
 from algorand.utils import transfer_assets, INDEXER
+from algorand.smartcontract import NOTE_CASHOUT_MOBILE
 
 
 logger = logging.getLogger(__name__)
@@ -89,7 +90,8 @@ class MTNPayout(models.Model):
                 self.transaction = transfer_assets(
                     self.user.account,
                     Account.get_main_account(),
-                    self.amount
+                    self.amount,
+                    note=NOTE_CASHOUT_MOBILE
                 )
                 self.status = MTNPayout.TRANSFERED
                 self.success = True

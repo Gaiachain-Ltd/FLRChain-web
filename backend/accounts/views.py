@@ -156,8 +156,10 @@ class TransactionView(CommonView):
                 inner_transactions = transaction['inner-txns']
                 if len(inner_transactions) > 0:
                     txid = transaction['id']
+                    note = transaction.get('note', "")
                     transaction = inner_transactions[0]
                     transaction['id'] = txid
+                    transaction['note'] = note
 
             if transaction.get('asset-transfer-transaction', None) is None:
                 continue
@@ -173,6 +175,7 @@ class TransactionView(CommonView):
                 "amount": util.microalgos_to_algos(
                     asset_transaction_details['amount']
                 ),
+                "note": base64.b64decode(transaction.get("note", "")).decode(),
                 **project_dict.get(
                     transaction['sender'] if received else asset_transaction_details['receiver'],
                     {}

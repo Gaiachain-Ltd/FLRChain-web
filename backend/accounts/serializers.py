@@ -11,3 +11,4 @@ class TransactionSerializer(serializers.Serializer):
     created = serializers.DateTimeField()
     project_id = serializers.IntegerField(required=False)
     project_name = serializers.CharField(required=False)
+    note = serializers.CharField(required=False)

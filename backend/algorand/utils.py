@@ -72,11 +72,24 @@ def transfer_algos(sender, receiver, amount, close_remainder_to=None):
     return CLIENT.send_transaction(signed_txn)
 
 
-def transfer_assets(sender, receiver, amount,
-                    asset=settings.ALGO_ASSET, close_assets_to=None):
+def transfer_assets(
+    sender, 
+    receiver, 
+    amount,
+    asset=settings.ALGO_ASSET, 
+    close_assets_to=None,
+    note=None
+):
     _params = params()
-    atxn = AssetTransferTxn(sender.address, _params, receiver.address, int(amount * 1000000), asset,
-                            close_assets_to=close_assets_to.address if close_assets_to else None)
+    atxn = AssetTransferTxn(
+        sender.address, 
+        _params, 
+        receiver.address, 
+        util.algos_to_microalgos(amount), 
+        asset,
+        note=note,
+        close_assets_to=close_assets_to.address if close_assets_to else None
+    )
     signed_atxn = atxn.sign(sender.private_key)
     return CLIENT.send_transaction(signed_atxn)
 

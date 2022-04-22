@@ -17,6 +17,7 @@ from projects.models import Project, Assignment
 from algorand.utils import transfer_assets
 from django.shortcuts import get_object_or_404
 from accounts.models import Account
+from algorand.smartcontract import NOTE_CASHOUT_FAC
 
 
 logger = logging.getLogger(__name__)
@@ -215,7 +216,8 @@ class FacilitatorPayoutView(CommonView):
             txn = transfer_assets(
                 request.user.account,
                 facililator_account,
-                serializer.validated_data['amount']
+                serializer.validated_data['amount'],
+                note=NOTE_CASHOUT_FAC
             )
             success = True
         except Exception as e:

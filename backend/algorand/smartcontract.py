@@ -11,6 +11,14 @@ from algorand.utils import (INDEXER, CLIENT, wait_for_confirmation, prepare_tran
 from django.conf import settings
 
 
+NOTE_PAY_BEN_WORK = "P|W" #Pay for work
+NOTE_PAY_FAC_ADM = "P|F" #Pay for fac adm funds
+NOTE_PAYBACK_INV = "P|I" #Payback unspend funds
+NOTE_PAY_BEN_BATCH = "P|B" #Pay batch
+NOTE_CASHOUT_FAC = "C|F" #Cashout to facilitator
+NOTE_CASHOUT_MOBILE = "C|M" #Cashout to mobile
+
+
 def approval_program():
     G_STATUS_KEY = Bytes("status")
     G_TOTAL_KEY = Bytes("total")
@@ -218,6 +226,7 @@ def approval_program():
                     TxnField.xfer_asset: Txn.assets[0],
                     TxnField.asset_receiver: Txn.accounts[1],
                     TxnField.asset_amount: Btoi(Txn.application_args[1]),
+                    TxnField.note: Bytes(NOTE_PAY_BEN_WORK)
                 }),
                 InnerTxnBuilder.Submit(),
             ])
@@ -243,7 +252,8 @@ def approval_program():
                             TxnField.type_enum: TxnType.AssetTransfer,
                             TxnField.xfer_asset: Txn.assets[0],
                             TxnField.asset_receiver: Txn.sender(),
-                            TxnField.asset_amount: tmp.load()
+                            TxnField.asset_amount: tmp.load(),
+                            TxnField.note: Bytes(NOTE_PAY_FAC_ADM)
                         }),
                         InnerTxnBuilder.Submit(),
                         App.localPut(
@@ -268,6 +278,7 @@ def approval_program():
             TxnField.xfer_asset: Txn.assets[0],
             TxnField.asset_receiver: Txn.accounts[1],
             TxnField.asset_amount: Btoi(Txn.application_args[1]),
+            TxnField.note: Bytes(NOTE_PAY_BEN_BATCH)
         }),
         InnerTxnBuilder.Submit(),
         Approve()
@@ -333,6 +344,7 @@ def approval_program():
                     TxnField.xfer_asset: Txn.assets[0],
                     TxnField.asset_receiver: Txn.sender(),
                     TxnField.asset_amount: Btoi(Txn.application_args[0]),
+                    TxnField.note: Bytes(NOTE_PAYBACK_INV)
                 }),
                 InnerTxnBuilder.Submit(),
                 App.localPut(Txn.sender(), L_COUNT_KEY, Int(0))
