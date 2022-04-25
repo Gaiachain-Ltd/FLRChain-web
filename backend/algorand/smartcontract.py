@@ -361,12 +361,12 @@ def approval_program():
         [Txn.on_completion() == OnComplete.DeleteApplication, handle_delete],
         [Txn.on_completion() == OnComplete.NoOp, handle_noop]
     )
-    return compileTeal(program, Mode.Application, version=5)
+    return compileTeal(program, Mode.Application, version=6)
 
 
 def clear_program():
     program = Return(Int(1))
-    return compileTeal(program, Mode.Application, version=5)
+    return compileTeal(program, Mode.Application, version=6)
 
 
 def create(creator_address, creator_pk):
