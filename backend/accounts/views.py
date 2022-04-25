@@ -16,6 +16,7 @@ from rest_framework import status
 from django.http import HttpResponse
 from accounts.serializers import *
 from django.conf import settings
+from collections import defaultdict
 
 
 logger = logging.getLogger(__name__)
@@ -64,14 +65,14 @@ class AccountView(CommonView):
             txn_type="appl"
         )['transactions']
 
-        app_ids = dict()
+        app_ids = defaultdict(lambda: 0)
         for invest_transaction in invest_transactions:
             invest_details = invest_transaction['application-transaction']
             if len(invest_details['application-args']) > 1:
                 amount = base64.b64decode(
                     invest_details['application-args'][1])
                 app_ids[invest_details['application-id']
-                        ] = int.from_bytes(amount, "big")
+                        ] += int.from_bytes(amount, "big")
 
         projects = Project.objects.filter(
             app_id__in=app_ids.keys()
