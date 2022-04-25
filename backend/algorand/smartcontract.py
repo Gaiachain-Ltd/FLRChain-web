@@ -58,7 +58,10 @@ def approval_program():
     is_facilitator = App.localGet(
         Txn.sender(), L_ROLE_KEY) == FACILILTATOR_ROLE
 
-    has_invested = App.localGet(Txn.sender(), L_COUNT_KEY) != Int(0)
+    projectBalance = AssetHolding.balance(
+        Global.current_application_address(), Txn.assets[0])
+
+    tmp = ScratchVar(TealType.uint64)
 
     @Subroutine(TealType.uint64)
     def is_accepted(account):
@@ -88,8 +91,6 @@ def approval_program():
             App.globalGet(G_ADM_KEY),
             App.localGet(Txn.sender(), L_TOTAL_KEY)
         )
-
-    tmp = ScratchVar(TealType.uint64)
 
     # OPT-IN USDC:
     on_init = Seq([
@@ -272,15 +273,29 @@ def approval_program():
         Assert(is_facilitator),
         Assert(is_started),
         Assert(App.localGet(Txn.accounts[1], L_ROLE_KEY) == BENEFICIARY_ROLE),
-        InnerTxnBuilder.Begin(),
-        InnerTxnBuilder.SetFields({
-            TxnField.type_enum: TxnType.AssetTransfer,
-            TxnField.xfer_asset: Txn.assets[0],
-            TxnField.asset_receiver: Txn.accounts[1],
-            TxnField.asset_amount: Btoi(Txn.application_args[1]),
-            TxnField.note: Bytes(NOTE_PAY_BEN_BATCH)
-        }),
-        InnerTxnBuilder.Submit(),
+        projectBalance,
+        If(projectBalance.value() >= Btoi(Txn.application_args[1])).
+        Then(Seq([
+            InnerTxnBuilder.Begin(),
+            InnerTxnBuilder.SetFields({
+                TxnField.type_enum: TxnType.AssetTransfer,
+                TxnField.xfer_asset: Txn.assets[0],
+                TxnField.asset_receiver: Txn.accounts[1],
+                TxnField.asset_amount: Btoi(Txn.application_args[1]),
+                TxnField.note: Bytes(NOTE_PAY_BEN_BATCH)
+            }),
+            InnerTxnBuilder.Submit(),
+        ])).Else(Seq([
+            InnerTxnBuilder.Begin(),
+            InnerTxnBuilder.SetFields({
+                TxnField.type_enum: TxnType.AssetTransfer,
+                TxnField.xfer_asset: Txn.assets[0],
+                TxnField.asset_receiver: Txn.accounts[1],
+                TxnField.asset_amount: Int(0),
+                TxnField.note: Bytes(NOTE_PAY_BEN_BATCH)
+            }),
+            InnerTxnBuilder.Submit(),
+        ])),
         Approve()
     ])
 

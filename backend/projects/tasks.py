@@ -358,6 +358,9 @@ def payout_batch():
 
                 amount = task.batch / beneficiaries.count()
 
+                if task.project.usdc_balance() < (amount * beneficiaries.count()):
+                    amount = 0
+
                 txns = list()
                 for beneficiary in beneficiaries:
                     batch_activity = Activity.objects.create(
