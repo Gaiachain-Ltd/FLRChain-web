@@ -20,9 +20,9 @@
     </v-col>
     <v-spacer></v-spacer>
     <v-col>
-      <DefaultText size="14">Project</DefaultText>
+      <DefaultText size="14">{{ detailsTitle }}</DefaultText>
       <DefaultText size="18" :color="$vuetify.theme.themes.light.octonary">{{
-        transaction.project_name ? transaction.project_name : "-"
+        details
       }}</DefaultText>
     </v-col>
     <v-col>
@@ -111,6 +111,22 @@ export default {
       let sign = this.isReceived ? "+" : "-";
       return `${sign}${ this.transaction.amount } USDC`;
     },
+    detailsTitle() {
+      switch (this.transaction.note) {
+        case "C|F":
+          return "Transaction";
+        default:
+          return "Project";
+      }
+    },
+    details() {
+      switch (this.transaction.note) {
+        case "C|F":
+          return "from steward";
+        default:
+          return this.transaction.project_name ? this.transaction.project_name : "-";
+      }
+    }
   },
 };
 </script>
