@@ -42,6 +42,45 @@ def usdc_balance(address):
     return Decimal(0)
 
 
+def reserved_algos(address):
+    info = check_balance_info(address)
+
+    opted_in_apps_cost = 0
+    if info.get("total-apps-opted-in", None) is not None:
+        opted_in_apps_cost = info["total-apps-opted-in"] * 100000
+
+    opted_in_assets_cost = 0
+    if info.get("total-assets-opted-in", None) is not None:
+        opted_in_assets_cost = info["total-assets-opted-in"] * 100000
+
+    apps_created_cost = 0
+    if info.get("total-created-apps", None) is not None:
+        apps_created_cost = info["total-created-apps"] * 100000
+
+    assets_created_cost = 0
+    if info.get("total-created-assets", None) is not None:
+        assets_created_cost = info["total-created-assets"] * 100000
+
+    apps_uint_cost = 0
+    apps_byte_slice_cost = 0
+    if info.get("apps-total-schema", None) is not None and (opted_in_apps_cost > 0 or apps_created_cost > 0):
+        apps_uint_cost = info["apps-total-schema"]["num-uint"] * 28500
+        apps_byte_slice_cost = info["apps-total-schema"]["num-byte-slice"] * 50000
+
+    apps_extra_pages_cost = 0
+    if info.get("apps-total-extra-pages", None) is not None:
+        apps_extra_pages_cost = info["apps-total-extra-pages"] * 100000
+
+    return (
+        opted_in_apps_cost + 
+        opted_in_assets_cost + 
+        apps_created_cost + 
+        assets_created_cost + 
+        apps_uint_cost + 
+        apps_byte_slice_cost + 
+        apps_extra_pages_cost
+    ), info["amount"]
+
 def params():
     return CLIENT.suggested_params()
 

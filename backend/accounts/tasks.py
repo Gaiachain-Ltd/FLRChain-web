@@ -1,7 +1,13 @@
 import logging
 from celery import shared_task
 from accounts.models import Account
-from algorand.utils import CLIENT, wait_for_confirmation, sign_send_atomic_trasfer, prepare_transfer_algos, prepare_transfer_assets
+from algorand.utils import (CLIENT, wait_for_confirmation, 
+                            sign_send_atomic_trasfer, 
+                            prepare_transfer_algos, 
+                            prepare_transfer_assets,
+                            transfer_algos, 
+                            reserved_algos,
+                            util)
 from django.conf import settings
 
 
@@ -75,3 +81,19 @@ def transfer_back_funds():
             logger.warning("Account %s closed.", account.address)
         except Exception as e:
             logger.error("Error: %s", e)
+
+
+@shared_task()
+def resupply_algos():
+    accounts = Account.objects.filter(
+        type=Account.NORMAL_ACCOUNT,
+        opted_in=True
+    )
+
+    main = Account.get_main_account()
+
+    for account in accounts:
+        reserved, amount = reserved_algos(account.address)
+        if util.microalgos_to_algos(amount - reserved) <= 0.5:
+            txn = transfer_algos(main, account, settings.ALGO_OPT_IN_AMOUNT)
+            wait_for_confirmation(txn)

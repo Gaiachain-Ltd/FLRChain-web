@@ -183,6 +183,7 @@ CELERY_RESULT_BACKEND = "redis://redis:6379"
 DEFAULT_QUICK_SCHEDULE = timedelta(seconds=14)
 DEFAULT_NORMAL_SCHEDULE = timedelta(minutes=1)
 DEFAULT_SLOW_SCHEDULE = timedelta(minutes=5)
+DEFAULT_DAILY_SCHEDULE = timedelta(days=1)
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers.DatabaseScheduler'
 CELERY_BEAT_SCHEDULE = {
     "opt_in_accs": {
@@ -192,6 +193,10 @@ CELERY_BEAT_SCHEDULE = {
     "transfer_back_funds": {
         "task": "accounts.tasks.transfer_back_funds",
         "schedule": DEFAULT_SLOW_SCHEDULE
+    },
+    "resupply_algos": {
+        "task": "accounts.tasks.resupply_algos",
+        "schedule": DEFAULT_DAILY_SCHEDULE
     },
     "create_project": {
         "task": "projects.tasks.create_project",
@@ -248,7 +253,7 @@ CELERY_BEAT_SCHEDULE = {
     "mtn_payout": {
         "task": "payments.tasks.process_payouts",
         "schedule": DEFAULT_NORMAL_SCHEDULE
-    }
+    },
 }
 
 # Logging
