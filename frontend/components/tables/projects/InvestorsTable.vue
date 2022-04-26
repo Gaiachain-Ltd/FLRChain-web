@@ -14,7 +14,7 @@
     </template>
     <template v-slot:item.details="{ item }">
       <v-layout @click.prevent="() => openExplorerTransactionLink(item.id)">
-        <a>See more</a>
+        <a href="">See more</a>
       </v-layout>
     </template>
   </v-data-table>

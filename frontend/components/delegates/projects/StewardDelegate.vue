@@ -1,10 +1,15 @@
 <template>
-  <v-layout>
-    <DefaultText>{{ steward.name }}</DefaultText>
+  <v-layout @click.prevent="showPopup">
+    <a href="">{{ steward.name }}</a>
     <v-spacer></v-spacer>
-    <DefaultText :color="statusColor(steward.approval)" bold>{{
-      status(steward.approval)
+    <DefaultText :color="statusColor(steward.status)" bold>{{
+      status(steward.status)
     }}</DefaultText>
+    <ProfilePopup
+      v-if="show"
+      v-model="show"
+      :profileId="steward.user_id"
+    ></ProfilePopup>
   </v-layout>
 </template>
 
@@ -13,8 +18,14 @@ export default {
   props: {
     steward: {},
   },
+  data() {
+    return {
+      show: false,
+    };
+  },
   components: {
     DefaultText: () => import("@/components/texts/DefaultText"),
+    ProfilePopup: () => import("@/components/popups/profile/ProfilePopup"),
   },
   methods: {
     status(value) {
@@ -38,6 +49,9 @@ export default {
         default:
           return undefined;
       }
+    },
+    showPopup() {
+      this.show = true;
     },
   },
 };

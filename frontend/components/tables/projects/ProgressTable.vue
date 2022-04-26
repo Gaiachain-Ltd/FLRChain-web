@@ -7,6 +7,11 @@
       hide-default-footer
       :items-per-page="-1"
     >
+      <template v-slot:item.name="{ item }">
+        <StewardCell
+          :profile="{ name: item.name, id: item.user_id }"
+        ></StewardCell>
+      </template>
       <template v-slot:item.amount="{ item }">
         {{ amount(item) }}
       </template>
@@ -15,7 +20,7 @@
       </template>
       <template v-slot:item.details="{ item }">
         <v-layout @click.prevent="() => openExplorerTransactionLink(item.txid)">
-          <a>See more</a>
+          <a href="">See more</a>
         </v-layout>
       </template>
       <template v-slot:item.data="{ item }">
@@ -100,6 +105,7 @@ export default {
       import("@/components/popups/projects/PhotoGalleryPopup"),
     SubmittedDataCell: () =>
       import("@/components/tables/projects/SubmittedDataCell"),
+    StewardCell: () => import("@/components/tables/projects/StewardCell"),
   },
   methods: {
     amount(item) {

@@ -7,6 +7,11 @@
       hide-default-footer
       :items-per-page="-1"
     >
+    <template v-slot:item.name="{ item }">
+      <StewardCell
+        :profile="{ name: item.name, id: item.user_id }"
+      ></StewardCell>
+    </template>
       <template v-slot:item.task_name="{ item }">
         {{
           item.activity_type == 0
@@ -71,7 +76,7 @@
       </template>
       <template v-slot:item.details="{ item }">
         <v-layout @click.prevent="() => openExplorerTransactionLink(item.txid)">
-          <a>See more</a>
+          <a href="">See more</a>
         </v-layout>
       </template>
     </v-data-table>
@@ -222,6 +227,7 @@ export default {
     ActionButton: () => import("@/components/buttons/ActionButton"),
     SubmittedDataCell: () =>
       import("@/components/tables/projects/SubmittedDataCell"),
+    StewardCell: () => import("@/components/tables/projects/StewardCell"),
   },
   async fetch() {
     await this.$axios.get(this.url).then((reply) => {

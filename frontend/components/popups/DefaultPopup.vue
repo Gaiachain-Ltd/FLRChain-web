@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="dialog" max-width="400">
+  <v-dialog v-model="dialog" :max-width="maxWidth">
     <template v-slot:activator="{ on, attrs }">
       <slot v-bind:attrs="attrs" v-bind:on="on"></slot>
     </template>
@@ -28,6 +28,10 @@ export default {
     },
     show: {
       type: Boolean,
+    },
+    maxWidth: {
+      type: Number | String,
+      default: 400,
     },
   },
   computed: {

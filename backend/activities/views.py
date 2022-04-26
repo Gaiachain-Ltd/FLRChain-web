@@ -79,6 +79,7 @@ class ActivityView(CommonView):
         for activity in activities:
             data[str(activity.id)].update({
                 "name": f"{activity.user.first_name} {activity.user.last_name}",
+                "user_id": activity.user.id,
                 "task_id": activity.task.id,
                 "task_name": activity.task.name,
                 "status": activity.status,

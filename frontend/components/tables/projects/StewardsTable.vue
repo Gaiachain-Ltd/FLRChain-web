@@ -7,6 +7,11 @@
     no-data-text="No stewards"
     :items-per-page="-1"
   >
+    <template v-slot:item.name="{ item }">
+      <StewardCell
+        :profile="{ name: item.name, id: item.user_id }"
+      ></StewardCell>
+    </template>
     <template v-slot:item.round-time="{ item }">
       {{ datetime(item) }}
     </template>
@@ -52,7 +57,7 @@
           }
         "
       >
-        <a>See more</a>
+        <a href="">See more</a>
       </v-layout>
     </template>
   </v-data-table>
@@ -100,7 +105,7 @@ export default {
         {
           text: "Details",
           value: "details",
-          sortable: false
+          sortable: false,
         },
       ],
     };
@@ -165,6 +170,7 @@ export default {
   },
   components: {
     ActionButton: () => import("@/components/buttons/ActionButton"),
+    StewardCell: () => import("@/components/tables/projects/StewardCell"),
   },
   mounted() {
     this.requestRefresh();

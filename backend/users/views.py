@@ -14,6 +14,7 @@ from django.conf import settings
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
+from django.shortcuts import get_object_or_404
 
 
 @receiver(reset_password_token_created)
@@ -140,6 +141,24 @@ class UserInfoView(CommonView):
         serializer = UserInfoSerializer(request.user, data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    @swagger_auto_schema(
+        operation_summary="Retrieve steward profile",
+        request_body=UserInfoSerializer,
+        responses={
+            status.HTTP_200_OK: UserInfoSerializer
+        },
+        tags=['users', 'facililator', 'beneficiary', 'investor']
+    )
+    def retrieve(self, request, pk=None):
+        user = get_object_or_404(
+            CustomUser,
+            pk=pk,
+            type=CustomUser.BENEFICIARY
+        )
+
+        serializer = UserInfoSerializer(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 

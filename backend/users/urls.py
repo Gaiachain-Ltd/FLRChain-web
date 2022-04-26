@@ -30,6 +30,7 @@ decorated_change_password_view = swagger_auto_schema(
 urlpatterns = [
     path('login/', CustomAuthToken.as_view(), name='login'),
     path('register/', user_register, name='register'),
+    path('info/<int:pk>/', UserInfoView.as_view({'get': 'retrieve'})),
     path(
         'info/', UserInfoView.as_view({'get': 'list', 'post': 'update'}), name='info'),
     path('organization/',
