@@ -6,7 +6,7 @@
       :project="project"
     ></FundraisingProgressCard>
     <v-layout wrap>
-      <v-col class="ma-0 pa-3" md="8" sm="12">
+      <v-col class="ma-0 pa-3" :md="isFacililator ? 12 : 8" sm="12">
         <DetailsBlockchainCard :project="project"></DetailsBlockchainCard>
       </v-col>
       <v-col
@@ -20,14 +20,7 @@
           @refresh="onRefresh"
         ></InputInvestmentCard>
       </v-col>
-      <v-col
-        :class="['ma-0 pa-3', !isFacililator && isFundraising && 'order-md-2']"
-        md="4"
-        sm="12"
-      >
-        <DetailsStewardsCard :project="project"></DetailsStewardsCard>
-      </v-col>
-      <v-col class="ma-0 pa-3" :md="!isFundraising ? 12 : 8" sm="12">
+      <v-col class="ma-0 pa-3" sm="12">
         <InputProjectCard
           ref="form"
           :project.sync="project"
