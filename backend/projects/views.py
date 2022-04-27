@@ -13,6 +13,7 @@ from rest_framework import parsers
 from PIL import Image, ImageOps
 from django.core.files import File
 from io import BytesIO
+from rest_framework.permissions import IsAuthenticated
 
 
 class ProjectView(CommonView):
