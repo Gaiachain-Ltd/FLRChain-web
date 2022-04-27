@@ -17,6 +17,7 @@ NOTE_PAYBACK_INV = "P|I" #Payback unspend funds
 NOTE_PAY_BEN_BATCH = "P|B" #Pay batch
 NOTE_CASHOUT_FAC = "C|F" #Cashout to facilitator
 NOTE_CASHOUT_MOBILE = "C|M" #Cashout to mobile
+NOTE_CASHOUT_ADDRESS = "C|A" # Cashout to wallet address
 
 
 def approval_program():

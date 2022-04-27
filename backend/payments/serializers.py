@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from projects.models import Project
+from algosdk import encoding
 
 
 class BillingDetailsSerializer(serializers.Serializer):
@@ -47,6 +48,17 @@ class FacililatorSerializer(serializers.ModelSerializer):
 class FacililatorPayoutSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     amount = serializers.DecimalField(max_digits=26, decimal_places=6)
+
+
+class WalletPayoutSerializer(serializers.Serializer):
+    address = serializers.CharField()
+    amount = serializers.DecimalField(max_digits=26, decimal_places=6)
+
+    def validate_address(self, address):
+        if not encoding.is_valid_address(address):
+            raise serializers.ValidationError(
+                {'address': 'Invalid Algorand address'})
+        return address
 
 
 class PayoutResultSerializer(serializers.Serializer):

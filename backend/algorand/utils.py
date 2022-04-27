@@ -119,15 +119,30 @@ def transfer_assets(
     close_assets_to=None,
     note=None
 ):
+    if isinstance(sender, str):
+        snd = sender
+    else:
+        snd = sender.address
+    print("REC", receiver, type(receiver))
+    if isinstance(receiver, str):
+        rec = receiver
+    else:
+        rec = receiver.address
+
+    if isinstance(close_assets_to, str):
+        close_assets_to = close_assets_to
+    elif close_assets_to is not None:
+        close_assets_to = close_assets_to.address
+
     _params = params()
     atxn = AssetTransferTxn(
-        sender.address, 
+        snd, 
         _params, 
-        receiver.address, 
+        rec, 
         util.algos_to_microalgos(amount), 
         asset,
         note=note,
-        close_assets_to=close_assets_to.address if close_assets_to else None
+        close_assets_to=close_assets_to
     )
     signed_atxn = atxn.sign(sender.private_key)
     return CLIENT.send_transaction(signed_atxn)

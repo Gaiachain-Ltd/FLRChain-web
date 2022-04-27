@@ -17,7 +17,7 @@ from projects.models import Project, Assignment
 from algorand.utils import transfer_assets
 from django.shortcuts import get_object_or_404
 from accounts.models import Account
-from algorand.smartcontract import NOTE_CASHOUT_FAC
+from algorand.smartcontract import NOTE_CASHOUT_FAC, NOTE_CASHOUT_ADDRESS
 
 
 logger = logging.getLogger(__name__)
@@ -222,6 +222,43 @@ class FacilitatorPayoutView(CommonView):
             success = True
         except Exception as e:
             logger.error(f"[Facililator Payout Error]: {e}")
+            success = False
+
+        serializer = PayoutResultSerializer(
+            {
+                'txid': txn,
+                'success': success
+            }
+        )
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class WalletPayoutView(CommonView):
+    permission_classes = (IsAuthenticated, isBeneficiary)
+
+    @swagger_auto_schema(
+        auto_schema=NoGetQueryParametersSchema,
+        operation_summary="Wallet address payout",
+        request_body=WalletPayoutSerializer,
+        responses={
+            status.HTTP_200_OK: PayoutResultSerializer
+        },
+        tags=['payments', 'beneficiary'],
+    )
+    def payout(self, request):
+        serializer = WalletPayoutSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        try:
+            txn = transfer_assets(
+                request.user.account,
+                serializer.validated_data['address'],
+                serializer.validated_data['amount'],
+                note=NOTE_CASHOUT_ADDRESS
+            )
+            success = True
+        except Exception as e:
+            logger.error(f"[Wallet Payout Error]: {e}")
             success = False
 
         serializer = PayoutResultSerializer(
