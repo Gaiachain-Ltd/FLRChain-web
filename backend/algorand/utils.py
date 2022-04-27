@@ -123,7 +123,7 @@ def transfer_assets(
         snd = sender
     else:
         snd = sender.address
-    print("REC", receiver, type(receiver))
+        
     if isinstance(receiver, str):
         rec = receiver
     else:

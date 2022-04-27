@@ -141,8 +141,6 @@ export default {
     ActionBarCard: () => import("@/components/cards/ActionBarCard"),
     DetailsBlockchainCard: () =>
       import("@/components/cards/project/DetailsBlockchainCard"),
-    DetailsStewardsCard: () =>
-      import("@/components/cards/project/DetailsStewardsCard"),
     FundraisingProgressCard: () =>
       import("@/components/cards/project/FundraisingProgressCard"),
     InputProjectCard: () =>

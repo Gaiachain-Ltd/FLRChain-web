@@ -1,21 +1,15 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import status
-from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from investments.serializers import InvestmentSerializer
 from common.views import CommonView
 from projects.models import Project
 from investments.models import Investment
 from rest_framework.response import Response
-from django.db import transaction
 from users.permissions import isInvestor, isOptedIn
-from rest_framework.permissions import IsAuthenticated
-from algorand.smartcontract import invest
 from django.db.models import Sum
 from users.models import CustomUser
-from algorand.utils import get_transactions_info, get_transactions, application_address
-import datetime
-from django.conf import settings
+from algorand.utils import get_transactions
 import base64
 from algosdk import util
 from collections import defaultdict

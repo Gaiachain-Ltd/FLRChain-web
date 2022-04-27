@@ -1,5 +1,4 @@
 from rest_framework import serializers
-from decimal import *
 
 
 class InvestmentSerializer(serializers.Serializer):

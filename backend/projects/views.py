@@ -20,15 +20,6 @@ class ProjectView(CommonView):
     parser_classes = (parsers.MultiPartParser, parsers.JSONParser)
     search_fields = ('title',)
 
-    # def get_permissions(self):
-    #     """
-    #     Only facililator can make and update projects.
-    #     """
-    #     if self.request.method in ["POST", "PUT"]:
-    #         return [permission() for permission in [
-    #             *self.permission_classes, isFacilitator, isOptedIn]]
-    #     return [permission() for permission in self.permission_classes]
-
     @swagger_auto_schema(
         auto_schema=NoGetQueryParametersSchema,
         operation_summary="Project list",
@@ -202,6 +193,7 @@ class ProjectView(CommonView):
 
 class DataTypeTagView(CommonView):
     serializer_class = DataTypeTagSerializer
+    permission_classes = (IsAuthenticated, isFacilitator)
 
     def create(self, request):
         serializer = self.serializer_class(data=request.data)
@@ -217,6 +209,7 @@ class DataTypeTagView(CommonView):
 
 class DataTagView(CommonView):
     serializer_class = DataTagSerializer
+    permission_classes = (IsAuthenticated, isFacilitator)
     
     def create(self, request):
         serializer = self.serializer_class(data=request.data)
@@ -233,21 +226,21 @@ class DataTagView(CommonView):
 class AssignmentView(CommonView):
     serializer_class = AssignmentSerializer
 
-    # def get_permissions(self):
-    #     """
-    #     Only beneficiary can make join request.
-    #     Only facililator can get list of pending beneficiaries.
-    #     Only facililator can accept/reject join request.
-    #     """
-    #     if self.request.method == "POST":
-    #         return [permission() for permission in [*self.permission_classes, isBeneficiary]]
-    #     elif self.request.method in ["GET", "PUT"]:
-    #         return [permission() for permission in [*self.permission_classes, isFacilitator]]
-    #     return [permission() for permission in self.permission_classes]
+    def get_permissions(self):
+        """
+        Only beneficiary can make join request.
+        Only facililator can accept/reject join request.
+        """
+        if self.request.method == "POST":
+            return [permission() for permission in [*self.permission_classes, isBeneficiary]]
+        elif self.request.method == "PUT":
+            return [permission() for permission in [*self.permission_classes, isFacilitator]]
+        return [permission() for permission in self.permission_classes]
 
     @swagger_auto_schema(
         operation_summary="Beneficiary list",
-        tags=['assignment', 'facililator'])
+        tags=['assignment', 'facililator']
+    )
     def list(self, request, pk=None):
         project = get_object_or_404(Project, pk=pk)
         data = smartcontract.get_beneficiaries(project.app_id)
@@ -284,7 +277,8 @@ class AssignmentView(CommonView):
         responses={
             status.HTTP_201_CREATED: AssignmentSerializer
         },
-        tags=['assignment', 'beneficiary'])
+        tags=['assignment', 'beneficiary']
+    )
     def create(self, request, pk=None):
         project = get_object_or_404(Project, pk=pk)
         assignment = Assignment.objects.create(
@@ -296,7 +290,8 @@ class AssignmentView(CommonView):
     @swagger_auto_schema(
         operation_summary="Accept or reject join request",
         request_body=AssignmentSerializer,
-        tags=['assignment', 'facililator'])
+        tags=['assignment', 'facililator']
+    )
     def update(self, request, pk=None):
         assignment = get_object_or_404(
             Assignment, 

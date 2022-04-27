@@ -1,5 +1,4 @@
-from django.urls import path, include
-from rest_framework.authtoken.views import obtain_auth_token
+from django.urls import path
 from rest_framework import status
 from users.views import *
 from drf_yasg.utils import swagger_auto_schema
