@@ -217,6 +217,7 @@ class ActivityView(CommonView):
         serializer = self.serializer_class(activities, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
 class PhotoView(CommonView):
     serializer_class = ActivityPhotoSerializer
     parser_classes = (MultiPartParser,)

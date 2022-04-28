@@ -52,6 +52,7 @@ class ActivitySerializer(serializers.ModelSerializer):
         read_only_fields = ('id', 'project', 'task', 'beneficiary',
                             'txid', 'sync')
 
+
 class CreateActivitySerializer(serializers.ModelSerializer):
     text = serializers.CharField(required=False)
     area = serializers.IntegerField(required=False)
@@ -60,6 +61,7 @@ class CreateActivitySerializer(serializers.ModelSerializer):
     class Meta:
         model = Activity
         fields = ('text', 'area', 'number')
+
 
 class ActivityVerificationSerializer(serializers.Serializer):
     status = serializers.IntegerField()

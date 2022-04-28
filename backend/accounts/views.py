@@ -54,7 +54,6 @@ class AccountView(CommonView):
     @swagger_auto_schema(
         auto_schema=NoGetQueryParametersSchema,
         operation_summary="Investor balance",
-        operation_description=(""),
         tags=['accounts', 'investor'],
     )
     def details(self, request):
@@ -118,7 +117,8 @@ class TransactionView(CommonView):
         responses={
             status.HTTP_200_OK: TransactionSerializer
         },
-        tags=['transactions', 'beneficiary', 'facililator', 'investor'])
+        tags=['transactions', 'beneficiary', 'facililator', 'investor']
+    )
     def list(self, request):
         requestor_address = request.user.account.address
 

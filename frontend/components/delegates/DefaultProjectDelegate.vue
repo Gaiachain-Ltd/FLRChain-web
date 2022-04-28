@@ -67,7 +67,6 @@ export default {
       import("@/components/widgets/projects/StatusIndicator"),
     DefaultText: () => import("@/components/texts/DefaultText"),
     DefaultSVGIcon: () => import("@/components/icons/DefaultSVGIcon"),
-    LabeledTextWithIcon: () => import("@/components/texts/LabeledTextWithIcon"),
     ActionButton: () => import("@/components/buttons/ActionButton"),
     MapButton: () => import("@/components/buttons/MapButton"),
   },
