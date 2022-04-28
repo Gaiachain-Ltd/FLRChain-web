@@ -32,7 +32,6 @@ def approval_program():
     L_ROLE_KEY = Bytes("role")
     L_JOIN_KEY = Bytes("join")
     L_COUNT_KEY = Bytes("count")
-    L_BALANCE_KEY = Bytes("balance")
 
     INITIAL_STATUS = Int(0)
     INITIALIZED_STATUS = Int(1)
@@ -125,14 +124,6 @@ def approval_program():
                 Gtxn[Global.group_size()-Int(1)].asset_amount() == Btoi(Txn.application_args[1])
             )
         ),
-        App.localPut(
-            Txn.sender(),
-            L_TOTAL_KEY,
-            Add(
-                App.localGet(Txn.sender(), L_TOTAL_KEY),
-                Gtxn[Global.group_size()-Int(1)].asset_amount()
-            )
-        ),
         App.globalPut(
             G_TOTAL_KEY,
             Add(
@@ -171,22 +162,6 @@ def approval_program():
         Assert(Len(Txn.note()) > Int(3)),
         Assert(Extract(Txn.note(), Int(0), Int(3)) == Bytes(NOTE_WORK)),
         Assert(is_accepted(Txn.sender())),
-        App.localPut(
-            Txn.sender(),
-            L_TOTAL_KEY,
-            Add(
-                App.localGet(Txn.sender(), L_TOTAL_KEY),
-                Btoi(Txn.application_args[1])
-            )
-        ),
-        App.localPut(
-            Txn.sender(),
-            L_COUNT_KEY,
-            Add(
-                App.localGet(Txn.sender(), L_COUNT_KEY),
-                Int(1)
-            )
-        ),
         Approve()
     ])
 
@@ -202,33 +177,9 @@ def approval_program():
                 Btoi(Txn.application_args[2]) == REJECTED_VERIFY
             )
         ),
-        App.localPut(
-            Txn.accounts[1],
-            L_TOTAL_KEY,
-            Minus(
-                App.localGet(Txn.accounts[1], L_TOTAL_KEY),
-                Btoi(Txn.application_args[1])
-            )
-        ),
-        App.localPut(
-            Txn.accounts[1],
-            L_COUNT_KEY,
-            Minus(
-                App.localGet(Txn.accounts[1], L_COUNT_KEY),
-                Int(1)
-            )
-        ),
         If(Btoi(Txn.application_args[2]) == ACCEPTED_VERIFY).
         Then(
             Seq([
-                App.localPut(
-                    Txn.accounts[1],
-                    L_BALANCE_KEY,
-                    Add(
-                        App.localGet(Txn.accounts[1], L_BALANCE_KEY),
-                        Btoi(Txn.application_args[1])
-                    )
-                ),
                 InnerTxnBuilder.Begin(),
                 InnerTxnBuilder.SetFields({
                     TxnField.type_enum: TxnType.AssetTransfer,
@@ -401,7 +352,7 @@ def create(creator_address, creator_pk):
     approval_compiled_decoded = base64.b64decode(approval_compiled['result'])
     clear_compiled_decoded = base64.b64decode(clear_compiled['result'])
 
-    local_ints = 5
+    local_ints = 4
     local_bytes = 0
     global_ints = 3
     global_bytes = 1
