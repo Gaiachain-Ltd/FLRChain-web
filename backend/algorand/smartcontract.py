@@ -16,6 +16,10 @@ NOTE_PAY_BEN_BATCH = "P|B" #Pay batch
 NOTE_CASHOUT_FAC = "C|F" #Cashout to facilitator
 NOTE_CASHOUT_MOBILE = "C|M" #Cashout to mobile
 NOTE_CASHOUT_ADDRESS = "C|A" # Cashout to wallet address
+NOTE_INVESTMENT = "I|"
+NOTE_WORK = "W|W"
+NOTE_VERIFY = "W|V"
+NOTE_BATCH = "W|B"
 
 
 def approval_program():
@@ -60,7 +64,7 @@ def approval_program():
     projectBalance = AssetHolding.balance(
         Global.current_application_address(), Txn.assets[0])
 
-    tmp = ScratchVar(TealType.uint64)
+    tmp_int = ScratchVar(TealType.uint64)
 
     @Subroutine(TealType.uint64)
     def is_accepted(account):
@@ -112,6 +116,7 @@ def approval_program():
     on_invest = Seq([
         Assert(is_investor),
         Assert(Or(is_initialized, is_started)),
+        Assert(Txn.note() == Bytes(NOTE_INVESTMENT)),
         Assert(
             And(
                 Gtxn[Global.group_size()-Int(1)].type_enum() == TxnType.AssetTransfer,
@@ -163,6 +168,8 @@ def approval_program():
     on_work = Seq([
         Assert(is_beneficiary),
         Assert(is_started),
+        Assert(Len(Txn.note()) > Int(3)),
+        Assert(Extract(Txn.note(), Int(0), Int(3)) == Bytes(NOTE_WORK)),
         Assert(is_accepted(Txn.sender())),
         App.localPut(
             Txn.sender(),
@@ -186,6 +193,8 @@ def approval_program():
     on_verify = Seq([
         Assert(is_facilitator),
         Assert(is_started),
+        Assert(Len(Txn.note()) > Int(3)),
+        Assert(Extract(Txn.note(), Int(0), Int(3)) == Bytes(NOTE_VERIFY)),
         Assert(is_accepted(Txn.accounts[1])),
         Assert(
             Or(
@@ -243,8 +252,8 @@ def approval_program():
         If(is_started). # Send ADM FEE
         Then(
             Seq([
-                tmp.store(facilitator_adm_fee_withdraw()),
-                If(tmp.load() > Int(0)).
+                tmp_int.store(facilitator_adm_fee_withdraw()),
+                If(tmp_int.load() > Int(0)).
                 Then(
                     Seq([
                         InnerTxnBuilder.Begin(),
@@ -252,7 +261,7 @@ def approval_program():
                             TxnField.type_enum: TxnType.AssetTransfer,
                             TxnField.xfer_asset: Txn.assets[0],
                             TxnField.asset_receiver: Txn.sender(),
-                            TxnField.asset_amount: tmp.load(),
+                            TxnField.asset_amount: tmp_int.load(),
                             TxnField.note: Bytes(NOTE_PAY_FAC_ADM)
                         }),
                         InnerTxnBuilder.Submit(),
@@ -272,6 +281,8 @@ def approval_program():
         Assert(is_facilitator),
         Assert(is_started),
         Assert(App.localGet(Txn.accounts[1], L_ROLE_KEY) == BENEFICIARY_ROLE),
+        Assert(Len(Txn.note()) > Int(3)),
+        Assert(Extract(Txn.note(), Int(0), Int(3)) == Bytes(NOTE_BATCH)),
         projectBalance,
         If(projectBalance.value() >= Btoi(Txn.application_args[1])).
         Then(Seq([
@@ -516,7 +527,7 @@ def invest(address, priv_key, app_id, amount, asset=settings.ALGO_ASSET, include
         app_id,
         ["INVEST", algos_to_microalgos(amount)],
         foreign_assets=[asset],
-        note="I|"
+        note=NOTE_INVESTMENT
     ))
     txns.append(prepare_transfer_assets(
         address,
@@ -624,7 +635,7 @@ def work(address, priv_key, activity_id, amount, app_id):
         params,
         app_id,
         ["WORK", algos_to_microalgos(amount)],
-        note=f"W|W|{activity_id}"
+        note=f"{NOTE_WORK}|{activity_id}"
     )
     txn_signed = txn.sign(priv_key)
     txn_id = CLIENT.send_transactions([txn_signed])
@@ -638,7 +649,7 @@ def verify(address, priv_key, beneficiary_address, activity_id, amount, value, a
         params,
         app_id,
         ["VERIFY", algos_to_microalgos(amount), value],
-        note=f"W|V|{activity_id}",
+        note=f"{NOTE_VERIFY}|{activity_id}",
         foreign_assets=[settings.ALGO_ASSET],
         accounts=[beneficiary_address]
     )
@@ -654,7 +665,7 @@ def batch(address, beneficiary_address, task_id, amount, app_id):
         params,
         app_id,
         ["BATCH", algos_to_microalgos(amount)],
-        note=f"W|B|{task_id}",
+        note=f"{NOTE_BATCH}|{task_id}",
         foreign_assets=[settings.ALGO_ASSET],
         accounts=[beneficiary_address]
     )
