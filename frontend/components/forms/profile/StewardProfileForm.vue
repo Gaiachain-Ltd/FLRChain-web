@@ -2,36 +2,49 @@
   <v-form ref="form" @submit.prevent>
     <v-layout column>
       <v-layout>
-        <TextInput
-          label="First name"
-          v-model="value.first_name"
-          :readonly="readonly"
-        ></TextInput>
+        <v-flex xs5>
+          <v-layout column>
+            <DefaultText :size="12"> First name </DefaultText>
+            <DefaultText :size="14" class="mt-1 text-wrap" color="#a6a6a6">{{
+              value.first_name
+            }}</DefaultText>
+          </v-layout>
+        </v-flex>
         <v-spacer></v-spacer>
-        <TextInput
-          label="Last name"
-          v-model="value.last_name"
-          :readonly="readonly"
-        ></TextInput>
+        <v-flex xs5>
+          <v-layout column>
+            <DefaultText :size="12"> Last name </DefaultText>
+            <DefaultText :size="14" class="mt-1 text-wrap" color="#a6a6a6">{{
+              value.last_name
+            }}</DefaultText>
+          </v-layout>
+        </v-flex>
       </v-layout>
-      <v-layout>
-        <TextInput
-          label="Email"
-          v-model="value.email"
-          :readonly="readonly"
-        ></TextInput>
+      <v-layout class="mt-3">
+        <v-flex xs5>
+          <v-layout column>
+            <DefaultText :size="12"> Email </DefaultText>
+            <DefaultText :size="14" class="mt-1 text-wrap" color="#a6a6a6">{{
+              value.email
+            }}</DefaultText>
+          </v-layout>
+        </v-flex>
         <v-spacer></v-spacer>
-        <TextInput
-          label="Phone"
-          v-model="value.phone"
-          :readonly="readonly"
-        ></TextInput>
+        <v-flex xs5>
+          <v-layout column>
+            <DefaultText :size="12"> Phone </DefaultText>
+            <DefaultText :size="14" class="mt-1 text-wrap" color="#a6a6a6">{{
+              value.phone
+            }}</DefaultText>
+          </v-layout>
+        </v-flex>
       </v-layout>
-      <TextInput
-        label="Village"
-        v-model="value.village"
-        :readonly="readonly"
-      ></TextInput>
+      <v-layout column class="mt-3">
+        <DefaultText :size="12"> Village </DefaultText>
+        <DefaultText :size="14" class="mt-1 text-wrap" color="#a6a6a6">{{
+          value.village
+        }}</DefaultText>
+      </v-layout>
     </v-layout>
   </v-form>
 </template>
@@ -47,6 +60,7 @@ export default {
   },
   components: {
     TextInput: () => import("@/components/inputs/TextInput"),
+    DefaultText: () => import("@/components/texts/DefaultText"),
   },
 };
 </script>
