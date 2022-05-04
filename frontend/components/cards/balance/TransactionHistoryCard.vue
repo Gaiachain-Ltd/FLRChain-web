@@ -1,6 +1,12 @@
 <template>
-  <DefaultCardWithTitle title="History">
-    <v-layout column ma-0>
+  <DefaultCard>
+    <v-layout column>
+      <DefaultText
+        class="mb-3"
+        :color="$vuetify.theme.themes.light.primary"
+        bold
+        >Wallet History</DefaultText
+      >
       <template v-for="transaction in transactions">
         <v-layout column :key="transaction.id" ma-0>
           <v-layout
@@ -23,7 +29,7 @@
         </v-layout>
       </template>
     </v-layout>
-  </DefaultCardWithTitle>
+  </DefaultCard>
 </template>
 
 <script>
@@ -35,8 +41,8 @@ export default {
   },
   components: {
     DefaultText: () => import("@/components/texts/DefaultText"),
-    DefaultCardWithTitle: () =>
-      import("@/components/cards/DefaultCardWithTitle"),
+    DefaultCard: () =>
+      import("@/components/cards/DefaultCard"),
     TransactionDelegate: () =>
       import("@/components/delegates/TransactionDelegate"),
   },
@@ -47,12 +53,13 @@ export default {
       for (let index = 0; index < transactions.length; index++) {
         const element = transactions[index];
         let addSeparatorWithDate = false;
-        
+        const dt = this.$moment(element['created'], "YYYY-MM-DD")
+
         if (!date) {
-          date = element.created;
+          date = dt;
           addSeparatorWithDate = true;
-        } else if (this.$moment(date).diff(element.created, "days") != 0) {
-          date = element.created;
+        } else if (date.diff(dt, "days") != 0) {
+          date = dt;
           addSeparatorWithDate = true;
         }
 
@@ -60,7 +67,7 @@ export default {
           id: date + index,
           separator: true,
           date: addSeparatorWithDate
-            ? this.$moment(date).format("YYYY-MM-DD")
+            ? date.format("YYYY-MM-DD")
             : undefined,
         });
         processedTransactions.push(element);
@@ -70,7 +77,7 @@ export default {
   },
   async fetch() {
     this.transactions = this.processTransactions(
-      await this.$axios.get("transactions/").then((reply) => reply.data.results)
+      await this.$axios.get("transactions/").then((reply) => reply.data)
     );
   },
 };

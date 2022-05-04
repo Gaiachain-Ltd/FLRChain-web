@@ -1,6 +1,6 @@
 <template>
   <TextInput
-    :text.sync="internalText"
+    v-model="internalText"
     :label="label"
     :placeholder="placeholder"
     type="password"

@@ -1,7 +1,7 @@
 <template>
   <v-flex
     shrink
-    :class="[clickable && 'pointer-cursor']"
+    :class="[clickable && 'pointer-cursor', bold && 'font-weight-bold']"
     @click.prevent="$emit('clicked')"
     :style="{
       color: color || $vuetify.theme.themes.light.quaternary,
@@ -30,8 +30,12 @@ export default {
     },
     family: {
       type: String,
-      default: "muli"
-    }
+      default: "Open Sans",
+    },
+    bold: {
+      type: Boolean,
+      default: false,
+    },
   },
 };
 </script>

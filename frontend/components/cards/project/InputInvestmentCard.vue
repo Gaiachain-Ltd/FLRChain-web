@@ -1,20 +1,30 @@
 <template>
   <div>
-    <DefaultCardWithTitle title="Invest in project:">
-      <v-layout column ma-0>
+    <DefaultCard>
+      <v-layout column>
+        <DefaultText
+          class="my-3"
+          bold
+          :color="$vuetify.theme.themes.light.primary"
+          >Invest in project</DefaultText
+        >
         <v-flex>
           <InvestmentForm
             ref="investmentForm"
-            :investment.sync="investment"
+            :amount.sync="amount"
+            :readonly="!canInvest"
           ></InvestmentForm>
         </v-flex>
         <v-flex>
-          <BlockButton :disabled="disabled" @clicked="invest"
+          <BlockButton
+            :disabled="!canInvest"
+            :loading="isSyncing"
+            @clicked="invest"
             >Invest</BlockButton
           >
         </v-flex>
       </v-layout>
-    </DefaultCardWithTitle>
+    </DefaultCard>
     <ErrorPopup
       v-if="errorPopupVisible"
       :value.sync="errorPopupVisible"
@@ -23,28 +33,45 @@
 </template>
 
 <script>
+import { SYNC, STATUS, STATE } from "@/constants/project";
+import AlgoExplorerMixin from "@/mixins/AlgoExplorerMixin";
+import SyncMixin from "@/mixins/SyncMixin";
+
 export default {
+  mixins: [AlgoExplorerMixin, SyncMixin],
   props: {
     project: {},
-    disabled: {
-      type: Boolean,
-      default: false,
-    },
   },
   data() {
     return {
       errorPopupVisible: false,
-      investment: {
-        amount: "0",
-        start: this.project.start,
-        end: this.project.end,
-      },
+      investment: null,
+      amount: "",
     };
   },
+  computed: {
+    canInvest() {
+      return (
+        this.project.status != STATUS.CLOSED &&
+        this.project.sync != SYNC.SYNCING &&
+        this.project.state >= STATE.INITIALIZED
+      );
+    },
+    url() {
+      return `projects/${this.project.id}/investments/`;
+    },
+    isSyncing() {
+      return (
+        this.investment &&
+        (this.investment.sync == SYNC.SYNCING ||
+          this.investment.sync == SYNC.TO_SYNC)
+      );
+    },
+  },
   components: {
+    DefaultText: () => import("@/components/texts/DefaultText"),
     ErrorPopup: () => import("@/components/popups/ErrorPopup"),
-    DefaultCardWithTitle: () =>
-      import("@/components/cards/DefaultCardWithTitle"),
+    DefaultCard: () => import("@/components/cards/DefaultCard"),
     InvestmentForm: () => import("@/components/forms/project/InvestmentForm"),
     BlockButton: () => import("@/components/buttons/BlockButton"),
   },
@@ -52,14 +79,29 @@ export default {
     invest() {
       if (this.$refs.investmentForm.validate()) {
         this.$axios
-          .post(
-            `projects/${this.$route.params.id}/investments/`,
-            this.investment
-          )
-          .then(() => this.$emit("refresh"))
+          .post(`projects/${this.project.id}/investments/`, {
+            amount: this.amount,
+          })
+          .then(() => {
+            this.investment.sync = SYNC.SYNCING;
+            this.requestRefresh();
+            if (this.$route.path.includes("/project/fundraising")) {
+              this.$router.replace("/project/investments/details");
+            }
+          })
           .catch(() => (this.errorPopupVisible = true));
       }
     },
+    onUpdate(value) {
+      this.investment = value;
+      this.$emit("refresh");
+    },
+  },
+  async fetch() {
+    await this.$axios.get(this.url).then((reply) => {
+      this.investment = reply.data;
+      this.requestRefresh();
+    });
   },
 };
 </script>

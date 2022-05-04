@@ -1,10 +1,11 @@
 import uuid
 import logging
 from django.db import models
-from transactions.models import Transaction
 from accounts.models import Account
 from payments.mtn import MTNAPI
 from django.conf import settings
+from algorand.utils import transfer_assets, INDEXER
+from algorand.smartcontract import NOTE_CASHOUT_MOBILE
 
 
 logger = logging.getLogger(__name__)
@@ -43,27 +44,6 @@ class CirclePayment(models.Model):
     claimed = models.BooleanField(default=False)
 
 
-class CircleTransfer(models.Model):
-    FAILED = 'failed'
-    PENDING = 'pending'
-    COMPLETE = 'complete'
-
-    STATUS = (
-        (FAILED, "Failed"),
-        (PENDING, "Pending"),
-        (COMPLETE, "Complete")
-    )
-
-    id = models.CharField(max_length=255, primary_key=True, editable=False)
-    amount = models.DecimalField(
-        max_digits=26, decimal_places=6, default=0)
-    status = models.CharField(max_length=10, choices=STATUS, default=PENDING)
-    user = models.ForeignKey(
-        'users.CustomUser', on_delete=models.SET_NULL, null=True)
-    transaction = models.OneToOneField(
-        'transactions.Transaction', on_delete=models.SET_NULL, null=True)
-
-
 class MTNPayout(models.Model):
     """
     1. Wait for celery.
@@ -94,8 +74,7 @@ class MTNPayout(models.Model):
     status = models.PositiveSmallIntegerField(choices=STATUS, default=PENDING)
     user = models.ForeignKey(
         'users.CustomUser', on_delete=models.SET_NULL, null=True)
-    transaction = models.OneToOneField(
-        'transactions.Transaction', on_delete=models.SET_NULL, null=True)
+    transaction = models.CharField(max_length=64, null=True, blank=True)
     success = models.NullBooleanField(default=None)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
@@ -107,26 +86,28 @@ class MTNPayout(models.Model):
             logger.warning(f"Insufficient funds: {self.amount}/{usdc_balance}")
             self.success = False
         else:
-            self.transaction = Transaction.transfer(
-                self.user.account, 
-                Account.get_main_account(),
-                self.amount,
-                Transaction.USDC,
-                Transaction.PAYOUT
-            )
-            self.status = MTNPayout.TRANSFERED
-            self.success = True
+            try:
+                self.transaction = transfer_assets(
+                    self.user.account,
+                    Account.get_main_account(),
+                    self.amount,
+                    note=NOTE_CASHOUT_MOBILE
+                )
+                self.status = MTNPayout.TRANSFERED
+                self.success = True
+            except Exception as e:
+                logger.error(f"[MTN Payout Error]: {e}")
+                self.success = False
 
         self.save()
 
     def confirm(self):
-        if self.transaction.status == Transaction.REJECTED:
-            self.success = False
-        elif self.transaction.status == Transaction.PENDING:
-            self.success = None
-        else:
+        try:
+            INDEXER.transaction(self.transaction)
             self.status = MTNPayout.CONFIRMED
             self.success = True
+        except Exception as e:
+            self.success = None
 
         self.save()
 

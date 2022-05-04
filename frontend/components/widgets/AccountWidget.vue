@@ -22,7 +22,7 @@
     <v-flex v-else>
       <AccountWidgetDelegate
         label="Invested:"
-        :value="spent"
+        :value="allocated"
         usdc
       ></AccountWidgetDelegate>
     </v-flex>
@@ -46,7 +46,7 @@ export default {
   data() {
     return {
       total: 0,
-      spent: 0,
+      allocated: 0,
       balance: 0,
       projectCount: 0,
       projectActiveCount: 0,
@@ -67,19 +67,19 @@ export default {
   },
   async fetch() {
     const balanceInfo = await this.$axios
-      .get("accounts/")
+      .get("accounts/details/")
       .then((reply) => reply.data);
-    this.total = balanceInfo.total;
-    this.spent = balanceInfo.spent;
+    this.allocated = balanceInfo.allocated;
     this.balance = balanceInfo.balance;
+    this.total = parseFloat((this.allocated + this.balance).toFixed(6));
 
     if (this.isFacililator) {
       this.projectCount = await this.$axios
-        .get("projects/")
+        .get("projects/?nodetails=true")
         .then((reply) => reply.data.count);
 
       this.projectActiveCount = await this.$axios
-        .get("projects/", { investment__isnull: false })
+        .get("projects/", { investment__isnull: false, nodetails: true })
         .then((reply) => reply.data.count);
     }
   },

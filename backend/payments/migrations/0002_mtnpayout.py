@@ -10,7 +10,6 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('transactions', '0019_alter_transaction_action'),
         ('payments', '0001_initial'),
     ]
 
@@ -25,7 +24,6 @@ class Migration(migrations.Migration):
                 ('success', models.NullBooleanField(default=None)),
                 ('created', models.DateTimeField(auto_now_add=True)),
                 ('modified', models.DateTimeField(auto_now=True)),
-                ('transaction', models.OneToOneField(null=True, on_delete=django.db.models.deletion.SET_NULL, to='transactions.transaction')),
                 ('user', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to=settings.AUTH_USER_MODEL)),
             ],
         ),

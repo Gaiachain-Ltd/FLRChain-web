@@ -4,12 +4,18 @@
       label
     }}</DefaultText>
     <v-text-field
-      class="text-field-style"
+      :class="['text-field-style', readonly && 'mt-0 pt-0']"
       :placeholder="placeholder"
-      solo
+      :solo="!readonly"
+      :readonly="readonly"
+      :disabled="readonly"
       flat
       :background-color="
-        hasError ? '#FBF7F7' : $vuetify.theme.themes.light.tertiary
+        readonly
+          ? 'white'
+          : hasError
+          ? '#FBF7F7'
+          : $vuetify.theme.themes.light.tertiary
       "
       height="50"
       v-model="internalText"
@@ -19,8 +25,14 @@
       v-mask="mask ? `${mask}` : undefined"
       @blur="validate"
     >
-      <v-layout v-if="icon" column pr-2 mb-1 align-center slot="prepend-inner">
-        <DefaultSVGIcon :icon="icon"></DefaultSVGIcon>
+      <v-layout v-if="icon" column pr-2 align-center slot="prepend-inner">
+        <DefaultSVGIcon
+          :class="readonly && 'readonly-icon'"
+          :icon="icon"
+        ></DefaultSVGIcon>
+      </v-layout>
+      <v-layout slot="append">
+        <slot name="append"></slot>
       </v-layout>
     </v-text-field>
   </v-layout>
@@ -37,9 +49,7 @@ export default {
       type: String,
       default: "",
     },
-    text: {
-      type: String,
-    },
+    value: {},
     rules: {
       type: Array,
       default: () => [],
@@ -57,12 +67,16 @@ export default {
     },
     type: {
       type: String,
-      default: 'text'
+      default: "text",
     },
     mask: {
       type: String,
-      default: undefined
-    }
+      default: undefined,
+    },
+    readonly: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -80,10 +94,10 @@ export default {
   computed: {
     internalText: {
       get() {
-        return this.text;
+        return this.value;
       },
       set(value) {
-        this.$emit("update:text", value);
+        this.$emit("input", value);
       },
     },
     internalError: {
@@ -118,6 +132,9 @@ export default {
 <style scoped lang="scss">
 .text-field-style {
   border-radius: 7px !important;
+}
+.readonly-icon {
+  margin-top: 8px !important;
 }
 </style>
 

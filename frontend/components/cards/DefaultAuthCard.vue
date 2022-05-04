@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-card :width="width" class="auth-transition">
+    <v-card :width="width" class="auth-transition elevation-16">
       <v-card-title class="px-6">
         <div class="auth-title">{{ title }}</div>
       </v-card-title>
@@ -42,12 +42,17 @@ export default {
   },
   computed: {
     width() {
-      switch (this.$vuetify.breakpoint.name){
-        case 'xs': return 350
-        case 'sm': return 400
-        case 'md': return 500
-        case 'lg': return 550
-        case 'xl': return 600
+      switch (this.$vuetify.breakpoint.name) {
+        case "xs":
+          return 350;
+        case "sm":
+          return 400;
+        case "md":
+          return 450;
+        case "lg":
+          return 500;
+        case "xl":
+          return 550;
       }
     },
   },
@@ -77,17 +82,16 @@ export default {
 
 <style scoped>
 .auth-title {
-  font-family: "open-sans" !important;
+  font-family: "Open Sans" !important;
   font-weight: 400 !important;
-  font-size: 32px !important;
-  line-height: 42px !important;
-  color: var(--v-primary-base);
+  font-size: 28px !important;
+  line-height: 40px !important;
+  color: var(--v-quinary-base);
 }
 .auth-transition {
-    -moz-transition: width 1s ease-in-out, left 1.5s ease-in-out;
-    -webkit-transition: width 1s ease-in-out, left 1.5s ease-in-out;
-    -o-transition: width 1s ease-in-out, left 1.5s ease-in-out;
-    transition: width 1s ease-in-out, left 1.5s ease-in-out;
+  -moz-transition: width 1s ease-in-out, left 1.5s ease-in-out;
+  -webkit-transition: width 1s ease-in-out, left 1.5s ease-in-out;
+  -o-transition: width 1s ease-in-out, left 1.5s ease-in-out;
+  transition: width 1s ease-in-out, left 1.5s ease-in-out;
 }
-
 </style>

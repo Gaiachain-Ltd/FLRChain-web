@@ -9,7 +9,7 @@ export default {
   props: {
     icon: {},
     size: {
-      type: Number,
+      type: Number | String,
       default: 20,
     },
   },

@@ -7,16 +7,10 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('smart_contracts', '0001_initial'),
         ('accounts', '0006_auto_20210322_0916'),
     ]
 
     operations = [
-        migrations.AddField(
-            model_name='account',
-            name='smart_contract',
-            field=models.OneToOneField(null=True, on_delete=django.db.models.deletion.CASCADE, to='smart_contracts.smartcontract'),
-        ),
         migrations.AlterField(
             model_name='account',
             name='private_key',

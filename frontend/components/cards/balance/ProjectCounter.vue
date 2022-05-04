@@ -1,5 +1,5 @@
 <template>
-  <BalanceCard :value="projects" label="All projects created"></BalanceCard>
+  <BalanceCard :value="projects" label="Created" text="All your projects" currency="Projects"></BalanceCard>
 </template>
 
 <script>
@@ -14,7 +14,7 @@ export default {
   },
   async fetch() {
     this.projects = await this.$axios
-      .get("projects/")
+      .get("projects/?nodetails=true")
       .then((reply) => reply.data.count);
   },
 };

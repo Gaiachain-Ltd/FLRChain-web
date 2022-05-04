@@ -1,3 +1,32 @@
-$body-font-family: 'muli';
+$body-font-family: 'Open Sans';
 $input-font-size: 14px;
+
+$navigation-drawer-border-width: 0px;
+
+//Shadows:
+$shadow-key-umbra-opacity: rgba(lightgray, 0.3);
+$shadow-key-penumbra-opacity: rgba(lightgray, 0.2);
+$shadow-key-ambient-opacity: rgba(lightgray, 0.1);
+
+//Cards:
 $card-border-radius: 10px;
+$card-elevation: 16;
+
+//Snackbars:
+$snackbar-border-radius: 10px;
+$snackbar-elevation: 16;
+$snackbar-wrapper-margin: 50px;
+
+//TextInput:
+$text-field-details-padding-top: 2px !important;
+
+.border-wrapper {
+    border-color: #dce0e7;
+    border-style: solid;
+    border-width: 1px;
+    border-radius: 10px;
+}
+
+.v-data-table-header th {
+    white-space: nowrap;
+}

@@ -1,14 +1,22 @@
 import logging
-from common.views import CommonView
+import base64
+import datetime
+from common.views import CommonView, NoGetQueryParametersSchema
 from rest_framework.response import Response
 from rest_framework import status
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
-from transactions.models import Transaction
-from django.db.models import Sum, Q
+from django.db.models import Sum
 from projects.models import Project
-from django.shortcuts import get_object_or_404
 from decimal import *
+from algorand.utils import get_transactions, application_address, INDEXER
+from activities.models import Activity
+from algosdk import util
+from rest_framework import status
+from django.http import HttpResponse
+from accounts.serializers import *
+from django.conf import settings
+from collections import defaultdict
 
 
 logger = logging.getLogger(__name__)
@@ -16,92 +24,184 @@ logger = logging.getLogger(__name__)
 
 class AccountView(CommonView):
     @swagger_auto_schema(
-        operation_summary="Balance",
-        tags=['accounts', 'facililator', 'beneficiary', 'investor'])
-    def list(self, request):
-        account = request.user.account
-        spent = Transaction.objects.filter(
-            from_account=request.user.account,
-            currency=Transaction.USDC,
-            status__in=[Transaction.CONFIRMED, Transaction.PENDING, 
-                        Transaction.PAYOUT]).aggregate(
-                total_spent=Sum('amount')).get('total_spent', 0)
-        received = Transaction.objects.filter(
-            Q(to_account=request.user.account,
-            currency=Transaction.USDC,
-            status__in=[Transaction.CONFIRMED, Transaction.PENDING]) &
-            ~Q(action__in=[Transaction.FUELING, Transaction.TOP_UP])).aggregate(
-            total_received=Sum('amount')).get('total_received', 0)
-        top_ups = Transaction.objects.filter(
-            to_account=request.user.account,
-            currency=Transaction.USDC,
-            status__in=[Transaction.CONFIRMED, Transaction.PENDING],
-            action__in=[Transaction.FUELING, Transaction.TOP_UP]).aggregate(
-            total_received=Sum('amount')).get('total_received', 0)
-        ret = Transaction.objects.filter(
-            to_account=request.user.account,
-            currency=Transaction.USDC,
-            status__in=[Transaction.CONFIRMED, Transaction.PENDING],
-            action=Transaction.RETURN_INVESTMENT).aggregate(
-            total_return=Sum('amount')).get('total_return', 0)
-
-        if not received:
-            received = Decimal(0)
-        else:
-            received = Decimal(received)
-
-        if not spent:
-            spent = Decimal(0)
-        else:
-            spent = Decimal(spent)
-
-        if not top_ups:
-            top_ups = Decimal(0)
-        else:
-            top_ups = Decimal(top_ups)
-
-        if not ret:
-            ret = Decimal(0)
-        else:
-            ret = Decimal(ret)
-
-        getcontext().prec = 6
-        balance = account.usdc_balance()
+        auto_schema=NoGetQueryParametersSchema,
+        operation_summary="User balance",
+        operation_description=("User's account balance in USDC"),
+        tags=['accounts', 'facililator', 'beneficiary', 'investor'],
+        responses={
+            status.HTTP_200_OK: openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'balance': openapi.Schema(
+                        type=openapi.TYPE_INTEGER
+                    ),
+                    'address': openapi.Schema(
+                        type=openapi.TYPE_STRING
+                    )
+                }
+            ),
+        }
+    )
+    def balance(self, request):
         return Response(
             {
-                'balance': balance,
-                'spent': (spent - ret),
-                'received': received,
-                'total': balance + (spent - ret),
-                'address': account.address
+                'balance': request.user.account.usdc_balance(),
+                'address': request.user.account.address
+            },
+            status=status.HTTP_200_OK
+        )
+
+    @swagger_auto_schema(
+        auto_schema=NoGetQueryParametersSchema,
+        operation_summary="Investor balance",
+        tags=['accounts', 'investor'],
+    )
+    def details(self, request):
+        invest_transactions = get_transactions(
+            address=request.user.account.address,
+            address_role="sender",
+            note_prefix="I|".encode(),
+            txn_type="appl"
+        )['transactions']
+
+        app_ids = defaultdict(lambda: 0)
+        for invest_transaction in invest_transactions:
+            invest_details = invest_transaction['application-transaction']
+            if len(invest_details['application-args']) > 1:
+                amount = base64.b64decode(
+                    invest_details['application-args'][1])
+                app_ids[invest_details['application-id']
+                        ] += int.from_bytes(amount, "big")
+
+        projects = Project.objects.filter(
+            app_id__in=app_ids.keys()
+        )
+
+        distributed = Activity.objects.filter(
+            project__in=projects
+        ).aggregate(distributed=Sum('reward'))['distributed']
+
+        allocated = 0
+        for project in projects:
+            amount = app_ids.get(project.app_id, None)
+            if amount:
+                allocated += amount
+
+        return Response(
+            {
+                'allocated': util.microalgos_to_algos(allocated),
+                'distributed': distributed,
+                'balance': request.user.account.usdc_balance(),
+                "address": request.user.account.address
             },
             status=status.HTTP_200_OK)
 
     @swagger_auto_schema(
-        operation_summary="Project balance",
-        tags=['accounts', 'facililator', 'investor'])
-    def retrieve(self, request, pk=None):
-        project = get_object_or_404(
-            Project,
-            pk=pk,
-            investment__isnull=False)
+        auto_schema=NoGetQueryParametersSchema,
+        operation_summary="User's wallet QR code",
+        tags=['accounts', 'beneficiary'],
+    )
+    def qr_code(self, request):
+        response = HttpResponse(
+            request.user.account.qr_code, content_type='image/svg+xml')
+        response['Content-Disposition'] = 'attachment; filename="code.svg"'
+        return response
 
-        account = project.smartcontract.account
-        balance = account.usdc_balance()
-        spent = Transaction.objects.filter(
-            from_account=account,
-            action=Transaction.REWARD,
-            status__in=[Transaction.CONFIRMED, Transaction.PENDING],
-            project=project).aggregate(
-                total_spent=Sum('amount')).get('total_spent', 0)
-        facililator_fee = Transaction.objects.get(
-            action=Transaction.FACILITATOR_FEE,
-            status__in=[Transaction.CONFIRMED, Transaction.PENDING],
-            project=project).amount
 
-        return Response({
-            'total': project.investment.amount,
-            'balance': balance,
-            'spent': spent if spent else 0,
-            'facililator_fee': facililator_fee
-        }, status=status.HTTP_200_OK)
+class TransactionView(CommonView):
+    serializer_class = TransactionSerializer
+
+    @swagger_auto_schema(
+        auto_schema=NoGetQueryParametersSchema,
+        operation_summary="Transaction list",
+        responses={
+            status.HTTP_200_OK: TransactionSerializer
+        },
+        tags=['transactions', 'beneficiary', 'facililator', 'investor']
+    )
+    def list(self, request):
+        requestor_address = request.user.account.address
+
+        participations = get_transactions(
+            address=request.user.account.address,
+            address_role="sender",
+            txn_type="appl"
+        )['transactions']
+        app_ids = list()
+        for participation in participations:
+            app_transaction_details = participation['application-transaction']
+            app_ids.append(app_transaction_details['application-id'])
+
+        projects = Project.objects.filter(app_id__in=app_ids).values_list(
+            'id',
+            'title',
+            'app_id'
+        )
+        project_dict = dict()
+        for project in projects:
+            project_dict[application_address(project[2])] = {
+                "project_id": project[0],
+                "project_name": project[1]
+            }
+
+        transactions = get_transactions(
+            address=request.user.account.address,
+            asset_id=settings.ALGO_ASSET,
+            min_amount=1,
+            txn_type="axfer"
+        )['transactions']
+
+        data = list()
+        for transaction in transactions:
+            if transaction.get('inner-txns', None):
+                inner_transactions = transaction['inner-txns']
+                if len(inner_transactions) > 0:
+                    txid = transaction['id']
+                    note = transaction.get('note', "")
+                    transaction = inner_transactions[0]
+                    transaction['id'] = txid
+                    transaction['note'] = note
+
+            if transaction.get('asset-transfer-transaction', None) is None:
+                continue
+
+            asset_transaction_details = transaction['asset-transfer-transaction']
+            received = requestor_address == asset_transaction_details['receiver']
+            data.append({
+                "id": transaction['id'],
+                "action": 1 if received else 2,
+                "created": datetime.datetime.utcfromtimestamp(
+                    transaction['round-time']
+                ).strftime('%Y-%m-%d %H:%M:%S'),
+                "amount": util.microalgos_to_algos(
+                    asset_transaction_details['amount']
+                ),
+                "note": base64.b64decode(transaction.get("note", "")).decode(),
+                **project_dict.get(
+                    transaction['sender'] if received else asset_transaction_details['receiver'],
+                    {}
+                )
+            })
+        return Response(
+            TransactionSerializer(data, many=True).data,
+            status=status.HTTP_200_OK
+        )
+
+    @swagger_auto_schema(
+        auto_schema=NoGetQueryParametersSchema,
+        operation_summary="Transaction info",
+        operation_description=("Returns null if transaction is not confirmed yet."
+                               " Otherwise, returns a transaction details."
+                               ),
+        tags=['transactions', 'beneficiary', 'facililator', 'investor']
+    )
+    def retrieve(self, _, id=None):
+        try:
+            reply = INDEXER.transaction(id)
+        except:
+            reply = None
+
+        return Response(
+            {'details': reply},
+            status=status.HTTP_200_OK
+        )

@@ -5,15 +5,15 @@
         <v-layout column mt-8>
           <TextInput
             label="Email*"
-            :text.sync="username"
-            :rules="emailRules"
+            v-model="username"
+            :rules="[...requiredRules, ...emailRules]"
             :error.sync="wrongEmail"
             placeholder="Please enter your email..."
             required
           ></TextInput>
           <TextInput
             label="Password*"
-            :text.sync="password"
+            v-model="password"
             :rules="passwordRules"
             :error.sync="wrongPassword"
             placeholder="Please enter your password..."
@@ -22,7 +22,7 @@
           ></TextInput>
         </v-layout>
         <v-layout row align-center mx-0 mb-3>
-          <v-checkbox mb-0 label="Remember me"></v-checkbox>
+          <v-checkbox mb-0 label="Remember me" v-model="remember"></v-checkbox>
           <v-spacer></v-spacer>
           <DefaultText
             @clicked="$router.push('/forgot')"
@@ -37,12 +37,14 @@
           }}</DefaultText>
         </v-flex>
         <v-flex mb-8>
-          <BlockButton :loading="loading" @clicked="logIn" type="submit">Log In</BlockButton>
+          <BlockButton :loading="loading" @clicked="logIn" type="submit"
+            >Log In</BlockButton
+          >
         </v-flex>
       </v-form>
     </v-layout>
     <v-layout column align-center mb-2 slot="footer">
-      <DefaultText>You do not have account?</DefaultText>
+      <DefaultText>You do not have an account?</DefaultText>
       <DefaultText
         @clicked="$router.push('/register')"
         clickable
@@ -63,6 +65,7 @@ export default {
     return {
       username: "",
       password: "",
+      remember: false,
       loading: false,
       externalError: "",
       wrongEmail: false,
@@ -81,23 +84,47 @@ export default {
   methods: {
     ...mapActions(["updateRegEmail"]),
     logIn() {
-      this.$auth
-        .loginWith("local", {
-          data: {
-            username: this.username,
-            password: this.password,
-          },
-        })
-        .then(() => this.$router.push("/"))
-        .catch(({ response }) => {
-          if (response && response.data.non_field_errors) {
-            this.wrongPassword = true;
-            this.wrongEmail = true;
-            this.externalError = "Provided credentials are incorrect";
-          } else {
-            this.$refs.card.showErrorPopup();
-          }
-        });
+      if (this.$refs.form.validate()) {
+        this.$auth
+          .loginWith("local", {
+            data: {
+              username: this.username,
+              password: this.password,
+            },
+          })
+          .then(() => {
+            this.$nextTick(() => {
+              //Disable auto-logout:
+              if (this.remember) {
+                this.$auth.$storage.setUniversal(
+                  "_token_expiration.local",
+                  false
+                );
+              }
+              this.$router.push("/");
+            });
+          })
+          .catch(({ response }) => {
+            if (response && response.data.non_field_errors) {
+              this.wrongPassword = true;
+              this.wrongEmail = true;
+              this.externalError = "Provided credentials are incorrect";
+            } else {
+              this.$refs.card.showErrorPopup();
+            }
+          });
+      } else {
+        const u = !this.username.length;
+        const p = !this.password.length;
+        if (u && p) {
+          this.wrongEmail = true;
+          this.wrongPassword = true;
+        } else if (u) {
+          this.wrongEmail = true;
+        } else if (p) {
+          this.wrongPassword = true;
+        }
+      }
     },
   },
   mounted() {

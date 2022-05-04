@@ -1,16 +1,12 @@
 <template>
   <DefaultPopup :show.sync="show">
     <v-layout slot="icon">
-      <DefaultSVGIcon
-        :icon="require('@/assets/balance/received.svg')"
-        :size="70"
-      ></DefaultSVGIcon>
     </v-layout>
-    <v-layout column slot="content" class="mt-3">
+    <v-layout column slot="content" ma-6>
       <v-form v-model="isValid">
         <TextInput
           :label="`Amount (max ${this.convertedMaxAmount})*`"
-          :text.sync="amount"
+          v-model="amount"
           :rules="[
             ...requiredRules,
             ...decimalRules,
@@ -74,6 +70,7 @@ export default {
   data() {
     return {
       algodClient: null,
+      indexer: null,
       params: null,
       info: null,
       amount: "0",
@@ -177,9 +174,15 @@ export default {
     }
     this.algodClient = new algosdk.Algodv2(
       "",
-      "https://api.testnet.algoexplorer.io",
+      "https://node.testnet.algoexplorerapi.io",
       ""
     );
+
+    this.indexer = new algosdk.Indexer(
+      "",
+      "https://algoindexer.testnet.algoexplorerapi.io",
+      ""
+    )
 
     try {
       this.params = await this.algodClient.getTransactionParams().do();
@@ -191,14 +194,14 @@ export default {
     }
 
     try {
-      this.info = await this.algodClient.accountInformation(this.address).do();
+      this.info = await this.indexer.lookupAccountAssets(this.address).assetId(USDC).do();
     } finally {
       if (!this.info) {
         this.onError("Unable to fetch wallet info. Please try again later.");
         return;
       }
     }
-
+    
     for (let index = 0; index < this.info.assets.length; index++) {
       const asset = this.info.assets[index];
       if (asset["asset-id"] == USDC) {

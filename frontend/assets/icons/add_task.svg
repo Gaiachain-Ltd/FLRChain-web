@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" viewBox="0 0 21 21">
+  <g id="addtask-icon" transform="translate(-592 -1240)">
+    <g id="bg" transform="translate(592 1240)" fill="none" stroke="#06bcc1" stroke-width="1.5">
+      <rect width="21" height="21" rx="6" stroke="none"/>
+      <rect x="0.75" y="0.75" width="19.5" height="19.5" rx="5.25" fill="none"/>
+    </g>
+    <line id="Line_2555" data-name="Line 2555" y2="8" transform="translate(602.5 1246.5)" fill="none" stroke="#06bcc1" stroke-linecap="round" stroke-width="1.5"/>
+    <line id="Line_2556" data-name="Line 2556" y2="8" transform="translate(606.5 1250.5) rotate(90)" fill="none" stroke="#06bcc1" stroke-linecap="round" stroke-width="1.5"/>
+  </g>
+</svg>

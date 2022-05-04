@@ -26,6 +26,12 @@ class CommonTestCase(TestCase):
         self.assertEqual(reply.status_code, status)
         return reply
 
+    def _patrial_update(self, user, url, data, status, format='json'):
+        self._auth(user)
+        reply = client.patch(url, data, format=format)
+        self.assertEqual(reply.status_code, status)
+        return reply
+
     def _list(self, user, url, status, format='json'):
         self._auth(user)
         reply = client.get(url, format=format)

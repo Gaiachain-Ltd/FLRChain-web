@@ -16,13 +16,14 @@
         }}</DefaultText>
         <v-text-field
           class="text-field-style"
-          background-color="#f7f9fb"
+          :background-color="readonly ? 'white' : '#f7f9fb'"
           height="50"
           v-model="date"
           v-bind="attrs"
           v-on="on"
           @click.prevent="showMenu = showMenu"
-          solo
+          :solo="!readonly"
+          :disabled="readonly"
           flat
           readonly
           :required="required"
@@ -37,6 +38,7 @@
             @click="showMenu = !showMenu"
           >
             <DefaultSVGIcon
+              :class="readonly && 'readonly-icon'"
               :icon="require('@/assets/icons/calendar.svg')"
             ></DefaultSVGIcon>
           </v-layout>
@@ -47,6 +49,7 @@
       v-model="date"
       no-title
       color="primary"
+      :min="minimumDate"
       @input="showMenu = false"
     ></v-date-picker>
   </v-menu>
@@ -70,11 +73,31 @@ export default {
       type: Array,
       default: () => [],
     },
+    readonly: {
+      type: Boolean,
+      default: false
+    },
+    min: {
+      type: String,
+      default: ""
+    }
   },
   data() {
     return {
       showMenu: false,
     };
+  },
+  watch: {
+    min() {
+      if (!this.min) {
+        return;
+      }
+      const min = this.$moment(this.min, "YYYY-MM-DD");
+      const current = this.$moment(this.date, "YYYY-MM-DD");
+      if (min > current) {
+        this.date = min.format("YYYY-MM-DD");
+      }
+    }
   },
   computed: {
     date: {
@@ -85,6 +108,13 @@ export default {
         this.$emit("update:text", value);
       },
     },
+    minimumDate() {
+      if (this.min == "") {
+        return this.$moment().format("YYYY-MM-DD");
+      } else {
+        return this.min;
+      }
+    }
   },
   components: {
     DefaultSVGIcon: () => import("@/components/icons/DefaultSVGIcon"),
@@ -96,5 +126,8 @@ export default {
 <style scoped>
 .text-field-style {
   border-radius: 7px !important;
+}
+.readonly-icon {
+  margin-top: 8px !important;
 }
 </style>

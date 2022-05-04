@@ -1,10 +1,10 @@
 <template>
-  <v-dialog v-model="dialog" max-width="400">
+  <v-dialog v-model="dialog" :max-width="maxWidth">
     <template v-slot:activator="{ on, attrs }">
       <slot v-bind:attrs="attrs" v-bind:on="on"></slot>
     </template>
     <v-card ma-0>
-      <v-layout column ma-0 pa-6 align-center>
+      <v-layout column>
         <slot name="icon">
           <v-flex>
             <DefaultSVGIcon
@@ -28,6 +28,10 @@ export default {
     },
     show: {
       type: Boolean,
+    },
+    maxWidth: {
+      type: Number | String,
+      default: 400,
     },
   },
   computed: {

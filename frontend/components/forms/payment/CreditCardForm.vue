@@ -4,7 +4,7 @@
       <v-flex>
         <TextInput
           label="Amount*"
-          :text.sync="card.amount"
+          v-model="card.amount"
           placeholder="Amount..."
           :mask="'##########'"
           :rules="[...requiredRules, ...decimalRules, ...nonZeroDecimalRules]"

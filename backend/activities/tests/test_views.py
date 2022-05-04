@@ -5,7 +5,6 @@ from users.models import CustomUser
 from rest_framework import status
 from accounts.models import Account
 from investments.models import Investment
-from smart_contracts.models import SmartContract
 from transactions.models import Transaction
 from algorand import utils
 from django.core.files.uploadedfile import SimpleUploadedFile

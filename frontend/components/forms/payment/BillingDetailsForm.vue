@@ -4,7 +4,7 @@
       <v-flex>
         <TextInput
           label="Cardholder name*"
-          :text.sync="billingDetails.name"
+          v-model="billingDetails.name"
           :rules="[...requiredRules]"
           placeholder="Card holder name..."
         ></TextInput>
@@ -12,7 +12,7 @@
       <v-flex>
         <TextInput
           label="Address*"
-          :text.sync="billingDetails.address"
+          v-model="billingDetails.address"
           :rules="[...requiredRules]"
           placeholder="Address..."
         ></TextInput>
@@ -21,7 +21,7 @@
         <v-flex xs5>
           <TextInput
             label="City*"
-            :text.sync="billingDetails.city"
+            v-model="billingDetails.city"
             :rules="[...requiredRules]"
             placeholder="City..."
           ></TextInput>
@@ -30,7 +30,7 @@
         <v-flex xs5>
           <TextInput
             label="Postalcode*"
-            :text.sync="billingDetails.postalCode"
+            v-model="billingDetails.postalCode"
             :rules="[...requiredRules]"
             placeholder="Postalcode..."
           ></TextInput>
@@ -47,7 +47,7 @@
       >
         <TextInput
           label="District*"
-          :text.sync="billingDetails.district"
+          v-model="billingDetails.district"
           :rules="[...requiredRules]"
           mask="AA"
           placeholder="District (2-letter)..."

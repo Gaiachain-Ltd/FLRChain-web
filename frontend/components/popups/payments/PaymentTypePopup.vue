@@ -1,13 +1,9 @@
 <template>
   <DefaultPopup :show.sync="show">
     <v-layout slot="icon">
-      <DefaultSVGIcon
-        :icon="require('@/assets/balance/received.svg')"
-        :size="70"
-      ></DefaultSVGIcon>
     </v-layout>
-    <v-layout column slot="content">
-      <BlockButton class="mt-3" @clicked="onShowCardPopup">
+    <v-layout column slot="content" ma-6>
+      <BlockButton @clicked="onShowCardPopup">
         <v-layout align-center shrink>
           <DefaultSVGIcon
             class="mr-1"
@@ -95,8 +91,16 @@
             :icon="require('@/assets/payments/algorand_wallet.svg')"
             :size="19"
           ></DefaultSVGIcon
-          ><span>Algorand Wallet</span>
+          ><span>Pera or Algorand Wallet</span>
         </v-layout></BlockButton
+      >
+      <ActionButton
+        class="mt-3"
+        color="white"
+        :border="`1px ${$vuetify.theme.themes.light.primary} solid !important`"
+        :textColor="`${$vuetify.theme.themes.light.primary} !important`"
+        @click.prevent="show = false"
+        >Cancel</ActionButton
       >
     </v-layout>
     <AlgorandPaymentPopup
@@ -151,6 +155,7 @@ export default {
     },
   },
   components: {
+    ActionButton: () => import("@/components/buttons/ActionButton"),
     DefaultSVGIcon: () => import("@/components/icons/DefaultSVGIcon"),
     DefaultPopup: () => import("@/components/popups/DefaultPopup"),
     BlockButton: () => import("@/components/buttons/BlockButton"),

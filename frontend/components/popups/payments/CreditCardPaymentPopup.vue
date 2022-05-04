@@ -1,12 +1,9 @@
 <template>
   <DefaultPopup :show.sync="show">
     <v-layout slot="icon">
-      <DefaultSVGIcon
-        :icon="require('@/assets/balance/received.svg')"
-        :size="70"
-      ></DefaultSVGIcon>
     </v-layout>
-    <v-layout column slot="content" class="mt-3">
+    <v-layout column slot="content" mt-6 mx-6>
+      <DefaultText class="mb-3">Credit card details</DefaultText>
       <CreditCardForm
         ref="cardform"
         v-if="page === 0"
@@ -18,17 +15,19 @@
         :billingDetails.sync="card.billingDetails"
       ></BillingDetailsForm>
     </v-layout>
-    <v-layout slot="buttons" column ma-0 style="width: 100%">
-      <v-flex mb-3>
-        <BlockButton @clicked="handleNext" :loading="loading">{{
-          nextButtonText
-        }}</BlockButton>
-      </v-flex>
-      <v-flex>
-        <BlockButton color="error" @clicked="handlePrev">{{
-          prevButtonText
-        }}</BlockButton>
-      </v-flex>
+        <v-layout slot="buttons" mb-6 mx-6>
+      <v-spacer></v-spacer>
+      <ActionButton
+        class="mr-3"
+        color="white"
+        :border="`1px ${$vuetify.theme.themes.light.primary} solid !important`"
+        :textColor="`${$vuetify.theme.themes.light.primary} !important`"
+        @click.prevent="handlePrev"
+        >{{ prevButtonText }}</ActionButton
+      >
+      <ActionButton color="primary" @click.prevent="handleNext" :loading="loading"
+        >{{ nextButtonText }}</ActionButton
+      >
     </v-layout>
   </DefaultPopup>
 </template>
@@ -90,6 +89,8 @@ export default {
     },
   },
   components: {
+    DefaultText: () => import("@/components/texts/DefaultText"),
+    ActionButton: () => import("@/components/buttons/ActionButton"),
     DefaultSVGIcon: () => import("@/components/icons/DefaultSVGIcon"),
     DefaultPopup: () => import("@/components/popups/DefaultPopup"),
     CreditCardForm: () => import("@/components/forms/payment/CreditCardForm"),

@@ -1,6 +1,12 @@
 from rest_framework import viewsets
 from rest_framework.settings import api_settings
 from rest_framework.permissions import IsAuthenticated
+from drf_yasg.inspectors import SwaggerAutoSchema
+
+
+class NoGetQueryParametersSchema(SwaggerAutoSchema):
+    def get_query_parameters(self):
+        return []
 
 
 class CommonView(viewsets.ViewSet):

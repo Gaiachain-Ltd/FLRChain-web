@@ -1,33 +1,15 @@
 <template>
-  <v-form ref="form">
+  <v-form ref="form" @submit.prevent>
     <v-layout column>
-      <v-layout row ma-0>
-        <v-flex mr-3 class="date-style">
-          <DateInput
-            label="Start date*"
-            :text.sync="investment.start"
-            :rules="[...requiredRules, ...dateRules]"
-            required
-          ></DateInput>
-        </v-flex>
-        <v-flex ml-3 class="date-style">
-          <DateInput
-            label="End date*"
-            :text.sync="investment.end"
-            :rules="[...requiredRules, ...dateRules]"
-            required
-          ></DateInput>
-        </v-flex>
-      </v-layout>
-      <v-flex>
-        <TextInput
-          label="Coins for investment*"
-          :text.sync="investment.amount"
-          :rules="[...requiredRules, ...decimalRules, ...nonZeroDecimalRules]"
-          :icon="icon"
-          required
-        ></TextInput>
-      </v-flex>
+      <TextInput
+        label="Coins for investment*"
+        v-model="internalAmount"
+        placeholder="0"
+        :rules="[...requiredRules, ...decimalRules, ...nonZeroDecimalRules]"
+        :icon="icon"
+        :readonly="readonly"
+        required
+      ></TextInput>
     </v-layout>
   </v-form>
 </template>
@@ -38,12 +20,26 @@ import ValidatorMixin from "@/validators";
 export default {
   mixins: [ValidatorMixin],
   props: {
-    investment: {},
+    amount: {},
+    readonly: {
+      type: Boolean,
+      default: false
+    }
   },
   data() {
     return {
       icon: require("@/assets/icons/currency.svg"),
     };
+  },
+  computed: {
+    internalAmount: {
+      get() {
+        return this.amount;
+      },
+      set(value) {
+        this.$emit('update:amount', value);
+      }
+    }
   },
   components: {
     TextInput: () => import("@/components/inputs/TextInput"),

@@ -6,12 +6,15 @@
     <v-textarea
       class="text-field-style"
       :placeholder="placeholder"
-      solo
+      :solo="!readonly"
+      :readonly="readonly"
+      :disabled="readonly"
       flat
-      background-color="#f7f9fb"
+      :background-color="readonly ? 'white' : '#f7f9fb'"
       v-model="internalText"
       auto-grow
       :rows="4"
+      :rules="rules"
     ></v-textarea>
   </v-layout>
 </template>
@@ -19,6 +22,7 @@
 <script>
 export default {
   props: {
+    value: {},
     label: {
       type: String,
       default: "",
@@ -27,21 +31,26 @@ export default {
       type: String,
       default: "",
     },
-    text: {
-      type: String,
-    },
     password: {
       type: Boolean,
       default: false,
+    },
+    readonly: {
+      type: Boolean,
+      default: false
+    },
+    rules: {
+      type: Array,
+      default: () => [],
     },
   },
   computed: {
     internalText: {
       get() {
-        return this.text;
+        return this.value;
       },
       set(value) {
-        this.$emit("update:text", value);
+        this.$emit("input", value);
       },
     },
   },

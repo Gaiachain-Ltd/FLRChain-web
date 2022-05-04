@@ -1,23 +1,23 @@
 <template>
-  <v-layout column fill-height mt-2 style="width: 100%">
+  <v-layout column fill-height pa-6>
     <ToolBar title="Create project"></ToolBar>
-    <DefaultTitle class="mt-10 mb-5">New project</DefaultTitle>
     <InputProjectCard
       ref="inputProject"
-      class="mb-5"
+      class="pb-0"
       :project.sync="project"
     ></InputProjectCard>
-    <InputTasksCard ref="inputTasks" :project.sync="project"></InputTasksCard>
-    <v-spacer></v-spacer>
-    <div class="placeholder"></div>
     <ActionBarCard
+      class="mt-6"
+      saveBtnText="Create project"
       :disabled="!$auth.user.opted_in"
       @save="handleCreate"
       @cancel="handleCancel"
     ></ActionBarCard>
+    <v-spacer></v-spacer>
     <ErrorPopup
       v-if="errorPopupVisible"
       :value.sync="errorPopupVisible"
+      :text="errorText"
     ></ErrorPopup>
     <InfoPopup
       v-if="infoPopupVisible"
@@ -28,20 +28,39 @@
 </template>
 
 <script>
+import { mapActions } from "vuex";
+import { STATUS } from "@/constants/project";
+
 export default {
   data() {
     return {
       infoPopupVisible: false,
       errorPopupVisible: false,
+      errorText: "",
       project: {
         title: "",
         description: "",
         start: this.$moment().format("YYYY-MM-DD"),
         end: this.$moment().format("YYYY-MM-DD"),
-        tasks: [
+        fac_adm_funds: "0",
+        status: STATUS.FUNDRAISING,
+        actions: [
           {
-            action: "",
-            reward: "0",
+            name: "",
+            milestones: [
+              {
+                name: "",
+                tasks: [
+                  {
+                    name: "",
+                    instructions: "",
+                    batch: "0",
+                    reward: "0",
+                    count: 1,
+                  },
+                ],
+              },
+            ],
           },
         ],
       },
@@ -51,11 +70,11 @@ export default {
     ToolBar: () => import("@/components/toolbar/ToolBar"),
     InputProjectCard: () =>
       import("@/components/cards/project/InputProjectCard"),
-    InputTasksCard: () => import("@/components/cards/project/InputTasksCard"),
-    ActionBarCard: () => import("@/components/cards/project/ActionBarCard"),
+    ActionBarCard: () => import("@/components/cards/ActionBarCard"),
     DefaultTitle: () => import("@/components/texts/DefaultTitle"),
     ErrorPopup: () => import("@/components/popups/ErrorPopup"),
     InfoPopup: () => import("@/components/popups/InfoPopup"),
+    ProjectForm: () => import("@/components/forms/project/ProjectForm"),
   },
   computed: {
     blocked() {
@@ -63,19 +82,42 @@ export default {
     },
   },
   methods: {
+    ...mapActions(["updateDetailsProjectId"]),
     handleCreate() {
-      if (
-        this.$refs.inputProject.validate() &&
-        this.$refs.inputTasks.validate()
-      ) {
+      if (this.$refs.inputProject.validate()) {
         this.$axios
           .post("projects/", this.project)
-          .then(() => this.$router.push("/"))
-          .catch(() => (this.errorPopupVisible = true));
+          .then((reply) => {
+            if (this.project.fileToUpload) {
+              let formData = new FormData();
+              formData.append("image", this.project.fileToUpload);
+              this.$axios
+                .put(`projects/${reply.data.id}/image/`, formData)
+                .then(() => {
+                  this.updateDetailsProjectId(reply.data.id);
+                  this.$router.replace("/project/all/details");
+                })
+                .catch(() => this.showErrorPopup());
+            } else {
+                this.updateDetailsProjectId(reply.data.id);
+                this.$router.replace("/project/all/details");
+            }
+          })
+          .catch(() => this.showErrorPopup());
+      } else {
+        this.showErrorPopup("Please correct fields marked on red.");
       }
     },
     handleCancel() {
       this.$router.back();
+    },
+    showErrorPopup(text) {
+      if (text) {
+        this.errorText = text;
+      } else {
+        this.errorText = "Something went wrong. Please try again later.";
+      }
+      this.errorPopupVisible = true;
     },
   },
   async fetch() {
