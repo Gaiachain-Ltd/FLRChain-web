@@ -12,16 +12,22 @@ def project_invest():
     )[:1]
 
     for investment in investments:
-        invest(
-            investment.investor.account.address,
-            investment.investor.account.private_key,
-            investment.project.app_id,
-            investment.amount,
-            include_opt_in=not Investment.objects.filter(
-                sync=Investment.SYNCED, 
-                project=investment.project,
-                investor=investment.investor
-            ).exists()
-        )
+        try:
+            invest(
+                investment.investor.account.address,
+                investment.investor.account.private_key,
+                investment.project.app_id,
+                investment.amount,
+                include_opt_in=not Investment.objects.filter(
+                    sync=Investment.SYNCED, 
+                    project=investment.project,
+                    investor=investment.investor
+                ).exists()
+            )
+        except Exception:
+            investment.sync = Investment.FAILED
+            investment.save()
+            continue
+        
         investment.sync = Investment.SYNCED
         investment.save()
