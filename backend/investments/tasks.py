@@ -2,12 +2,32 @@ import datetime
 from celery import shared_task
 from investments.models import Investment
 from django.db.models import F
+from algorand.smartcontract import invest
+
 
 @shared_task()
-def finish_investment():
-    finished_investments = Investment.objects.filter(
-        status=Investment.INVESTED,
-        end__lte=datetime.datetime.now().date() - datetime.timedelta(days=1))[:10]
-    
-    for finished_investment in finished_investments:
-        finished_investment.finish()
+def project_invest():
+    investments = Investment.objects.filter(
+        sync=Investment.TO_SYNC
+    )[:1]
+
+    for investment in investments:
+        try:
+            invest(
+                investment.investor.account.address,
+                investment.investor.account.private_key,
+                investment.project.app_id,
+                investment.amount,
+                include_opt_in=not Investment.objects.filter(
+                    sync=Investment.SYNCED, 
+                    project=investment.project,
+                    investor=investment.investor
+                ).exists()
+            )
+        except Exception:
+            investment.sync = Investment.FAILED
+            investment.save()
+            continue
+        
+        investment.sync = Investment.SYNCED
+        investment.save()

@@ -12,7 +12,9 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 
 from pathlib import Path
 import os
+import sys
 from celery.schedules import crontab
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -27,17 +29,21 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'sEk2#K1izjzajAAk22kalsiAAAjzakl')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
+TESTING = sys.argv[1:2] == ['test']
+
 if DEBUG:
     ALLOWED_HOSTS = '*'
     CORS_ORIGIN_ALLOW_ALL = True
 else:
     ALLOWED_HOSTS = ['localhost', '127.0.0.1', '195.201.81.231',
-                     '172.23.0.1', 'flrchain.milosolutions.com']
+                     '172.23.0.1', 'flrchain.milosolutions.com',
+                     'dev.flrchain.milosolutions.com']
 
     CORS_ORIGIN_ALLOW_ALL = False
 
     CORS_ORIGIN_WHITELIST = [
         'https://flrchain.milosolutions.com',
+        'https://dev.flrchain.milosolutions.com'
     ]
 
 # Application definition
@@ -56,12 +62,13 @@ INSTALLED_APPS = [
     'users',
     'accounts',
     'projects',
-    'smart_contracts',
-    'transactions',
     'investments',
     'activities',
+    'payments',
+    'algorand',
     'django_filters',
     'django_celery_beat',
+    'django_rest_passwordreset',
 ]
 
 MIDDLEWARE = [
@@ -164,6 +171,7 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': [
         'django_filters.rest_framework.DjangoFilterBackend',
         'rest_framework.filters.OrderingFilter',
+        'rest_framework.filters.SearchFilter'
     ],
     'PAGE_SIZE': 100
 }
@@ -172,19 +180,80 @@ REST_FRAMEWORK = {
 
 CELERY_BROKER_URL = "redis://redis:6379"
 CELERY_RESULT_BACKEND = "redis://redis:6379"
+DEFAULT_QUICK_SCHEDULE = timedelta(seconds=14)
+DEFAULT_NORMAL_SCHEDULE = timedelta(minutes=1)
+DEFAULT_SLOW_SCHEDULE = timedelta(minutes=5)
+DEFAULT_DAILY_SCHEDULE = timedelta(days=1)
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers.DatabaseScheduler'
 CELERY_BEAT_SCHEDULE = {
+    "opt_in_accs": {
+        "task": "accounts.tasks.opt_in_accounts",
+        "schedule": DEFAULT_QUICK_SCHEDULE
+    },
     "transfer_back_funds": {
         "task": "accounts.tasks.transfer_back_funds",
-        "schedule": crontab(minute="*/1")
+        "schedule": DEFAULT_SLOW_SCHEDULE
     },
-    "finish_investment": {
-        "task": "investments.tasks.finish_investment",
-        "schedule": crontab(minute="*/1")
+    "resupply_algos": {
+        "task": "accounts.tasks.resupply_algos",
+        "schedule": DEFAULT_DAILY_SCHEDULE
     },
-    "verify_transactions": {
-        "task": "transactions.tasks.verify_transactions",
-        "schedule": crontab(minute="*/1")
-    }
+    "create_project": {
+        "task": "projects.tasks.create_project",
+        "schedule": DEFAULT_QUICK_SCHEDULE
+    },
+    "initialize_project": {
+        "task": "projects.tasks.initialize_project",
+        "schedule": DEFAULT_QUICK_SCHEDULE
+    },
+    "start_project": {
+        "task": "projects.tasks.start_project",
+        "schedule": DEFAULT_QUICK_SCHEDULE
+    },
+    "update_project": {
+        "task": "projects.tasks.update_project",
+        "schedule": DEFAULT_QUICK_SCHEDULE
+    },
+    "finish_project": {
+        "task": "projects.tasks.finish_project",
+        "schedule": DEFAULT_QUICK_SCHEDULE
+    },
+    "close_project": {
+        "task": "projects.tasks.close_project",
+        "schedule": DEFAULT_SLOW_SCHEDULE
+    },
+    "join_request": {
+        "task": "projects.tasks.join_project",
+        "schedule": DEFAULT_QUICK_SCHEDULE
+    },
+    "beneficiary_approval": {
+        "task": "projects.tasks.beneficiary_approval",
+        "schedule": DEFAULT_QUICK_SCHEDULE
+    },
+    "payout_batch": {
+        "task": "projects.tasks.payout_batch",
+        "schedule": DEFAULT_NORMAL_SCHEDULE
+    },
+    "create_activity": {
+        "task": "activities.tasks.create_activity",
+        "schedule": DEFAULT_QUICK_SCHEDULE
+    },
+    "verify_activity": {
+        "task": "activities.tasks.verify_activity",
+        "schedule": DEFAULT_QUICK_SCHEDULE
+    },
+    "investment": {
+        "task": "investments.tasks.project_invest",
+        "schedule": DEFAULT_QUICK_SCHEDULE
+    },
+    "circle_transfer": {
+        "task": "payments.tasks.check_payment_status",
+        "schedule": DEFAULT_NORMAL_SCHEDULE
+    },
+    "mtn_payout": {
+        "task": "payments.tasks.process_payouts",
+        "schedule": DEFAULT_NORMAL_SCHEDULE
+    },
 }
 
 # Logging
@@ -223,6 +292,11 @@ LOGGING = {
             'propagate': True,
             'level': 'DEBUG'
         },
+        'payments': {
+            'handlers': ['console'],
+            'propagate': True,
+            'level': 'DEBUG'
+        }
     },
 }
 
@@ -238,10 +312,51 @@ SWAGGER_SETTINGS = {
 }
 
 # Constants
-FACILITATOR_FEE = os.getenv('FACILITATOR_FEE', 0.1)
+AUTO_INV_FUELING = os.getenv('AUTO_INV_FUELING', 0)
 
 # Algorand
 ALGO_API_TOKEN = os.getenv('ALGO_API_TOKEN')
 ALGO_API_URL = os.getenv('ALGO_API_URL', 'http://algorand:4161')
-ALGO_OPT_IN_AMOUNT = os.getenv('ALGO_OPT_IN_AMOUNT', 0.3)
-ALGO_ASSET = os.getenv('ALGO_ASSET', 10458941) # Default: TESTnet USDC on ALGO
+ALGO_OPT_IN_AMOUNT = float(os.getenv('ALGO_OPT_IN_AMOUNT', "1.0"))
+ALGO_APP_CREATE_AMOUNT = float(os.getenv('ALGO_APP_CREATE_AMOUNT', "1.5"))
+ALGO_ASSET = os.getenv('ALGO_ASSET', 10458941)  # Default: TESTnet USDC on ALGO
+ALGO_INDEXER_API_URL = os.getenv('ALGO_INDEXER_API_URL', '')
+ALGO_INDEXER_API_TOKEN = os.getenv('ALGO_INDEXER_API_TOKEN', '')
+
+# Circle
+CIRCLE_API_KEY = os.getenv('CIRCLE_API_KEY', '')
+CIRCLE_API_ENVIROMENT_URL = os.getenv(
+    'CIRCLE_API_ENVIROMENT_URL', 'https://api-sandbox.circle.com')
+CIRCLE_ALGO_WALLET_ID = os.getenv('CIRCLE_ALGO_WALLET_ID')
+
+# MTN
+MTN_SUBSCRIPTION_KEY = os.getenv('MTN_SUBSCRIPTION_KEY', '')
+MTN_CALLBACK_HOST = os.getenv('MTN_CALLBACK_HOST', '')
+MTN_API_KEY = os.getenv('MTN_API_KEY', '')
+MTN_USER_ID = os.getenv('MTN_USER_ID', '')
+MTN_URL = os.getenv('MTN_URL', '')
+
+# Email
+DEFAULT_FROM_EMAIL = os.environ.get('EMAIL_DEFAULT_FROM', '')
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST_USER = os.environ.get('EMAIL_USER', '')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASSWORD', '')
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
+# Frontend
+FRONTEND_URL = os.environ.get('FRONTEND_URL', 'http://localhost:8080')
+
+# Sentry
+SENTRY_DSN = os.environ.get('SENTRY_DSN', None)
+if SENTRY_DSN:
+    import sentry_sdk
+    from sentry_sdk.integrations.django import DjangoIntegration
+
+    sentry_sdk.init(
+        dsn=SENTRY_DSN,
+        integrations=[DjangoIntegration()],
+        traces_sample_rate=0.7,
+        send_default_pii=True,
+    )

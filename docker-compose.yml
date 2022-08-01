@@ -61,16 +61,6 @@ services:
     ports:
       - 8080:8080
 
-  algorand:
-    image: algorand/testnet:latest
-    tty: true
-    command: ./algod -l 0.0.0.0:4161 -d data
-    ports:
-      - 4161:4161
-    volumes:
-      - algorand_node:/root/node/
-      - algorand_data:/root/node/data/
-
   redis:
     image: redis:alpine
     restart: unless-stopped
@@ -100,5 +90,3 @@ services:
 
 volumes:
   postgres_data:
-  algorand_data:
-  algorand_node:

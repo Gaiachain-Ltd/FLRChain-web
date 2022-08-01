@@ -1,0 +1,17 @@
+
+version: '3.9'
+
+services:
+  algorand:
+    image: algorand/testnet:latest
+    tty: true
+    command: ./algod -l 0.0.0.0:4161 -d data
+    ports:
+      - 4161:4161
+    volumes:
+      - algorand_node:/root/node/
+      - algorand_data:/root/node/data/
+
+volumes:
+  algorand_data:
+  algorand_node:

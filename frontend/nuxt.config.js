@@ -1,4 +1,7 @@
 module.exports = {
+  // SSR IS DISABLED!
+  // Due to issue: https://github.com/nuxt-community/auth-module/issues/478
+  ssr: false,
   /*
   ** Headers of the page
   */
@@ -11,7 +14,10 @@ module.exports = {
     ],
     link: [
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
-      { rel: 'stylesheet', href: 'https://use.typekit.net/gdw2tmn.css'}
+      { rel: 'stylesheet', href: 'https://use.typekit.net/gdw2tmn.css' },
+      { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
+      { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: true },
+      { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500;1,600;1,700;1,800&display=swap' } 
     ]
   },
   /*
@@ -39,45 +45,52 @@ module.exports = {
   buildModules: [
     '@nuxtjs/vuetify',
     '@nuxtjs/axios',
-    '@nuxtjs/auth',
+    '@nuxtjs/auth-next',
     '@nuxtjs/moment',
   ],
   plugins: [
-    { src: '~/plugins/vue-timers', mode: 'client' }
+    { src: '@/plugins/vue-timers', mode: 'client' },
+    { src: '@/plugins/v-mask', mode: 'client'}
   ],
   publicRuntimeConfig: {
     axios: {
       baseURL: process.env.BASE_URL + 'api/v1/'
     },
+    baseUrl: process.env.BASE_URL
   },
   router: {
     middleware: ['auth']
   },
   auth: {
+    cookie: false,
     strategies: {
       local: {
-        autoFetch: false,
+        token: {
+          property: 'token',
+          type: 'Token',
+          name: 'Authorization',
+          global: true,
+          maxAge: 43200
+        },
+        refreshToken: {
+          required: false,
+          maxAge: false
+        },
+        user: {
+          property: false
+        },
         endpoints: {
           login: {
             url: 'login/',
             method: 'post',
-            property_name: 'token'
           },
           logout: false,
           user: {
             url: 'info/',
             method: 'get',
-            propertyName: false,
           }
         },
-        tokenType: 'Token',
-        tokenName: 'Authorization',
-      },
-      redirect: {
-        login: '/login',
-        logout: '/login',
-        home: '/',
-      },
+      }
     }
   },
   vuetify: {
@@ -88,8 +101,8 @@ module.exports = {
       dark: false,
       themes: {
         light: {
-          primary: '#23BC3D',
-          secondary: '#06BCC1',
+          primary: '#06BCC1',
+          secondary: '#23BC3D',
           tertiary: '#F7F9FB',
           quaternary: "#778699",
           quinary: "#414D55",
@@ -98,13 +111,13 @@ module.exports = {
           octonary: "#253f50",
           nonary: "#72809D",
           accent: '#FAFAFD',
-          error: '#FE2121',
+          error: '#C50505',
           info: '#2196F3',
-          success: '#4CAF50',
+          success: '#25B81F',
           warning: '#FFC107',
         }
       }
     }
-  }
+  },
 }
 

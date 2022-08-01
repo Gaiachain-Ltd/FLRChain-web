@@ -21,26 +21,27 @@
             xs5
             label="First name*"
             placeholder="First name..."
-            :text.sync="user.first_name"
+            v-model="user.first_name"
             :rules="firstNameRules"
             required
           ></TextInput>
-          <v-spacer></v-spacer>
+          <v-spacer class="hidden-sm-and-down"></v-spacer>
           <TextInput
             xs5
             label="Last name*"
             placeholder="Last name..."
-            :text.sync="user.last_name"
+            v-model="user.last_name"
             :rules="lastNameRules"
             required
           ></TextInput>
         </v-layout>
         <v-flex shrink mx-0>
           <TextInput
+            xs5
             label="Email*"
             placeholder="Email..."
-            :text.sync="user.email"
-            :rules="emailRules"
+            v-model="user.email"
+            :rules="[...requiredRules, ...emailRules]"
             :error.sync="usedEmail"
             required
           ></TextInput>
@@ -50,21 +51,21 @@
             xs5
             label="Password*"
             placeholder="Password..."
-            :text.sync="user.password"
+            v-model="user.password"
             :rules="passwordRules"
             :error.sync="passwordsNotTheSame"
-            password
+            type="password"
             required
           ></TextInput>
-          <v-spacer></v-spacer>
+          <v-spacer class="hidden-sm-and-down"></v-spacer>
           <TextInput
             xs5
             label="Re-password*"
             placeholder="Repeat password..."
-            :text.sync="repassword"
+            v-model="repassword"
             :rules="passwordRules"
             :error.sync="passwordsNotTheSame"
-            password
+            type="password"
             required
           ></TextInput>
         </v-layout>
@@ -77,6 +78,7 @@
           <BlockButton
             :disabled="!isValid || passwordsNotTheSame"
             @clicked="register"
+            type="submit"
             >Register</BlockButton
           >
         </v-flex>

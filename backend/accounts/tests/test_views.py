@@ -4,7 +4,6 @@ from accounts.models import Account
 from rest_framework import status
 from projects.models import Project
 from investments.models import Investment
-from smart_contracts.models import SmartContract
 from algorand import utils
 
 

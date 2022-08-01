@@ -15,10 +15,9 @@ export default {
                     "Last name must be less than 255 characters",
             ],
             emailRules: [
-                (v) => !!v || "Email is required",
                 (v) => {
                     const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-                    return pattern.test(v) || 'Invalid e-mail.'
+                    return (!v || pattern.test(v)) || 'Invalid e-mail.'
                 }
             ],
             passwordRules: [
@@ -38,7 +37,23 @@ export default {
             ],
             nonZeroDecimalRules: [
                 (v) => parseFloat(v) > 0.0 || "Value has to be greater than 0",
-            ]
+            ],
+            oneOrMoreInteger: [
+                (v) => parseInt(v) >= 1 || "Value has to be greater than 1"
+            ],
+            integerRules: [
+                (v) => !isNaN(v) && (function(x) { return (x | 0) === x; })(parseFloat(v)) || "Invalid value"
+            ],
+            maxLengthRules(max=255) {
+                return [
+                    (v) => (!v || v.length <= max) || `Limit of ${max} characters exceeded`
+                ]
+            },
+            noLessThan(value) {
+                return [
+                    (v) => parseFloat(v) >= value || `Value has to be greater than ${value}`
+                ]
+            }
         };
     },
 };

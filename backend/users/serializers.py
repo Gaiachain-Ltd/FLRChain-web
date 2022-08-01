@@ -1,20 +1,18 @@
 from rest_framework import serializers
-from users.models import CustomUser
-from transactions.models import Transaction
+from users.models import CustomUser, Organization
 
 
-class CustomUserSerializer(serializers.ModelSerializer):
+class UserSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField(required=False)
     last_name = serializers.CharField(required=False)
     phone = serializers.CharField(required=False, allow_blank=True)
     village = serializers.CharField(required=False, allow_blank=True)
-    opted_in = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = CustomUser
         fields = ('id', 'password', 'email', 'type',
                   'first_name', 'last_name', 'phone',
-                  'village', 'opted_in')
+                  'village',)
         write_only_fields = ('password',)
         read_only_fields = ('id',)
         extra_kwargs = {
@@ -33,5 +31,37 @@ class CustomUserSerializer(serializers.ModelSerializer):
 
         return user
 
+
+class UserInfoSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(read_only=True)
+    email = serializers.CharField(read_only=True)
+    opted_in = serializers.SerializerMethodField(read_only=True)
+    first_name = serializers.CharField(required=False)
+    last_name = serializers.CharField(required=False)
+    phone = serializers.CharField(required=False, allow_blank=True)
+    village = serializers.CharField(required=False, allow_blank=True)
+    type = serializers.ChoiceField(choices=CustomUser.USER_TYPES, read_only=True)
+
+    class Meta:
+        model = CustomUser
+        fields = ('id', 'email', 'type', 'first_name', 'last_name', 
+                  'phone', 'village', 'opted_in')
+
     def get_opted_in(self, obj):
         return obj.opted_in
+
+
+class OrganizationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Organization
+        fields = ('name', 'organization_type', 'website',
+                  'statement', 'principal', 'email', 'phone')
+
+
+class PasswordReplySerializer(serializers.Serializer):
+    status = serializers.CharField()
+
+
+class PasswordChangeSerializer(serializers.Serializer):
+    old_password = serializers.CharField()
+    new_password = serializers.CharField()

@@ -1,34 +1,47 @@
 <template>
-  <v-layout row shrink ma-0>
-    <v-flex xs9 shrink>
-      <BalanceCard
-        :value="received"
-        label="Project rewards in USDC"
-      ></BalanceCard>
-    </v-flex>
-    <v-spacer></v-spacer>
-    <v-flex xs2 shrink>
-      <ProjectCounter></ProjectCounter>
-    </v-flex>
-  </v-layout>
+  <DefaultCard>
+    <v-layout column>
+      <DefaultText
+        bold
+        :color="$vuetify.theme.themes.light.primary"
+        class="mb-3"
+        >Summary</DefaultText
+      >
+      <v-row shrink>
+        <v-col>
+          <BalanceCard
+            :value="balance"
+            label="Balance"
+            text="Your current wallet balance"
+          ></BalanceCard>
+        </v-col>
+        <v-col>
+          <ProjectCounter></ProjectCounter>
+        </v-col>
+      </v-row>
+    </v-layout>
+  </DefaultCard>
 </template>
 
 <script>
 export default {
   data() {
     return {
-      received: 0,
+      balance: 0,
     };
   },
   components: {
+    DefaultText: () => import("@/components/texts/DefaultText"),
+
+    DefaultCard: () => import("@/components/cards/DefaultCard"),
     BalanceCard: () => import("@/components/cards/balance/BalanceCard"),
     ProjectCounter: () => import("@/components/cards/balance/ProjectCounter"),
   },
   async fetch() {
     const balanceInfo = await this.$axios
-      .get("accounts/")
+      .get("accounts/balance/")
       .then((reply) => reply.data);
-    this.received = balanceInfo.received;
+    this.balance = balanceInfo.balance;
   },
 };
 </script>

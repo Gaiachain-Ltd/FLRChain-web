@@ -1,17 +1,33 @@
 <template>
   <v-app class="background-style">
-    <v-navigation-drawer app class="background-style">
+    <v-navigation-drawer
+      app
+      class="background-style elevation-16"
+      v-model="drawerState"
+      left
+      fixed
+    >
       <v-layout column align-center fill-height>
         <v-flex shrink mt-6>
-          <img :src="logo" />
+          <img :src="logo" width="135px" />
         </v-flex>
-        <v-layout shrink column ml-10 mt-6>
-          <SideMenuItem
-            class="my-3"
-            v-for="item in items"
-            :key="item.label"
-            :item="item"
-          ></SideMenuItem>
+        <v-layout shrink column mt-6>
+          <template v-for="item in items">
+            <v-layout column :key="item.label">
+              <SideMenuItem class="mt-6" :item="item"></SideMenuItem>
+              <v-expand-transition>
+                <v-layout column v-if="item.enabled">
+                  <SideMenuItem
+                    v-for="children in item.childrens"
+                    :key="children.label"
+                    :item="children"
+                    class="mt-2"
+                  >
+                  </SideMenuItem>
+                </v-layout>
+              </v-expand-transition>
+            </v-layout>
+          </template>
         </v-layout>
         <v-spacer></v-spacer>
         <v-flex shrink class="mb-6">
@@ -22,7 +38,7 @@
       </v-layout>
     </v-navigation-drawer>
     <v-main>
-      <v-container fill-height>
+      <v-container fill-height pa-0>
         <Nuxt />
       </v-container>
     </v-main>
@@ -30,51 +46,108 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapGetters, mapActions } from "vuex";
 
 export default {
   data() {
     return {
-      logo: require("@/assets/side/sidebar_logo.svg"),
+      logo: require("@/assets/logo.svg"),
     };
   },
   computed: {
-    ...mapGetters(['isFacililator']),
+    ...mapGetters(["isFacililator", "getDrawerState"]),
     items() {
-      let items = [];
-      [
+      return [
         {
-          iconOn: require("@/assets/side/home_on.svg"),
-          iconOff: require("@/assets/side/home_off.svg"),
-          enabled: this.$route.name === "index",
-          label: "Home",
-          route: "/",
+          iconOn: require("@/assets/side/profile_on.svg"),
+          iconOff: require("@/assets/side/profile_off.svg"),
+          enabled: this.$route.name === "profile",
+          label: "Profile",
+          route: "/profile",
           visible: true,
         },
         {
-          iconOn: require("@/assets/side/plus_on.svg"),
-          iconOff: require("@/assets/side/plus_off.svg"),
-          enabled: this.$route.name === "project-create",
-          label: "Create project",
-          route: "/project/create",
-          visible: this.isFacililator,
+          iconOn: require("@/assets/side/projects_on.svg"),
+          iconOff: require("@/assets/side/projects_off.svg"),
+          enabled:
+            this.$route.name === "index" ||
+            this.$route.name.includes("project"),
+          label: "Projects",
+          route: "/",
+          visible: true,
+          childrens: [
+            {
+              enabled:
+                this.$route.path == "/" ||
+                this.$route.path.includes("/project/all"),
+              label: "All",
+              route: "/",
+              fontSize: 13,
+              visible: true,
+            },
+            {
+              enabled: this.$route.path.includes("/project/fundraising"),
+              label: "Fundraising",
+              route: "/project/fundraising",
+              fontSize: 13,
+              visible: true,
+            },
+            {
+              enabled: this.$route.path.includes("/project/investments"),
+              label: "Investments",
+              route: "/project/investments",
+              fontSize: 13,
+              visible: !this.isFacililator,
+            },
+            {
+              enabled: this.$route.path.includes("/project/active"),
+              label: "Active",
+              route: "/project/active",
+              fontSize: 13,
+              visible: this.isFacililator,
+            },
+            {
+              enabled: this.$route.path.includes("/project/closed"),
+              label: "Closed",
+              route: "/project/closed",
+              fontSize: 13,
+              visible: true,
+            },
+            {
+              iconOn: require("@/assets/side/plus_on.svg"),
+              iconOff: require("@/assets/side/plus_off.svg"),
+              enabled: this.$route.name === "project-create",
+              label: "Create project",
+              route: "/project/create",
+              fontSize: 13,
+              iconSize: 12,
+              spacing: 1,
+              visible: this.isFacililator,
+            },
+          ].filter((child) => child.visible),
         },
         {
           iconOn: require("@/assets/side/wallet_on.svg"),
           iconOff: require("@/assets/side/wallet_off.svg"),
           enabled: this.$route.name === "balance",
-          label: "Balance",
+          label: "Wallet",
           route: "/balance",
           visible: true,
         },
-      ].forEach((item) => {
-        if (item.visible) {
-          items.push(item);
-          console.log(this.$route.name);
-        }
-      });
-      return items;
+      ].filter((item) => item.visible);
     },
+    drawerState: {
+      get() {
+        return this.getDrawerState;
+      },
+      set(value) {
+        console.log(value, this.getDrawerState);
+        this.updateDrawerState(value);
+      },
+    },
+  },
+  methods: {
+    ...mapActions(["updateDrawerState"]),
   },
   components: {
     SideMenuItem: () => import("@/components/sidemenu/SideMenuItem"),

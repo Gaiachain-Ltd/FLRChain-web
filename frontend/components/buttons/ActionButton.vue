@@ -1,11 +1,11 @@
 <template>
   <v-btn
-    @click.prevent="$emit('clicked')"
+    v-bind="$attrs"
+    v-on="$listeners"
     class="action-btn-style text-none elevation-0"
-    height="50"
-    :color="color"
-    :disabled="disabled"
-    >{{ label }}</v-btn
+    :style="{ border: border, color: textColor }"
+    height="41"
+    ><slot>{{ label }}</slot></v-btn
   >
 </template>
 
@@ -15,14 +15,14 @@ export default {
     label: {
       type: String,
     },
-    color: {
+    border: {
       type: String,
-      default: "primary",
+      default: "unset",
     },
-    disabled: {
-      type: Boolean,
-      default: false
-    }
+    textColor: {
+      type: String,
+      default: "white",
+    },
   },
 };
 </script>
@@ -30,9 +30,8 @@ export default {
 <style scoped>
 .action-btn-style {
   border-radius: 7px !important;
-  font-family: "open-sans" !important;
-  font-size: 16px !important;
+  font-family: "Open Sans" !important;
+  font-size: 12px !important;
   font-weight: 600 !important;
-  min-width: 250px !important;
 }
 </style>
